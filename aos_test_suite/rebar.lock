@@ -1,0 +1,8 @@
+{"1.2.0",
+[{<<"luerl">>,{pkg,<<"luerl">>,<<"1.2.0">>},0}]}.
+[
+{pkg_hash,[
+ {<<"luerl">>, <<"60F05F4240F0E7C148DDB79B67B8FF972734AAD237AA74C83D0748B8214C8EF0">>}]},
+{pkg_hash_ext,[
+ {<<"luerl">>, <<"9CAFD4F6094FF0F5A9D278FD81D60D3E026C820BDFB6CACD4B1BD909F21B525D">>}]}
+].
