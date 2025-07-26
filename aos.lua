@@ -26,21 +26,48 @@ function meta.init(msg)
   end
 
 end
--- Private function to check if message has valid owner commitment
--- Validates that the message's committer matches the State.owner
-function meta.is_owner(msg)
-  -- Message must have commitments
-  if not msg.commitments then
-    return false
+
+-- Private function to ensure message has a 'from' field
+-- Sets msg.from based on from-process or first non-HMAC signed commitment
+function meta.ensure_message(msg)
+  -- If message already has 'from', leave it as is
+  if msg.from then
+    return
   end
-  -- Check each commitment in the message
-  for key, commitment in pairs(msg.commitments) do
-    if commitment.type and commitment.committer then
-      if commitment.committer == meta.owner then
-        return true
+  
+  -- First check if there's a from-process field
+  if msg["from-process"] then
+    msg.from = msg["from-process"]
+    return
+  end
+  
+  -- Otherwise, find the first non-HMAC signed commitment's committer
+  if msg.commitments then
+    for key, commitment in pairs(msg.commitments) do
+      if commitment.type and commitment.committer then
+        -- Skip HMAC commitments
+        if string.lower(commitment.type) ~= "hmac-sha256" then
+          msg.from = commitment.committer
+          return
+        end
       end
     end
   end
+  
+  -- If no from-process and no non-HMAC commitments, from remains nil
+end
+
+-- Private function to check if message has valid owner commitment
+-- Validates that the message's from matches the meta.owner
+function meta.is_owner(msg)
+  -- Ensure message has 'from' field
+  meta.ensure_message(msg)
+  
+  -- Check if msg.from matches the owner
+  if msg.from and msg.from == meta.owner then
+    return true
+  end
+  
   return false
 end
 
@@ -112,6 +139,9 @@ function compute(state, assignment)
   State.results.output = { data = "", prompt = prompt() }
   state.results.info = "hyper-aos"
   local msg = assignment.body or {}
+  -- Ensure message has 'from' field
+  meta.ensure_message(msg)
+  
   if not meta.initialized then meta.init(msg) end
 
   local action = msg.action or ""

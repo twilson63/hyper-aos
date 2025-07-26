@@ -110,7 +110,7 @@ wrong_commitment_type_test() ->
     Output = aos_test_helpers:extract_output_data(Result),
     ?assertEqual(<<"should work">>, Output).
 
-%% Test with HMAC commitment (should work since committer matches)
+%% Test with only HMAC commitment (should fail - no valid from)
 hmac_commitment_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
@@ -120,24 +120,24 @@ hmac_commitment_test() ->
     Owner = <<"AR8wJBpKbBS7kZbHtUmB9V7VfQYxKCh7kyTkrLGS4N0">>,
     LuaState2 = initialize_with_owner(LuaState, State, Owner),
     
-    %% Message with hmac-sha256 commitment
+    %% Message with only hmac-sha256 commitment (no committer)
     HmacMsg = #{
         <<"id">> => <<"test-msg">>,
         <<"action">> => <<"eval">>,
-        <<"data">> => <<"return 'should work'">>,
+        <<"data">> => <<"return 'should fail'">>,
         <<"commitments">> => #{
             <<"key1">> => #{
-                <<"type">> => <<"hmac-sha256">>,
-                <<"committer">> => Owner
+                <<"type">> => <<"hmac-sha256">>
+                % HMAC commitments don't have committers
             }
         }
     },
     Assignment = aos_test_helpers:create_assignment(HmacMsg),
     
-    %% Call compute and verify - should work since committer matches
+    %% Call compute and verify - should fail since no valid from can be derived
     Result = aos_test_helpers:call_compute(LuaState2, State, Assignment),
     Output = aos_test_helpers:extract_output_data(Result),
-    ?assertEqual(<<"should work">>, Output).
+    ?assertMatch(<<"Unauthorized:", _/binary>>, Output).
 
 %% Helper function to initialize with owner
 initialize_with_owner(LuaState, State, Owner) ->
