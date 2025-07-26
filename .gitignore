@@ -128,3 +128,10 @@ ENV/
 # Misc
 .cache/
 .history/
+
+# Arweave wallet files - NEVER COMMIT THESE!
+*.json
+wallet.json
+keyfile.json
+arweave-wallet.json
+demo.json
