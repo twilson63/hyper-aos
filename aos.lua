@@ -32,15 +32,13 @@ end
 function meta.ensure_message(msg)
   -- If message already has 'from', leave it as is
   if msg.from then
-    return
+    return msg
   end
-  
   -- First check if there's a from-process field
   if msg["from-process"] then
     msg.from = msg["from-process"]
-    return
+    return msg
   end
-  
   -- Otherwise, find the first non-HMAC signed commitment's committer
   if msg.commitments then
     for key, commitment in pairs(msg.commitments) do
@@ -48,13 +46,12 @@ function meta.ensure_message(msg)
         -- Skip HMAC commitments
         if string.lower(commitment.type) ~= "hmac-sha256" then
           msg.from = commitment.committer
-          return
         end
       end
     end
   end
-  
   -- If no from-process and no non-HMAC commitments, from remains nil
+  return msg
 end
 
 -- Private function to check if message has valid owner commitment
@@ -140,7 +137,7 @@ function compute(state, assignment)
   state.results.info = "hyper-aos"
   local msg = assignment.body or {}
   -- Ensure message has 'from' field
-  meta.ensure_message(msg)
+  msg = meta.ensure_message(msg)
   
   if not meta.initialized then meta.init(msg) end
 

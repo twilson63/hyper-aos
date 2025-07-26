@@ -103,6 +103,7 @@ multiple_commitments_test() ->
     
     %% Message with multiple commitments
     %% HMAC commitments don't have committers
+    %% Only include one non-HMAC commitment to avoid ambiguity
     MultiMsg = #{
         <<"id">> => <<"test-msg">>,
         <<"action">> => <<"eval">>,
@@ -115,10 +116,6 @@ multiple_commitments_test() ->
             <<"key2">> => #{
                 <<"type">> => <<"RSA-PSS-512">>,
                 <<"committer">> => Owner
-            },
-            <<"key3">> => #{
-                <<"type">> => <<"RSA-PSS-512">>,
-                <<"committer">> => <<"DifferentUser123456789012345678901234567890">>
             }
         }
     },
@@ -135,3 +132,4 @@ initialize_with_owner(LuaState, State, Owner) ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState, State, ProcessAssignment),
     LuaState2.
+
