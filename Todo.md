@@ -1,0 +1,7 @@
+- msg.from - we need to create a `ensure_message` function in `meta` and this function will set the `from` key for a message, if the message contains a key `from-process` then we set the from key to that value, if the message does not contain a from-process key, then we set the first signed commitment commiter key to the from value. Then in the meta.is_owner function, we can check the msg.from with the meta.owner.
+
+- meta.authorities, and meta.is_trusted function, When a new message comes in if it's the first message, the process message there will be a key called authority in that key could be a string with, separated, values all 43 characters along what we need to do is create a new key on the Meta table called authorities that will assignall of the values in that, separated string on the process message to the metadata authorities key, then will create a Meta is trusted message or function, and when a new message comes in part of the assure insure message function is to verify that the message is trusted   
+
+
+we need to create a meta function that normalizes or adjust the message to add a from key, this key will either be the first signed commitment committer key or if the message has a `from-process` key then this normalize function will need to check the meta.authorities table and see if the first signed commitment committer key is included in that table. if it is, then we set the msg.from to the from-process value, otherwise we set it to the first signed commitment committer key.
+

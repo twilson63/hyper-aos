@@ -8,7 +8,7 @@
 -ifdef(ENABLE_AUTHORITIES_TESTS).
 
 %% Test authorities parsing from process message
-authorities_parsing_test_isolated() ->
+authorities_parsing_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -42,7 +42,7 @@ authorities_parsing_test_isolated() ->
     ?assertEqual([Authority1, Authority2, Authority3], AuthorityValues).
 
 %% Test authorities with spaces and invalid entries
-authorities_with_spaces_test_isolated() ->
+authorities_with_spaces_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -75,7 +75,7 @@ authorities_with_spaces_test_isolated() ->
     ?assertEqual([Authority1, Authority2], AuthorityValues).
 
 %% Test trusted message with matching authority
-trusted_message_test_isolated() ->
+trusted_message_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -126,7 +126,7 @@ trusted_message_test_isolated() ->
     ?assertEqual(true, Trusted).
 
 %% Test untrusted message - from != from-process
-untrusted_from_mismatch_test_isolated() ->
+untrusted_from_mismatch_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -176,7 +176,7 @@ untrusted_from_mismatch_test_isolated() ->
     ?assertEqual(false, Trusted).
 
 %% Test untrusted message - committer not in authorities
-untrusted_no_authority_test_isolated() ->
+untrusted_no_authority_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -226,7 +226,7 @@ untrusted_no_authority_test_isolated() ->
     ?assertEqual(false, Trusted).
 
 %% Test message without from-process is not trusted
-no_from_process_test_isolated() ->
+no_from_process_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),
@@ -274,7 +274,7 @@ no_from_process_test_isolated() ->
     ?assertEqual(false, Trusted).
 
 %% Test process message without authorities field
-no_authorities_test_isolated() ->
+no_authorities_test() ->
     %% Initialize AOS
     LuaState = aos_test_helpers:initialize_aos(),
     State = aos_test_helpers:create_base_state(),

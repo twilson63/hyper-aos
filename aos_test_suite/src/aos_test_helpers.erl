@@ -174,7 +174,7 @@ call_compute(LuaState, State, Assignment) ->
         "local state = ", StateStr, "\n",
         "local assignment = ", AssignmentStr, "\n",
         "local status, result = compute(state, assignment)\n",
-        "return result.results.output.data, result.results.status\n"
+        "return result.results.output.data, result\n"
     ]),
     
     luerl:do(LuaCode, LuaState).
@@ -182,7 +182,9 @@ call_compute(LuaState, State, Assignment) ->
 %% Extract output data from result
 extract_output_data(Result) when is_binary(Result) ->
     Result;
-extract_output_data({[Data, _Status], _LuaState}) ->
+extract_output_data({[Data, _Result], _LuaState}) when is_binary(Data) ->
+    Data;
+extract_output_data({[Data, _Result], _LuaState}) when is_list(Data) ->
     iolist_to_binary(Data);
 extract_output_data(_) ->
     undefined.
