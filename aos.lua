@@ -10,7 +10,7 @@ _OUTPUT = ""
 -- Private functions table
 -- This table is local to this module and cannot be accessed from eval() or external code
 ---@diagnostic disable-next-line
-meta = meta or { initialized = false, owner = "", id = "" }
+meta = meta or { initialized = false, owner = "", id = "", authorities = {} }
 function meta.init(msg)
   -- Initialize owner from first Process message
   if not meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
@@ -20,6 +20,36 @@ function meta.init(msg)
         meta.id = key
         meta.owner = commitment.committer
         meta.initialized = true
+        
+        -- Parse authorities from comma-separated string
+        if msg.authority then
+          -- Split comma-separated authorities string manually
+          local authorities_str = msg.authority
+          local start_pos = 1
+          while true do
+            local comma_pos = string.find(authorities_str, ",", start_pos)
+            local authority
+            if comma_pos then
+              authority = string.sub(authorities_str, start_pos, comma_pos - 1)
+            else
+              authority = string.sub(authorities_str, start_pos)
+            end
+            
+            -- Trim whitespace
+            authority = string.match(authority, "^%s*(.-)%s*$") or authority
+            
+            -- Check if it's 43 characters
+            if #authority == 43 then
+              table.insert(meta.authorities, authority)
+            end
+            
+            if not comma_pos then
+              break
+            end
+            start_pos = comma_pos + 1
+          end
+        end
+        
         break
       end
     end
@@ -27,16 +57,51 @@ function meta.init(msg)
 
 end
 
--- Private function to ensure message has a 'from' field
+-- Private function to check if a message is trusted
+-- A message is trusted if it has from-process equal to from and the committer is in authorities
+function meta.is_trusted(msg)
+  -- Check if message has both from and from-process fields
+  if not msg.from or not msg["from-process"] then
+    return false
+  end
+  
+  -- Check if from equals from-process
+  if msg.from ~= msg["from-process"] then
+    return false
+  end
+  
+  -- Check if any commitment's committer is in the authorities list
+  if msg.commitments then
+    for _, commitment in pairs(msg.commitments) do
+      if commitment.committer then
+        -- Check if this committer is in the authorities list
+        for _, authority in ipairs(meta.authorities) do
+          if commitment.committer == authority then
+            return true
+          end
+        end
+      end
+    end
+  end
+  
+  return false
+end
+
+-- Private function to ensure message has a 'from' field and check trust
 -- Sets msg.from based on from-process or first non-HMAC signed commitment
+-- Also sets msg.trusted based on authorities verification
 function meta.ensure_message(msg)
   -- If message already has 'from', leave it as is
   if msg.from then
+    -- Still need to check trust even if from exists
+    msg.trusted = meta.is_trusted(msg)
     return msg
   end
   -- First check if there's a from-process field
   if msg["from-process"] then
     msg.from = msg["from-process"]
+    -- Check trust after setting from
+    msg.trusted = meta.is_trusted(msg)
     return msg
   end
   -- Otherwise, find the first non-HMAC signed commitment's committer
@@ -51,6 +116,8 @@ function meta.ensure_message(msg)
     end
   end
   -- If no from-process and no non-HMAC commitments, from remains nil
+  -- Check trust after all from logic
+  msg.trusted = meta.is_trusted(msg)
   return msg
 end
 
