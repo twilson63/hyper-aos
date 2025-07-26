@@ -183,10 +183,21 @@ function meta.is_owner(msg)
   return false
 end
 
--- override print function
+-- override print function with colorized table support
 ---@diagnostic disable-next-line
-function print(txt)
-  _OUTPUT = _OUTPUT .. txt .. "\n"
+function print(...)
+  local args = {...}
+  local output = {}
+  
+  for i, v in ipairs(args) do
+    if type(v) == "table" then
+      table.insert(output, stringify(v))
+    else
+      table.insert(output, tostring(v))
+    end
+  end
+  
+  _OUTPUT = _OUTPUT .. table.concat(output, "\t") .. "\n"
 end
 
 -- utility function to remove last CR
@@ -196,6 +207,100 @@ function removeCR(str)
         return str:sub(1, -2)
     end
     return str
+end
+
+-- stringify utilities for colorized table printing
+---@diagnostic disable-next-line
+function isSimpleArray(tbl)
+  local arrayIndex = 1
+  for k, v in pairs(tbl) do
+    if k ~= arrayIndex or (type(v) ~= "number" and type(v) ~= "string") then
+      return false
+    end
+    arrayIndex = arrayIndex + 1
+  end
+  return true
+end
+
+---@diagnostic disable-next-line
+function stringify(tbl, indent, visited)
+  -- Handle non-table types
+  if type(tbl) ~= "table" then
+    if type(tbl) == "string" then
+      return meta.colors.green .. '"' .. tbl .. '"' .. meta.colors.reset
+    else
+      return meta.colors.blue .. tostring(tbl) .. meta.colors.reset
+    end
+  end
+  
+  indent = indent or 0
+  local toIndent = string.rep(" ", indent)
+  local toIndentChild = string.rep(" ", indent + 2)
+
+  local result = {}
+  local isArray = true
+  local arrayIndex = 1
+
+  -- Handle simple arrays
+  if isSimpleArray(tbl) then
+    for _, v in ipairs(tbl) do
+      if type(v) == "string" then
+        v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+      else
+        v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+      end
+      table.insert(result, v)
+    end
+    return "{ " .. table.concat(result, ", ") .. " }"
+  end
+
+  -- Handle complex tables
+  for k, v in pairs(tbl) do
+    if isArray then
+      if k == arrayIndex then
+        arrayIndex = arrayIndex + 1
+        if type(v) == "table" then
+          v = stringify(v, indent + 2, visited)
+        elseif type(v) == "string" then
+          v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+        else
+          v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+        end
+        table.insert(result, toIndentChild .. v)
+      else
+        isArray = false
+        result = {}
+      end
+    end
+    if not isArray then
+      if type(v) == "table" then
+        visited = visited or {}
+        if visited[v] then
+            v = meta.colors.dim .. "<circular reference>" .. meta.colors.reset
+        else
+          visited[v] = true
+          v = stringify(v, indent + 2, visited)
+        end
+      elseif type(v) == "string" then
+        v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+      else
+        v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+      end
+      -- Format key with color
+      local keyStr = tostring(k)
+      if type(k) == "string" then
+        keyStr = meta.colors.red .. keyStr .. meta.colors.reset
+      else
+        keyStr = meta.colors.yellow .. "[" .. keyStr .. "]" .. meta.colors.reset
+      end
+      table.insert(result, toIndentChild .. keyStr .. " = " .. v)
+    end
+  end
+
+  local prefix = isArray and "{\n" or "{\n"
+  local suffix = isArray and "\n" .. toIndent .. "}" or "\n" .. toIndent .. "}"
+  local separator = isArray and ",\n" or ",\n"
+  return prefix .. table.concat(result, separator) .. suffix
 end
 
 -- prompt function for console with colors
