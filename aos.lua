@@ -10,7 +10,7 @@ _OUTPUT = ""
 -- Private functions table
 -- This table is local to this module and cannot be accessed from eval() or external code
 ---@diagnostic disable-next-line
-meta = meta or { initialized = false, owner = "", id = "", authorities = {} }
+meta = meta or { initialized = false, owner = "", id = "", authorities = {}, colors = {} }
 function meta.init(msg)
   -- Initialize owner from first Process message
   if not meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
@@ -53,6 +53,54 @@ function meta.init(msg)
         break
       end
     end
+  end
+  
+  -- Initialize colors table with terminal escape codes
+  if not next(meta.colors) then
+    meta.colors = {
+      -- Reset
+      reset = "\27[0m",
+      
+      -- Regular colors
+      black = "\27[30m",
+      red = "\27[31m",
+      green = "\27[32m",
+      yellow = "\27[33m",
+      blue = "\27[34m",
+      magenta = "\27[35m",
+      cyan = "\27[36m",
+      white = "\27[37m",
+      
+      -- Bright colors
+      bright_black = "\27[90m",
+      bright_red = "\27[91m",
+      bright_green = "\27[92m",
+      bright_yellow = "\27[93m",
+      bright_blue = "\27[94m",
+      bright_magenta = "\27[95m",
+      bright_cyan = "\27[96m",
+      bright_white = "\27[97m",
+      
+      -- Background colors
+      bg_black = "\27[40m",
+      bg_red = "\27[41m",
+      bg_green = "\27[42m",
+      bg_yellow = "\27[43m",
+      bg_blue = "\27[44m",
+      bg_magenta = "\27[45m",
+      bg_cyan = "\27[46m",
+      bg_white = "\27[47m",
+      
+      -- Text styles
+      bold = "\27[1m",
+      dim = "\27[2m",
+      italic = "\27[3m",
+      underline = "\27[4m",
+      blink = "\27[5m",
+      reverse = "\27[7m",
+      hidden = "\27[8m",
+      strikethrough = "\27[9m"
+    }
   end
 
 end
@@ -150,10 +198,24 @@ function removeCR(str)
     return str
 end
 
--- prompt function for console
+-- prompt function for console with colors
 ---@diagnostic disable-next-line
 function prompt()
-  return "hyper~aos@" .. require('.process')._version .. "[" .. #Inbox .. "]> "
+  -- Use colors if available, otherwise fallback to plain text
+  if meta.colors and meta.colors.cyan then
+    local c = meta.colors
+    return c.cyan .. c.bold .. "hyper" .. c.reset .. 
+           c.white .. "~" .. c.reset .. 
+           c.bright_green .. "aos" .. c.reset .. 
+           c.white .. "@" .. c.reset .. 
+           c.yellow .. require('.process')._version .. c.reset .. 
+           c.white .. "[" .. c.reset .. 
+           c.bright_magenta .. #Inbox .. c.reset .. 
+           c.white .. "]" .. c.reset .. 
+           c.bright_blue .. "> " .. c.reset
+  else
+    return "hyper~aos@" .. require('.process')._version .. "[" .. #Inbox .. "]> "
+  end
 end
 
 -- send function for dispatching messages to other processes
