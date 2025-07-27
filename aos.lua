@@ -27,6 +27,8 @@ local SYSTEM_KEYS = {
   "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
   -- Private/temporary variables
   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
+  -- AO specific modules
+  "ao",
   -- These will be handled specially or excluded
   "State", "_G"
 }
@@ -130,6 +132,228 @@ function meta.init(msg)
   end
 
 end
+
+--- Validate if a string is a valid process ID (43-character base64url)
+-- @param id string The string to validate
+-- @return boolean True if valid process ID, false otherwise
+function meta.isProcessId(id)
+  if type(id) ~= "string" then
+    return false
+  end
+  
+  -- Check if it's exactly 43 characters
+  if #id ~= 43 then
+    return false
+  end
+  
+  -- Check if it contains only base64url characters (A-Z, a-z, 0-9, -, _)
+  local pattern = "^[A-Za-z0-9%-_]+$"
+  return string.match(id, pattern) ~= nil
+end
+
+-- Terminal properties that auto-resolve when accessed on a process proxy
+meta.terminal_properties = {
+  "supply", "balance", "owner", "holders", "votes", "canVote",
+  "now", "latest", "timestamp", "height", "block", "mint",
+  "minted", "burned", "transferred", "staked", "delegated",
+  "info", "state", "stats", "metadata", "profile", "config"
+}
+
+-- Create a set for O(1) lookup of terminal properties
+meta.terminal_properties_set = {}
+for _, prop in ipairs(meta.terminal_properties) do
+  meta.terminal_properties_set[prop] = true
+end
+
+--- Create a proxy table for process ID access with auto-resolution
+-- @param processId string The process ID to create a proxy for
+-- @param path string The current path (for building nested paths)
+-- @return table A proxy table with __index metamethod
+function meta.createProcessProxy(processId, path)
+  path = path or processId
+  
+  return setmetatable({}, {
+    __index = function(t, key)
+      local newPath = path .. "/" .. key
+      
+      -- Check if this is a terminal property
+      if meta.terminal_properties_set[key] then
+        -- Auto-resolve terminal properties
+        if _G.ao and _G.ao.resolve then
+          -- If ao.resolve exists, use it
+          return _G.ao.resolve(newPath)
+        else
+          -- Placeholder behavior when ao.resolve is not available
+          print("ao.resolve('" .. newPath .. "') would be called")
+          return "< " .. newPath .. " >"
+        end
+      else
+        -- Return another proxy for nested access
+        return meta.createProcessProxy(processId, newPath)
+      end
+    end,
+    
+    __tostring = function()
+      return "ProcessProxy<" .. path .. ">"
+    end
+  })
+end
+
+-- Set up the _G metatable to intercept process ID access
+-- This enables syntax like _G['processId'].now.supply
+local original_G_metatable = getmetatable(_G) or {}
+setmetatable(_G, {
+  __index = function(t, key)
+    -- First check if the key exists in the original __index if it exists
+    if original_G_metatable.__index then
+      local original_value
+      if type(original_G_metatable.__index) == "function" then
+        original_value = original_G_metatable.__index(t, key)
+      else
+        original_value = original_G_metatable.__index[key]
+      end
+      if original_value ~= nil then
+        return original_value
+      end
+    end
+    
+    -- Check if the key is a valid process ID
+    if meta.isProcessId(key) then
+      -- Return a process proxy for valid process IDs
+      return meta.createProcessProxy(key)
+    end
+    
+    -- Default behavior - return nil for non-existent keys
+    return rawget(t, key)
+  end,
+  
+  -- Preserve any existing metamethods
+  __newindex = original_G_metatable.__newindex,
+  __tostring = original_G_metatable.__tostring,
+  __pairs = original_G_metatable.__pairs,
+  __ipairs = original_G_metatable.__ipairs
+})
+
+-- Initialize ao table with a placeholder resolve function if it doesn't exist
+_G.ao = _G.ao or {}
+if not _G.ao.resolve then
+  -- Placeholder implementation - replace with actual ao.resolve when available
+  _G.ao.resolve = function(path)
+    print("ao.resolve called with path: " .. path)
+    return "resolved<" .. path .. ">"
+  end
+end
+
+--- Validate if a string is a valid process ID (43-character base64url)
+-- @param str string The string to validate
+-- @return boolean True if valid process ID, false otherwise
+function meta.isProcessId(str)
+  if type(str) == "string" and #str == 43 and str:match("^[A-Za-z0-9_-]+$") then
+    return true
+  else
+    return false
+  end
+end
+
+-- Terminal properties that should auto-resolve
+local AO_TERMINAL_PROPERTIES = {
+  "supply", "balance", "owner", "holders", "votes", "canVote",
+  "now", "latest", "timestamp", "height", "block",
+  "mint", "minted", "burned", "transferred", "staked", "delegated",
+  "info", "state", "stats", "metadata", "profile", "config"
+}
+
+-- Create lookup set for O(1) access
+local TERMINAL_PROPS = {}
+for _, prop in ipairs(AO_TERMINAL_PROPERTIES) do
+  TERMINAL_PROPS[prop] = true
+end
+
+--- Create a proxy object for process property access
+-- @param processId string The process ID
+-- @param path string The current path (defaults to processId)
+-- @return table Proxy table with metatable
+function meta.createProcessProxy(processId, path)
+  path = path or processId
+  local proxy = {}
+  
+  local mt = {
+    __index = function(t, key)
+      local newPath = path .. "/" .. key
+      
+      -- Check if this is a terminal property
+      if TERMINAL_PROPS[key] then
+        -- Ensure ao exists
+        if not _G.ao then
+          _G.ao = {}
+        end
+        if not _G.ao.resolve then
+          -- Default implementation for testing
+          _G.ao.resolve = function(path)
+            print("[ao.resolve] " .. path)
+            return "Resolved: " .. path
+          end
+        end
+        -- Call ao.resolve
+        return _G.ao.resolve(newPath)
+      else
+        -- Return another proxy for chaining
+        return meta.createProcessProxy(processId, newPath)
+      end
+    end,
+    
+    -- For debugging
+    __tostring = function(t)
+      return "ProcessProxy(" .. path .. ")"
+    end
+  }
+  
+  setmetatable(proxy, mt)
+  return proxy
+end
+
+-- Function to set up _G metatable (called after module loads)
+function meta.setupGlobalMetatable()
+  local mt = getmetatable(_G) or {}
+  local original_index = mt.__index
+  
+  -- Store references to avoid closure issues
+  local isProcessId = meta.isProcessId
+  local createProcessProxy = meta.createProcessProxy
+  
+  -- Create new __index function
+  mt.__index = function(t, key)
+    -- First check if the key exists in _G
+    local value = rawget(t, key)
+    if value ~= nil then
+      return value
+    end
+    
+    -- Check if it looks like a process ID
+    if isProcessId(key) then
+      -- Return a process proxy
+      return createProcessProxy(key)
+    end
+    
+    -- Fall back to original __index if it exists
+    if original_index then
+      if type(original_index) == "function" then
+        return original_index(t, key)
+      else
+        return original_index[key]
+      end
+    end
+    
+    return nil
+  end
+  
+  -- Apply the metatable
+  setmetatable(_G, mt)
+end
+
+-- Set up the metatable after module loads
+-- NOTE: Call meta.setupGlobalMetatable() manually or it will be set up on first compute
+-- meta.setupGlobalMetatable()
 
 --- Check if a message is trusted based on authorities
 -- A message is trusted if it has from-process equal to from 
@@ -243,6 +467,8 @@ end
 -- stringify utilities for colorized table printing
 ---@diagnostic disable-next-line
 function isSimpleArray(tbl)
+  -- SAFETY: Avoid infinite recursion during initialization
+  if type(tbl) ~= "table" then return false end
   local arrayIndex = 1
   for k, v in pairs(tbl) do
     if k ~= arrayIndex or (type(v) ~= "number" and type(v) ~= "string") then
@@ -258,9 +484,9 @@ function stringify(tbl, indent, visited)
   -- Handle non-table types
   if type(tbl) ~= "table" then
     if type(tbl) == "string" then
-      return _G.colors.green .. '"' .. tbl .. '"' .. _G.colors.reset
+      return (_G.colors and _G.colors.green or "") .. '"' .. tbl .. '"' .. (_G.colors and _G.colors.reset or "")
     else
-      return _G.colors.blue .. tostring(tbl) .. _G.colors.reset
+      return (_G.colors and _G.colors.blue or "") .. tostring(tbl) .. (_G.colors and _G.colors.reset or "")
     end
   end
   
@@ -276,9 +502,9 @@ function stringify(tbl, indent, visited)
   if isSimpleArray(tbl) then
     for _, v in ipairs(tbl) do
       if type(v) == "string" then
-        v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
+        v = (_G.colors and _G.colors.green or "") .. '"' .. v .. '"' .. (_G.colors and _G.colors.reset or "")
       else
-        v = _G.colors.blue .. tostring(v) .. _G.colors.reset
+        v = (_G.colors and _G.colors.blue or "") .. tostring(v) .. (_G.colors and _G.colors.reset or "")
       end
       table.insert(result, v)
     end
@@ -293,9 +519,9 @@ function stringify(tbl, indent, visited)
         if type(v) == "table" then
           v = stringify(v, indent + 2, visited)
         elseif type(v) == "string" then
-          v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
+          v = (_G.colors and _G.colors.green or "") .. '"' .. v .. '"' .. (_G.colors and _G.colors.reset or "")
         else
-          v = _G.colors.blue .. tostring(v) .. _G.colors.reset
+          v = (_G.colors and _G.colors.blue or "") .. tostring(v) .. (_G.colors and _G.colors.reset or "")
         end
         table.insert(result, toIndentChild .. v)
       else
@@ -307,22 +533,22 @@ function stringify(tbl, indent, visited)
       if type(v) == "table" then
         visited = visited or {}
         if visited[v] then
-            v = _G.colors.dim .. "<circular reference>" .. _G.colors.reset
+            v = (_G.colors and _G.colors.dim or "") .. "<circular reference>" .. (_G.colors and _G.colors.reset or "")
         else
           visited[v] = true
           v = stringify(v, indent + 2, visited)
         end
       elseif type(v) == "string" then
-        v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
+        v = (_G.colors and _G.colors.green or "") .. '"' .. v .. '"' .. (_G.colors and _G.colors.reset or "")
       else
-        v = _G.colors.blue .. tostring(v) .. _G.colors.reset
+        v = (_G.colors and _G.colors.blue or "") .. tostring(v) .. (_G.colors and _G.colors.reset or "")
       end
       -- Format key with color
       local keyStr = tostring(k)
       if type(k) == "string" then
-        keyStr = _G.colors.red .. keyStr .. _G.colors.reset
+        keyStr = (_G.colors and _G.colors.red or "") .. keyStr .. (_G.colors and _G.colors.reset or "")
       else
-        keyStr = _G.colors.yellow .. "[" .. keyStr .. "]" .. _G.colors.reset
+        keyStr = (_G.colors and _G.colors.yellow or "") .. "[" .. keyStr .. "]" .. (_G.colors and _G.colors.reset or "")
       end
       table.insert(result, toIndentChild .. keyStr .. " = " .. v)
     end
@@ -508,6 +734,12 @@ function compute(state, assignment)
   -- Initialize process state from first Process message
   if not meta.initialized then 
     meta.init(msg) 
+  end
+  
+  -- Set up global metatable if not already done
+  if not meta.metatable_initialized then
+    meta.setupGlobalMetatable()
+    meta.metatable_initialized = true
   end
 
   -- Extract and normalize action
