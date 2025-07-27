@@ -12,8 +12,8 @@ colors_initialization_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
-    %% Check that colors table exists
-    {ColorsTable, _} = luerl:get_table([<<"meta">>, <<"colors">>], LuaState2),
+    %% Check that colors table exists in _G
+    {ColorsTable, _} = luerl:get_table([<<"_G">>, <<"colors">>], LuaState2),
     
     %% Verify some key colors exist
     ?assertMatch({<<"reset">>, <<"\e[0m">>}, lists:keyfind(<<"reset">>, 1, ColorsTable)),

@@ -1,25 +1,51 @@
 -- set version for hyper-aos
 _G.package.loaded['.process'] = { _version = "dev" }
 
--- initialize inbox with max size
-Inbox = Inbox or {}
-MAX_INBOX_SIZE = 10000
--- state variable for prints
-_OUTPUT = ""
+-- Initialize global state variables directly in _G
+-- These will be persisted across compute calls
+_G.Inbox = _G.Inbox or {}
+_G.MAX_INBOX_SIZE = 10000
+_G._OUTPUT = ""
 
 -- Private functions table
 -- This table is local to this module and cannot be accessed from eval() or external code
+-- We keep meta separate as it contains private functions and initialization state
 ---@diagnostic disable-next-line
-meta = meta or { initialized = false, owner = "", id = "", authorities = {}, colors = {} }
+local meta = { initialized = false }
+
+-- List of Lua built-in keys to exclude when serializing state
+-- This ensures we only return user data, not system functions/tables
+local SYSTEM_KEYS = {
+  -- Lua built-in functions
+  "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", 
+  "load", "loadfile", "loadstring", "next", "pairs", "pcall", "print", 
+  "rawequal", "rawget", "rawlen", "rawset", "require", "select", 
+  "setmetatable", "tonumber", "tostring", "type", "xpcall", "_VERSION",
+  -- Lua built-in libraries
+  "coroutine", "debug", "io", "math", "os", "package", "string", "table", "utf8",
+  -- AOS specific functions that shouldn't be serialized
+  "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
+  -- Private/temporary variables
+  "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
+  -- These will be handled specially or excluded
+  "State", "_G"
+}
+--- Initialize process state from the first Process message
+-- Stores owner, id, and authorities directly in _G
+-- @param msg table The incoming message to process
 function meta.init(msg)
   -- Initialize owner from first Process message
   if not meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
     -- Find first non-hmac commitment and set its committer as owner
     for key, commitment in pairs(msg.commitments) do
       if commitment.type and string.lower(commitment.type) ~= "hmac-sha256" and commitment.committer then
-        meta.id = key
-        meta.owner = commitment.committer
+        -- Store process id and owner directly in _G
+        _G.id = key
+        _G.owner = commitment.committer
         meta.initialized = true
+        
+        -- Initialize authorities array in _G
+        _G.authorities = _G.authorities or {}
         
         -- Parse authorities from comma-separated string
         if msg.authority then
@@ -38,9 +64,9 @@ function meta.init(msg)
             -- Trim whitespace
             authority = string.match(authority, "^%s*(.-)%s*$") or authority
             
-            -- Check if it's 43 characters
+            -- Check if it's 43 characters (valid Arweave address)
             if #authority == 43 then
-              table.insert(meta.authorities, authority)
+              table.insert(_G.authorities, authority)
             end
             
             if not comma_pos then
@@ -55,9 +81,9 @@ function meta.init(msg)
     end
   end
   
-  -- Initialize colors table with terminal escape codes
-  if not next(meta.colors) then
-    meta.colors = {
+  -- Initialize colors table with terminal escape codes in _G
+  if not _G.colors then
+    _G.colors = {
       -- Reset
       reset = "\27[0m",
       
@@ -105,8 +131,11 @@ function meta.init(msg)
 
 end
 
--- Private function to check if a message is trusted
--- A message is trusted if it has from-process equal to from and the committer is in authorities
+--- Check if a message is trusted based on authorities
+-- A message is trusted if it has from-process equal to from 
+-- and the committer is in the authorities list
+-- @param msg table The message to validate
+-- @return boolean True if message is trusted, false otherwise
 function meta.is_trusted(msg)
   -- Check if message has both from and from-process fields
   if not msg.from or not msg["from-process"] then
@@ -119,11 +148,11 @@ function meta.is_trusted(msg)
   end
   
   -- Check if any commitment's committer is in the authorities list
-  if msg.commitments then
+  if msg.commitments and _G.authorities then
     for _, commitment in pairs(msg.commitments) do
       if commitment.committer then
         -- Check if this committer is in the authorities list
-        for _, authority in ipairs(meta.authorities) do
+        for _, authority in ipairs(_G.authorities) do
           if commitment.committer == authority then
             return true
           end
@@ -169,14 +198,16 @@ function meta.ensure_message(msg)
   return msg
 end
 
--- Private function to check if message has valid owner commitment
--- Validates that the message's from matches the meta.owner
+--- Check if message has valid owner commitment
+-- Validates that the message's from matches the global owner
+-- @param msg table The message to validate
+-- @return boolean True if message is from owner, false otherwise
 function meta.is_owner(msg)
   -- Ensure message has 'from' field
   meta.ensure_message(msg)
   
-  -- Check if msg.from matches the owner
-  if msg.from and msg.from == meta.owner then
+  -- Check if msg.from matches the owner stored in _G
+  if msg.from and _G.owner and msg.from == _G.owner then
     return true
   end
   
@@ -227,9 +258,9 @@ function stringify(tbl, indent, visited)
   -- Handle non-table types
   if type(tbl) ~= "table" then
     if type(tbl) == "string" then
-      return meta.colors.green .. '"' .. tbl .. '"' .. meta.colors.reset
+      return _G.colors.green .. '"' .. tbl .. '"' .. _G.colors.reset
     else
-      return meta.colors.blue .. tostring(tbl) .. meta.colors.reset
+      return _G.colors.blue .. tostring(tbl) .. _G.colors.reset
     end
   end
   
@@ -245,9 +276,9 @@ function stringify(tbl, indent, visited)
   if isSimpleArray(tbl) then
     for _, v in ipairs(tbl) do
       if type(v) == "string" then
-        v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+        v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
       else
-        v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+        v = _G.colors.blue .. tostring(v) .. _G.colors.reset
       end
       table.insert(result, v)
     end
@@ -262,9 +293,9 @@ function stringify(tbl, indent, visited)
         if type(v) == "table" then
           v = stringify(v, indent + 2, visited)
         elseif type(v) == "string" then
-          v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+          v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
         else
-          v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+          v = _G.colors.blue .. tostring(v) .. _G.colors.reset
         end
         table.insert(result, toIndentChild .. v)
       else
@@ -276,22 +307,22 @@ function stringify(tbl, indent, visited)
       if type(v) == "table" then
         visited = visited or {}
         if visited[v] then
-            v = meta.colors.dim .. "<circular reference>" .. meta.colors.reset
+            v = _G.colors.dim .. "<circular reference>" .. _G.colors.reset
         else
           visited[v] = true
           v = stringify(v, indent + 2, visited)
         end
       elseif type(v) == "string" then
-        v = meta.colors.green .. '"' .. v .. '"' .. meta.colors.reset
+        v = _G.colors.green .. '"' .. v .. '"' .. _G.colors.reset
       else
-        v = meta.colors.blue .. tostring(v) .. meta.colors.reset
+        v = _G.colors.blue .. tostring(v) .. _G.colors.reset
       end
       -- Format key with color
       local keyStr = tostring(k)
       if type(k) == "string" then
-        keyStr = meta.colors.red .. keyStr .. meta.colors.reset
+        keyStr = _G.colors.red .. keyStr .. _G.colors.reset
       else
-        keyStr = meta.colors.yellow .. "[" .. keyStr .. "]" .. meta.colors.reset
+        keyStr = _G.colors.yellow .. "[" .. keyStr .. "]" .. _G.colors.reset
       end
       table.insert(result, toIndentChild .. keyStr .. " = " .. v)
     end
@@ -307,8 +338,8 @@ end
 ---@diagnostic disable-next-line
 function prompt()
   -- Use colors if available, otherwise fallback to plain text
-  if meta.colors and meta.colors.cyan then
-    local c = meta.colors
+  if _G.colors and _G.colors.cyan then
+    local c = _G.colors
     return c.cyan .. c.bold .. "hyper" .. c.reset .. 
            c.white .. "~" .. c.reset .. 
            c.bright_green .. "aos" .. c.reset .. 
@@ -326,7 +357,10 @@ end
 -- send function for dispatching messages to other processes
 ---@diagnostic disable-next-line
 function send(msg)
-  table.insert(State.results.outbox, msg)
+  -- Initialize results table if needed
+  _G.results = _G.results or {}
+  _G.results.outbox = _G.results.outbox or {}
+  table.insert(_G.results.outbox, msg)
 end
 
 -- eval function, this function allows you update your process
@@ -358,68 +392,169 @@ function eval(msg)
   return output
 end
 
--- compute is the entry point of your process
----@diagnostic disable-next-line
+--- Recursively copy a table, handling circular references
+-- @param tbl table The table to copy
+-- @param visited table Table tracking visited tables for circular reference detection
+-- @return table The copied table
+local function copy_table_recursive(tbl, visited)
+  local copy = {}
+  
+  for k, v in pairs(tbl) do
+    local value_type = type(v)
+    
+    if value_type == "table" then
+      -- Check for circular reference
+      if visited[v] then
+        copy[k] = "<circular reference>"
+      else
+        -- Mark this table as visited
+        visited[v] = true
+        -- Recursively copy the table
+        copy[k] = copy_table_recursive(v, visited)
+        -- Unmark after processing
+        visited[v] = nil
+      end
+    elseif value_type ~= "function" then
+      -- Copy non-function values
+      copy[k] = v
+    end
+    -- Skip functions entirely
+  end
+  
+  return copy
+end
+
+--- Extract user state from _G, filtering out system keys and functions
+-- Handles circular references properly to avoid infinite loops
+-- @param visited table Optional table to track visited tables for circular reference detection
+-- @return table The filtered state containing only user data
+local function extract_state_from_global(visited)
+  visited = visited or {}
+  local state = {}
+  
+  -- Create a lookup table for system keys for O(1) access
+  local system_keys_set = {}
+  for _, key in ipairs(SYSTEM_KEYS) do
+    system_keys_set[key] = true
+  end
+  
+  -- Iterate through all keys in _G
+  for key, value in pairs(_G) do
+    -- Skip system keys and functions
+    if not system_keys_set[key] and type(value) ~= "function" then
+      local value_type = type(value)
+      
+      if value_type == "table" then
+        -- Check for circular reference
+        if visited[value] then
+          state[key] = "<circular reference>"
+        else
+          -- Mark this table as visited
+          visited[value] = true
+          -- Recursively copy the table
+          state[key] = copy_table_recursive(value, visited)
+          -- Unmark after processing (allows same table in different paths)
+          visited[value] = nil
+        end
+      else
+        -- For non-table values, just copy them
+        state[key] = value
+      end
+    end
+  end
+  
+  return state
+end
+
+--- Main entry point for message processing
+-- Processes messages and manages state directly in _G
+-- @param state table The incoming state (merged into _G on first call)
+-- @param assignment table The message assignment to process
+-- @return string Status ("ok")
+-- @return table The filtered state extracted from _G
 function compute(state, assignment)
-  -- clear output
-  _OUTPUT = ""
-  -- set State
-  State = state
-  State.results = state.results or {}
-  State.results.outbox = { }
-  State.results.output = { data = "", prompt = prompt() }
-  state.results.info = "hyper-aos"
+  -- Clear output buffer
+  _G._OUTPUT = ""
+  
+  -- On first message or when state is provided, merge it into _G
+  -- This allows the process to restore previous state
+  if state and next(state) then
+    -- Create a lookup table for system keys for O(1) access
+    local system_keys_set = {}
+    for _, key in ipairs(SYSTEM_KEYS) do
+      system_keys_set[key] = true
+    end
+    
+    for key, value in pairs(state) do
+      -- Don't overwrite system keys or functions
+      if type(_G[key]) ~= "function" and not system_keys_set[key] then
+        _G[key] = value
+      end
+    end
+  end
+  
+  -- Initialize results structure in _G
+  _G.results = _G.results or {}
+  _G.results.outbox = {}
+  _G.results.output = { data = "", prompt = prompt() }
+  _G.results.info = "hyper-aos"
+  
+  -- Extract message from assignment
   local msg = assignment.body or {}
+  
   -- Ensure message has 'from' field
   msg = meta.ensure_message(msg)
   
-  if not meta.initialized then meta.init(msg) end
+  -- Initialize process state from first Process message
+  if not meta.initialized then 
+    meta.init(msg) 
+  end
 
+  -- Extract and normalize action
   local action = msg.action or ""
   action = string.lower(action)
 
   local status, result = false, ""
 
-  -- handle actions being submitted 
+  -- Handle actions by calling global functions
   if action ~= "compute" and type(_G[action]) == "function" then
     status, result = pcall(_G[action], msg)
   else
-    -- in not handled add to inbox
+    -- If not handled, add to inbox
     result = "New Message"
-    table.insert(Inbox, msg)
-    -- implement FIFO rotation when inbox exceeds limit
-    if #Inbox > MAX_INBOX_SIZE then
-      table.remove(Inbox, 1)
+    table.insert(_G.Inbox, msg)
+    -- Implement FIFO rotation when inbox exceeds limit
+    if #_G.Inbox > _G.MAX_INBOX_SIZE then
+      table.remove(_G.Inbox, 1)
     end
   end
 
-  State.results.status = "ok"
+  -- Set execution status
+  _G.results.status = "ok"
   if not status and result ~= "" then
-    --print("ERROR:")
-    State.results.status = "error"
+    _G.results.status = "error"
   end
 
+  -- Format output based on result type
   if type(result) == "table" then
-    State.results.output.data = result -- TODO: need to format
+    _G.results.output.data = result
   else
     print(tostring(result))
-    State.results.output.data = removeCR(_OUTPUT)
+    _G.results.output.data = removeCR(_G._OUTPUT)
   end
 
+  -- Set print flag for non-eval actions
   if action ~= "eval" then
-    State.results.output.print = true
+    _G.results.output.print = true
   end
-  -- for aos console to provide feedback the process needs to return:
-  -- results:
-  --   output
-  --     data
-  --     print
-  --     prompt
-  --   outbox
-  --     - 1 message
-  --     - 2 message
-  --     - ...
-  return "ok", State
+  
+  -- Extract state from _G, filtering out system keys and functions
+  -- This creates a clean state object containing only user data
+  local filtered_state = extract_state_from_global()
+  
+  -- Return status and filtered state
+  -- The state will be persisted and passed back in the next compute call
+  return "ok", filtered_state
 end
 
 

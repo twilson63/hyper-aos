@@ -72,8 +72,8 @@ authorities_multi_step_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
-    %% Verify authorities were set
-    {MetaAuthorities, _} = luerl:get_table([<<"meta">>, <<"authorities">>], LuaState2),
+    %% Verify authorities were set in _G
+    {MetaAuthorities, _} = luerl:get_table([<<"_G">>, <<"authorities">>], LuaState2),
     %% Authorities are stored as a Lua array with {index, value} tuples
     ?assertEqual([{1, Authority1}, {2, Authority2}], MetaAuthorities),
     
