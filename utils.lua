@@ -12,6 +12,10 @@ _G.utils = _G.utils or {}
 -- Set version for tracking
 _G.utils._version = "1.0.0"
 
+-- Provide backwards compatibility alias: _G.Utils -> _G.utils
+-- This ensures code using Utils.map() continues to work with both cases
+_G.Utils = _G.utils
+
 --- LUERL-optimized helper function to check if a table is an array.
 -- An 'array' is defined as a table with integer keys starting from 1 and
 -- having no gaps between the keys. Optimized for LUERL VM performance.

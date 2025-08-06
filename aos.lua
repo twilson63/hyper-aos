@@ -15,6 +15,10 @@ local function load_utils()
     -- This is a placeholder to ensure smooth operation
     _G.utils._version = "loading"
   end
+  
+  -- Provide backwards compatibility alias: _G.Utils -> _G.utils
+  -- This ensures code using Utils.map() continues to work
+  _G.Utils = _G.utils
 end
 
 -- Initialize utils on module load

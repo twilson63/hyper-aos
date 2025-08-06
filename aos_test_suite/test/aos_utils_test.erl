@@ -691,3 +691,44 @@ test_luerl_compatibility(LuaState) ->
     ",
     {[FoundString, NestedValue, HasEnoughKeys], _} = luerl:do(LuaCode, LuaState),
     ?assertEqual([<<"string">>, <<"found">>, true], [FoundString, NestedValue, HasEnoughKeys]).
+
+%% Test backwards compatibility with capital U alias
+backwards_compatibility_test() ->
+    LuaState0 = luerl:init(),
+    {ok, UtilsContent} = file:read_file("utils.lua"),
+    {_, LuaState} = luerl:do(binary_to_list(UtilsContent), LuaState0),
+    
+    LuaCode = "
+        -- Verify both _G.utils and _G.Utils point to the same module
+        local same_reference = _G.utils == _G.Utils
+        local same_map = _G.utils.map == _G.Utils.map
+        
+        -- Test using capitalized Utils (backwards compatibility)
+        local doubled = _G.Utils.map(function(x) return x * 2 end, {1, 2, 3})
+        local filtered = _G.Utils.filter(function(x) return x > 2 end, {1, 2, 3, 4})
+        local reduced = _G.Utils.reduce(function(acc, x) return acc + x end, 0, {1, 2, 3})
+        
+        -- Test mixed usage (lowercase and uppercase)
+        local composed = _G.utils.compose(
+            function(x) return x * 2 end,
+            function(x) return x + 1 end
+        )
+        local result = composed(5)  -- (5 + 1) * 2 = 12
+        
+        -- Extract array values for comparison (LUERL doesn't auto-convert tables)
+        local doubled_values = {doubled[1], doubled[2], doubled[3]}
+        local filtered_values = {filtered[1], filtered[2]}
+        
+        return same_reference, same_map, doubled_values[1], doubled_values[2], doubled_values[3], 
+               filtered_values[1], filtered_values[2], reduced, result
+    ",
+    {[SameRef, SameMap, D1, D2, D3, F1, F2, Reduced, Result], _} = luerl:do(LuaCode, LuaState),
+    ?assertEqual(true, SameRef),
+    ?assertEqual(true, SameMap),
+    ?assertEqual(2, D1),
+    ?assertEqual(4, D2),
+    ?assertEqual(6, D3),
+    ?assertEqual(3, F1),
+    ?assertEqual(4, F2),
+    ?assertEqual(6, Reduced),
+    ?assertEqual(12, Result).
