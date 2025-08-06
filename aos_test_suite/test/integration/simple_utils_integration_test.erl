@@ -16,6 +16,36 @@
 -include_lib("eunit/include/eunit.hrl").
 
 %%%-------------------------------------------------------------------
+%%% Path Configuration
+%%%-------------------------------------------------------------------
+
+-define(UTILS_LUA_PATH, "../../src/utils.lua").
+-define(AOS_LUA_PATH, "../../src/aos.lua").
+
+%%%-------------------------------------------------------------------
+%%% Helper Functions
+%%%-------------------------------------------------------------------
+
+%% Robust file reader that tries multiple possible paths
+read_lua_file(Filename) ->
+    % Define possible paths based on test execution context
+    Paths = [
+        "../../src/" ++ Filename,           % From aos_test_suite/test/integration/
+        "../src/" ++ Filename,              % From aos_test_suite/
+        "src/" ++ Filename,                 % From project root
+        Filename                            % Current directory
+    ],
+    try_read_paths(Paths, Filename).
+
+try_read_paths([], Filename) ->
+    {error, {file_not_found, Filename}};
+try_read_paths([Path | Rest], Filename) ->
+    case file:read_file(Path) of
+        {ok, Content} -> {ok, Content};
+        {error, _} -> try_read_paths(Rest, Filename)
+    end.
+
+%%%-------------------------------------------------------------------
 %%% Test Descriptions
 %%%-------------------------------------------------------------------
 
@@ -23,15 +53,15 @@
 utils_basic_loading_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Check that utils is available
-      {ok, [UtilsExists]} = luerl:eval("return _G.utils ~= nil", State),
+      {[UtilsExists], _} = luerl:do("return _G.utils ~= nil", State),
       ?assertEqual(true, UtilsExists),
       
       % Check version
-      {ok, [Version]} = luerl:eval("return _G.utils._version", State),
+      {[Version], _} = luerl:do("return _G.utils._version", State),
       ?assertEqual(<<"1.0.0">>, Version)
     end).
 
@@ -39,8 +69,8 @@ utils_basic_loading_test() ->
 utils_basic_functions_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Test map function
       Code1 = "
@@ -48,10 +78,10 @@ utils_basic_functions_test() ->
         local doubled = utils.map(function(x) return x * 2 end, numbers)
         return doubled[1], doubled[2], doubled[3]
       ",
-      {ok, [Two, Four, Six]} = luerl:eval(Code1, State),
-      ?assertEqual(2.0, Two),
-      ?assertEqual(4.0, Four),
-      ?assertEqual(6.0, Six),
+      {[Two, Four, Six], _} = luerl:do(Code1, State),
+      ?assertEqual(2, Two),
+      ?assertEqual(4, Four),
+      ?assertEqual(6, Six),
       
       % Test filter function
       Code2 = "
@@ -59,18 +89,18 @@ utils_basic_functions_test() ->
         local evens = utils.filter(function(x) return x % 2 == 0 end, numbers)
         return #evens, evens[1], evens[2]
       ",
-      {ok, [Count, FirstEven, SecondEven]} = luerl:eval(Code2, State),
-      ?assertEqual(2.0, Count),
-      ?assertEqual(2.0, FirstEven),
-      ?assertEqual(4.0, SecondEven)
+      {[Count, FirstEven, SecondEven], _} = luerl:do(Code2, State),
+      ?assertEqual(2, Count),
+      ?assertEqual(2, FirstEven),
+      ?assertEqual(4, SecondEven)
     end).
 
 %% Test pattern matching functionality
 utils_pattern_matching_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Test matchesPattern function
       Code = "
@@ -89,7 +119,7 @@ utils_pattern_matching_test() ->
         
         return result1, result2, result3, result4
       ",
-      {ok, [StringMatch, WildcardMatch, FunctionMatchTrue, FunctionMatchFalse]} = luerl:eval(Code, State),
+      {[StringMatch, WildcardMatch, FunctionMatchTrue, FunctionMatchFalse], _} = luerl:do(Code, State),
       ?assertEqual(true, StringMatch),
       ?assertEqual(true, WildcardMatch),
       ?assertEqual(true, FunctionMatchTrue),
@@ -100,8 +130,8 @@ utils_pattern_matching_test() ->
 utils_curry_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Test curry functionality
       Code = "
@@ -111,16 +141,16 @@ utils_curry_test() ->
         local result = addFiveAndTen(3)
         return result
       ",
-      {ok, [Result]} = luerl:eval(Code, State),
-      ?assertEqual(18.0, Result)  % 5 + 10 + 3 = 18
+      {[Result], _} = luerl:do(Code, State),
+      ?assertEqual(18, Result)  % 5 + 10 + 3 = 18
     end).
 
 %% Test message-like spec matching (simulated AO message pattern)
 utils_message_spec_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Test spec matching with message-like objects
       Code = "
@@ -150,7 +180,7 @@ utils_message_spec_test() ->
         
         return match1, match2, match3
       ",
-      {ok, [StringSpecMatch, TableSpecMatch, TableSpecNoMatch]} = luerl:eval(Code, State),
+      {[StringSpecMatch, TableSpecMatch, TableSpecNoMatch], _} = luerl:do(Code, State),
       ?assertEqual(true, StringSpecMatch),
       ?assertEqual(true, TableSpecMatch),
       ?assertEqual(false, TableSpecNoMatch)
@@ -160,8 +190,8 @@ utils_message_spec_test() ->
 utils_array_functions_test() ->
   ?_test(
     begin
-      {ok, UtilsCode} = file:read_file("utils.lua"),
-      {ok, State} = luerl:eval(UtilsCode, luerl:init()),
+      {ok, UtilsCode} = read_lua_file("utils.lua"),
+      {_, State} = luerl:do(binary_to_list(UtilsCode), luerl:init()),
       
       % Test array utilities
       Code = "
@@ -184,13 +214,13 @@ utils_array_functions_test() ->
         
         return concat_len, reversed[1], reversed[3], has_2, has_7, found
       ",
-      {ok, [ConcatLen, RevFirst, RevLast, Has2, Has7, Found]} = luerl:eval(Code, State),
-      ?assertEqual(6.0, ConcatLen),     % {1,2,3,4,5,6} length
-      ?assertEqual(3.0, RevFirst),      % {3,2,1}[1] = 3
-      ?assertEqual(1.0, RevLast),       % {3,2,1}[3] = 1
+      {[ConcatLen, RevFirst, RevLast, Has2, Has7, Found], _} = luerl:do(Code, State),
+      ?assertEqual(6, ConcatLen),     % {1,2,3,4,5,6} length
+      ?assertEqual(3, RevFirst),      % {3,2,1}[1] = 3
+      ?assertEqual(1, RevLast),       % {3,2,1}[3] = 1
       ?assertEqual(true, Has2),         % arr1 includes 2
       ?assertEqual(false, Has7),        % arr1 doesn't include 7
-      ?assertEqual(3.0, Found)          % first element > 2 is 3
+      ?assertEqual(3, Found)          % first element > 2 is 3
     end).
 
 %%%-------------------------------------------------------------------
