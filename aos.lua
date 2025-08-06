@@ -1,6 +1,25 @@
 -- set version for hyper-aos
 _G.package.loaded['.process'] = { _version = "dev" }
 
+-- Load utils module and integrate into global namespace
+-- This makes utils functions available in _G.utils for message processing
+local function load_utils()
+  -- In production, utils.lua is loaded separately
+  -- In test environments, utils functions may be pre-loaded
+  -- Ensure utils is available in global state persistence
+  _G.utils = _G.utils or {}
+  
+  -- If utils not loaded yet, provide fallback initialization
+  if not _G.utils._version then
+    -- Utils will be loaded by the runtime environment
+    -- This is a placeholder to ensure smooth operation
+    _G.utils._version = "loading"
+  end
+end
+
+-- Initialize utils on module load
+load_utils()
+
 -- Initialize global state variables directly in _G
 -- These will be persisted across compute calls
 _G.Inbox = _G.Inbox or {}
@@ -12,6 +31,70 @@ _G._OUTPUT = ""
 -- We keep meta separate as it contains private functions and initialization state
 ---@diagnostic disable-next-line
 local meta = { initialized = false }
+
+--- Utility helpers using utils module for message processing
+-- These functions integrate utils functionality with AOS message patterns
+
+--- Filter messages by authority using utils.filter and propEq
+-- @param messages table Array of messages to filter
+-- @param authority string The authority address to filter by
+-- @return table Filtered array of messages from the specified authority
+function meta.filter_by_authority(messages, authority)
+  if not _G.utils or not _G.utils.filter or not _G.utils.propEq then
+    return {}
+  end
+  
+  return _G.utils.filter(_G.utils.propEq("from", authority), messages)
+end
+
+--- Find trusted message using utils.find and matchesSpec
+-- @param messages table Array of messages to search
+-- @return table|nil First trusted message or nil
+function meta.find_trusted_message(messages)
+  if not _G.utils or not _G.utils.find then
+    return nil
+  end
+  
+  return _G.utils.find(function(msg)
+    return meta.is_trusted(msg)
+  end, messages)
+end
+
+--- Transform message data using utils.map
+-- @param messages table Array of messages to transform
+-- @param transformer function Function to apply to each message
+-- @return table Array of transformed messages
+function meta.transform_messages(messages, transformer)
+  if not _G.utils or not _G.utils.map then
+    return messages
+  end
+  
+  return _G.utils.map(transformer, messages)
+end
+
+--- Check if message matches a specification using utils.matchesSpec
+-- @param msg table The message to check
+-- @param spec any The specification to match against
+-- @return boolean Whether the message matches the specification
+function meta.matches_spec(msg, spec)
+  if not _G.utils or not _G.utils.matchesSpec then
+    return false
+  end
+  
+  return _G.utils.matchesSpec(msg, spec)
+end
+
+--- Get message property using utils.prop
+-- @param msg table The message object
+-- @param property string The property name to extract
+-- @return any The property value or nil
+function meta.get_message_prop(msg, property)
+  if not _G.utils or not _G.utils.prop then
+    return nil
+  end
+  
+  return _G.utils.prop(property, msg)
+end
 
 -- List of Lua built-in keys to exclude when serializing state
 -- This ensures we only return user data, not system functions/tables
@@ -27,6 +110,8 @@ local SYSTEM_KEYS = {
   "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
   -- Private/temporary variables
   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
+  -- Utils module (system component, persisted separately)
+  "utils",
   -- These will be handled specially or excluded
   "State", "_G"
 }
@@ -509,10 +594,31 @@ function compute(state, assignment)
   if not meta.initialized then 
     meta.init(msg) 
   end
+  
+  -- Ensure utils is loaded and available
+  if not _G.utils then
+    load_utils()
+  end
 
   -- Extract and normalize action
   local action = msg.action or ""
   action = string.lower(action)
+  
+  -- Demonstrate utils integration for message processing
+  if action == "demo-utils" then
+    -- Show utils functionality with current message
+    local demo_result = {
+      utils_version = _G.utils._version or "not_loaded",
+      message_keys = _G.utils.keys and _G.utils.keys(msg) or {},
+      trusted = meta.is_trusted(msg),
+      matches_eval_spec = _G.utils.matchesSpec and _G.utils.matchesSpec(msg, {action = "demo-utils"}) or false,
+      inbox_count = #_G.Inbox,
+      filtered_inbox = meta.filter_by_authority(_G.Inbox, msg.from or "unknown")
+    }
+    print("Utils Integration Demo:")
+    print(demo_result)
+    return "ok", extract_state_from_global()
+  end
 
   local status, result = false, ""
 
