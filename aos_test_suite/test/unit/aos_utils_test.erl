@@ -24,9 +24,29 @@
 %% Test setup and teardown
 setup() ->
     LuaState1 = luerl:init(),
-    {ok, UtilsContent} = file:read_file("../utils.lua"),
-    {_, LuaState2} = luerl:do(binary_to_list(UtilsContent), LuaState1),
-    LuaState2.
+    
+    %% Try different possible locations for utils.lua
+    UtilsPath = case file:read_file("../../src/utils.lua") of
+        {ok, Content} -> {ok, Content};
+        {error, _} ->
+            case file:read_file("../src/utils.lua") of
+                {ok, Content} -> {ok, Content};
+                {error, _} ->
+                    case file:read_file("../utils.lua") of
+                        {ok, Content} -> {ok, Content};
+                        {error, _} ->
+                            {error, "Could not find utils.lua in expected locations"}
+                    end
+            end
+    end,
+    
+    case UtilsPath of
+        {ok, UtilsContent} ->
+            {_, LuaState2} = luerl:do(binary_to_list(UtilsContent), LuaState1),
+            LuaState2;
+        {error, Reason} ->
+            error({utils_file_not_found, Reason})
+    end.
 
 cleanup(_LuaState) ->
     ok.
@@ -695,7 +715,22 @@ test_luerl_compatibility(LuaState) ->
 %% Test backwards compatibility with capital U alias
 backwards_compatibility_test() ->
     LuaState0 = luerl:init(),
-    {ok, UtilsContent} = file:read_file("utils.lua"),
+    
+    %% Try different possible locations for utils.lua
+    {ok, UtilsContent} = case file:read_file("../../src/utils.lua") of
+        {ok, Content1} -> {ok, Content1};
+        {error, _} ->
+            case file:read_file("../src/utils.lua") of
+                {ok, Content2} -> {ok, Content2};
+                {error, _} ->
+                    case file:read_file("utils.lua") of
+                        {ok, Content3} -> {ok, Content3};
+                        {error, _} ->
+                            error("Could not find utils.lua in expected locations")
+                    end
+            end
+    end,
+    
     {_, LuaState} = luerl:do(binary_to_list(UtilsContent), LuaState0),
     
     LuaCode = "

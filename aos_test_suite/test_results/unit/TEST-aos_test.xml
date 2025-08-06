@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="7" failures="0" errors="0" skipped="0" time="0.031" name="module 'aos_test'">
+  <testcase time="0.002" name="aos_test:0 basic_message_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_test:0 eval_math_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_test:0 require_version_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_test:0 one_plus_one_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_test:0 send_outbox_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_test:0 print_function_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_test:0 multiple_sends_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

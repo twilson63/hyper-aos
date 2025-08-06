@@ -1,6 +1,6 @@
-.PHONY: all compile test eunit test-old test-require test-math test-outbox clean deps
+.PHONY: all compile test eunit test-unit test-integration test-security test-legacy test-authorities test-all test-old test-require test-math test-outbox clean deps shell
 
-all: deps compile eunit
+all: deps compile test-all
 
 deps:
 	@echo "Fetching dependencies..."
@@ -10,9 +10,38 @@ compile:
 	@echo "Compiling..."
 	@rebar3 compile
 
-# New EUnit tests (recommended)
+# Test categories
+test-unit: compile
+	@echo "Running unit tests..."
+	@mkdir -p test_results/unit
+	@rebar3 as unit_test eunit
+
+test-integration: compile
+	@echo "Running integration tests..."
+	@mkdir -p test_results/integration
+	@rebar3 as integration_test eunit
+
+test-security: compile
+	@echo "Running security tests..."
+	@mkdir -p test_results/security
+	@rebar3 as security_test eunit
+
+test-legacy: compile
+	@echo "Running legacy tests..."
+	@mkdir -p test_results/legacy
+	@rebar3 as legacy_test eunit
+
+# Authorities tests (backward compatibility)
+test-authorities: test-security
+
+# Run all test categories
+test-all: test-unit test-integration test-security test-legacy
+	@echo "All test categories completed"
+
+# Standard eunit (runs all tests)
 eunit: compile
-	@echo "Running EUnit tests..."
+	@echo "Running all EUnit tests..."
+	@mkdir -p test_results
 	@rebar3 eunit
 
 # Old manual tests (kept for reference)
@@ -35,10 +64,10 @@ test-outbox: compile
 clean:
 	@echo "Cleaning..."
 	@rebar3 clean
-	@rm -rf _build
+	@rm -rf _build test_results
 
 shell: compile
 	@rebar3 shell
 
-# Alias for backward compatibility
-test: eunit
+# Aliases for backward compatibility
+test: test-all

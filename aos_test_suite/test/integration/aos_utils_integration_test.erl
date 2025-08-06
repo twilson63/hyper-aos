@@ -259,17 +259,41 @@ authority_validation_test() ->
 
 %% Load aos.lua code with utils integration
 load_aos_with_utils() ->
-  {ok, AosCode} = file:read_file("../aos.lua"),
-  AosCode.
+  % Try different possible locations for aos.lua
+  case file:read_file("../../src/aos.lua") of
+    {ok, Content} -> Content;
+    {error, _} ->
+      case file:read_file("../src/aos.lua") of
+        {ok, Content} -> Content;
+        {error, _} ->
+          case file:read_file("../aos.lua") of
+            {ok, Content} -> Content;
+            {error, _} ->
+              error("Could not find aos.lua in expected locations")
+          end
+      end
+  end.
 
 %% Setup basic test environment with utils pre-loaded
 setup_test_environment() ->
   % First load utils
-  {ok, UtilsCode} = file:read_file("../utils.lua"),
+  UtilsCode = case file:read_file("../../src/utils.lua") of
+    {ok, Content} -> Content;
+    {error, _} ->
+      case file:read_file("../src/utils.lua") of
+        {ok, Content} -> Content;
+        {error, _} ->
+          case file:read_file("../utils.lua") of
+            {ok, Content} -> Content;
+            {error, _} ->
+              error("Could not find utils.lua in expected locations")
+          end
+      end
+  end,
   {ok, State1} = luerl:eval(UtilsCode, luerl:init()),
   
   % Then load aos
-  {ok, AosCode} = file:read_file("../aos.lua"),
+  AosCode = load_aos_with_utils(),
   {ok, State2} = luerl:eval(AosCode, State1),
   State2.
 
