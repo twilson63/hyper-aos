@@ -3,26 +3,16 @@ _G.package.loaded['.process'] = { _version = "dev" }
 
 -- Load utils module and integrate into global namespace
 -- This makes utils functions available in _G.utils for message processing
-local function load_utils()
-  -- In production, utils.lua is loaded separately
-  -- In test environments, utils functions may be pre-loaded
-  -- Ensure utils is available in global state persistence
-  _G.utils = _G.utils or {}
-  
-  -- If utils not loaded yet, provide fallback initialization
-  if not _G.utils._version then
-    -- Utils will be loaded by the runtime environment
-    -- This is a placeholder to ensure smooth operation
-    _G.utils._version = "loading"
-  end
-  
-  -- Provide backwards compatibility alias: _G.Utils -> _G.utils
-  -- This ensures code using Utils.map() continues to work
-  _G.Utils = _G.utils
+-- Only initialize if utils hasn't been loaded yet to avoid conflicts
+if not _G.utils or type(_G.utils) ~= "table" then
+  _G.utils = {}
 end
 
--- Initialize utils on module load
-load_utils()
+-- Provide backwards compatibility alias: _G.Utils -> _G.utils
+-- This ensures code using Utils.map() continues to work
+if _G.utils then
+  _G.Utils = _G.utils
+end
 
 -- Initialize global state variables directly in _G
 -- These will be persisted across compute calls
@@ -36,70 +26,8 @@ _G._OUTPUT = ""
 ---@diagnostic disable-next-line
 local meta = { initialized = false }
 
---- Utility helpers using utils module for message processing
--- These functions integrate utils functionality with AOS message patterns
-
---- Filter messages by authority using utils.filter and propEq
--- @param messages table Array of messages to filter
--- @param authority string The authority address to filter by
--- @return table Filtered array of messages from the specified authority
-function meta.filter_by_authority(messages, authority)
-  if not _G.utils or not _G.utils.filter or not _G.utils.propEq then
-    return {}
-  end
-  
-  return _G.utils.filter(_G.utils.propEq("from", authority), messages)
-end
-
---- Find trusted message using utils.find and matchesSpec
--- @param messages table Array of messages to search
--- @return table|nil First trusted message or nil
-function meta.find_trusted_message(messages)
-  if not _G.utils or not _G.utils.find then
-    return nil
-  end
-  
-  return _G.utils.find(function(msg)
-    return meta.is_trusted(msg)
-  end, messages)
-end
-
---- Transform message data using utils.map
--- @param messages table Array of messages to transform
--- @param transformer function Function to apply to each message
--- @return table Array of transformed messages
-function meta.transform_messages(messages, transformer)
-  if not _G.utils or not _G.utils.map then
-    return messages
-  end
-  
-  return _G.utils.map(transformer, messages)
-end
-
---- Check if message matches a specification using utils.matchesSpec
--- @param msg table The message to check
--- @param spec any The specification to match against
--- @return boolean Whether the message matches the specification
-function meta.matches_spec(msg, spec)
-  if not _G.utils or not _G.utils.matchesSpec then
-    return false
-  end
-  
-  return _G.utils.matchesSpec(msg, spec)
-end
-
---- Get message property using utils.prop
--- @param msg table The message object
--- @param property string The property name to extract
--- @return any The property value or nil
-function meta.get_message_prop(msg, property)
-  if not _G.utils or not _G.utils.prop then
-    return nil
-  end
-  
-  return _G.utils.prop(property, msg)
-end
-
+-- Utils helper functions removed to avoid LUERL loading conflicts
+-- Utils should be accessed directly via _G.utils or _G.Utils
 -- List of Lua built-in keys to exclude when serializing state
 -- This ensures we only return user data, not system functions/tables
 local SYSTEM_KEYS = {
@@ -599,9 +527,9 @@ function compute(state, assignment)
     meta.init(msg) 
   end
   
-  -- Ensure utils is loaded and available
-  if not _G.utils then
-    load_utils()
+  -- Ensure utils backwards compatibility alias is set
+  if _G.utils and not _G.Utils then
+    _G.Utils = _G.utils
   end
 
   -- Extract and normalize action
@@ -617,7 +545,7 @@ function compute(state, assignment)
       trusted = meta.is_trusted(msg),
       matches_eval_spec = _G.utils.matchesSpec and _G.utils.matchesSpec(msg, {action = "demo-utils"}) or false,
       inbox_count = #_G.Inbox,
-      filtered_inbox = meta.filter_by_authority(_G.Inbox, msg.from or "unknown")
+      -- filtered_inbox removed due to luerl loading conflict
     }
     print("Utils Integration Demo:")
     print(demo_result)
