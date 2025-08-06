@@ -155,9 +155,29 @@ build_lua_value_string(_) ->
 %% Initialize AOS with loaded Lua state
 initialize_aos() ->
     LuaState0 = luerl:init(),
-    {ok, AosContent} = file:read_file("../aos.lua"),
-    {_, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
-    LuaState1.
+    
+    %% Try different possible locations for aos.lua
+    AosPath = case file:read_file("../../src/aos.lua") of
+        {ok, Content} -> {ok, Content};
+        {error, _} ->
+            case file:read_file("../src/aos.lua") of
+                {ok, Content} -> {ok, Content};
+                {error, _} ->
+                    case file:read_file("../aos.lua") of
+                        {ok, Content} -> {ok, Content};
+                        {error, _} ->
+                            {error, "Could not find aos.lua in expected locations"}
+                    end
+            end
+    end,
+    
+    case AosPath of
+        {ok, AosContent} ->
+            {_, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
+            LuaState1;
+        {error, Reason} ->
+            error({aos_file_not_found, Reason})
+    end.
 
 %% Initialize a process with an owner
 initialize_process(LuaState, State) ->

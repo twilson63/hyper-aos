@@ -1,6 +1,19 @@
 -- set version for hyper-aos
 _G.package.loaded['.process'] = { _version = "dev" }
 
+-- Load utils module and integrate into global namespace
+-- This makes utils functions available in _G.utils for message processing
+-- Only initialize if utils hasn't been loaded yet to avoid conflicts
+if not _G.utils or type(_G.utils) ~= "table" then
+  _G.utils = {}
+end
+
+-- Provide backwards compatibility alias: _G.Utils -> _G.utils
+-- This ensures code using Utils.map() continues to work
+if _G.utils then
+  _G.Utils = _G.utils
+end
+
 -- Initialize global state variables directly in _G
 -- These will be persisted across compute calls
 _G.Inbox = _G.Inbox or {}
@@ -13,6 +26,8 @@ _G._OUTPUT = ""
 ---@diagnostic disable-next-line
 local meta = { initialized = false }
 
+-- Utils helper functions removed to avoid LUERL loading conflicts
+-- Utils should be accessed directly via _G.utils or _G.Utils
 -- List of Lua built-in keys to exclude when serializing state
 -- This ensures we only return user data, not system functions/tables
 local SYSTEM_KEYS = {
@@ -27,6 +42,8 @@ local SYSTEM_KEYS = {
   "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
   -- Private/temporary variables
   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
+  -- Utils module (system component, persisted separately)
+  "utils",
   -- These will be handled specially or excluded
   "State", "_G"
 }
@@ -509,10 +526,31 @@ function compute(state, assignment)
   if not meta.initialized then 
     meta.init(msg) 
   end
+  
+  -- Ensure utils backwards compatibility alias is set
+  if _G.utils and not _G.Utils then
+    _G.Utils = _G.utils
+  end
 
   -- Extract and normalize action
   local action = msg.action or ""
   action = string.lower(action)
+  
+  -- Demonstrate utils integration for message processing
+  if action == "demo-utils" then
+    -- Show utils functionality with current message
+    local demo_result = {
+      utils_version = _G.utils._version or "not_loaded",
+      message_keys = _G.utils.keys and _G.utils.keys(msg) or {},
+      trusted = meta.is_trusted(msg),
+      matches_eval_spec = _G.utils.matchesSpec and _G.utils.matchesSpec(msg, {action = "demo-utils"}) or false,
+      inbox_count = #_G.Inbox,
+      -- filtered_inbox removed due to luerl loading conflict
+    }
+    print("Utils Integration Demo:")
+    print(demo_result)
+    return "ok", extract_state_from_global()
+  end
 
   local status, result = false, ""
 

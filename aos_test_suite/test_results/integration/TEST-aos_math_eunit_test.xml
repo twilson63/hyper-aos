@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="8" failures="0" errors="0" skipped="0" time="0.042" name="module 'aos_math_eunit_test'">
+  <testcase time="0.002" name="aos_math_eunit_test:0 addition_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.003" name="aos_math_eunit_test:0 subtraction_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.003" name="aos_math_eunit_test:0 multiplication_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_math_eunit_test:0 division_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_math_eunit_test:0 exponentiation_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_math_eunit_test:0 modulo_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_math_eunit_test:0 complex_expression_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_math_eunit_test:0 floating_point_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="52" failures="0" errors="0" skipped="0" time="0.176" name="module 'aos_utils_test'">
+  <testcase time="0.000" name="aos_utils_test:62 -utils_test_/0-fun-50- (Pattern matching - wildcard)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:63 -utils_test_/0-fun-49- (Pattern matching - string exact)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:64 -utils_test_/0-fun-48- (Pattern matching - string regex)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:65 -utils_test_/0-fun-47- (Pattern matching - function)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:66 -utils_test_/0-fun-46- (Pattern matching - table)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:67 -utils_test_/0-fun-45- (Pattern matching - nil handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:70 -utils_test_/0-fun-44- (Spec matching - function spec)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:71 -utils_test_/0-fun-43- (Spec matching - table spec)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:72 -utils_test_/0-fun-42- (Spec matching - string spec)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:73 -utils_test_/0-fun-41- (Spec matching - nil handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:76 -utils_test_/0-fun-40- (Curry - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:77 -utils_test_/0-fun-39- (Curry - partial application)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:78 -utils_test_/0-fun-38- (Curry - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:79 -utils_test_/0-fun-37- (Compose - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:80 -utils_test_/0-fun-36- (Compose - multiple functions)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:83 -utils_test_/0-fun-35- (Concat - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:84 -utils_test_/0-fun-34- (Concat - empty arrays)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:85 -utils_test_/0-fun-33- (Concat - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:86 -utils_test_/0-fun-32- (Reverse - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:87 -utils_test_/0-fun-31- (Reverse - empty array)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:88 -utils_test_/0-fun-30- (Reverse - single element)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:91 -utils_test_/0-fun-29- (Reduce - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:92 -utils_test_/0-fun-28- (Reduce - empty array)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:93 -utils_test_/0-fun-27- (Reduce - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:94 -utils_test_/0-fun-26- (Map - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:95 -utils_test_/0-fun-25- (Map - empty array)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:96 -utils_test_/0-fun-24- (Map - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:97 -utils_test_/0-fun-23- (Filter - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:98 -utils_test_/0-fun-22- (Filter - all match)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_utils_test:99 -utils_test_/0-fun-21- (Filter - none match)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:102 -utils_test_/0-fun-20- (Find - found element)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:103 -utils_test_/0-fun-19- (Find - not found)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:104 -utils_test_/0-fun-18- (Find - object search)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:105 -utils_test_/0-fun-17- (Includes - found element)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:106 -utils_test_/0-fun-16- (Includes - not found)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:107 -utils_test_/0-fun-15- (Includes - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:110 -utils_test_/0-fun-14- (Prop - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:111 -utils_test_/0-fun-13- (Prop - missing property)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:112 -utils_test_/0-fun-12- (Prop - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:113 -utils_test_/0-fun-11- (PropEq - matching value)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:114 -utils_test_/0-fun-10- (PropEq - non-matching value)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:115 -utils_test_/0-fun-9- (PropEq - nil handling (LUERL curry issue))">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:116 -utils_test_/0-fun-8- (Keys - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:117 -utils_test_/0-fun-7- (Keys - empty table)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:118 -utils_test_/0-fun-6- (Keys - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:119 -utils_test_/0-fun-5- (Values - basic functionality)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:120 -utils_test_/0-fun-4- (Values - empty table)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:121 -utils_test_/0-fun-3- (Values - error handling)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:124 -utils_test_/0-fun-2- (Integration - chaining operations)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.014" name="aos_utils_test:125 -utils_test_/0-fun-1- (Performance - large dataset)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_test:126 -utils_test_/0-fun-0- (LUERL compatibility - type conversions)">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_utils_test:0 backwards_compatibility_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

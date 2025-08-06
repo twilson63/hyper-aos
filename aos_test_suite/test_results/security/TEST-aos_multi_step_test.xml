@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="3" failures="0" errors="0" skipped="0" time="0.018" name="module 'aos_multi_step_test'">
+  <testcase time="0.003" name="aos_multi_step_test:0 multi_step_eval_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_multi_step_test:0 authorities_multi_step_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.004" name="aos_multi_step_test:0 state_isolation_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>
