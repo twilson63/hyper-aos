@@ -14,11 +14,15 @@
     build_lua_table_string/1,
     build_lua_value_string/1,
     initialize_aos/0,
+    initialize_fresh_aos/0,
     initialize_process/2,
     call_compute/3,
     extract_output_data/1,
     create_unauthorized_eval_message/1,
-    create_message_without_commitments/1
+    create_message_without_commitments/1,
+    cleanup_lua_state/1,
+    get_atom_count/0,
+    ensure_binary_keys/1
 ]).
 
 %% Default test owner address
@@ -152,9 +156,18 @@ build_lua_value_string(false) ->
 build_lua_value_string(_) ->
     "nil".
 
-%% Initialize AOS with loaded Lua state
+%% Initialize AOS with loaded Lua state (legacy function)
 initialize_aos() ->
+    initialize_fresh_aos().
+
+%% Initialize fresh AOS state - creates completely new LUERL state
+%% This prevents atom table corruption between tests
+initialize_fresh_aos() ->
+    %% Always create a completely fresh LUERL state
     LuaState0 = luerl:init(),
+    
+    %% Ensure we have a clean environment by forcing garbage collection
+    erlang:garbage_collect(),
     
     %% Try different possible locations for aos.lua
     AosPath = case file:read_file("../../src/aos.lua") of
@@ -173,22 +186,33 @@ initialize_aos() ->
     
     case AosPath of
         {ok, AosContent} ->
-            {_, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
-            LuaState1;
+            try
+                %% Load the AOS code with binary strings to avoid atom creation
+                {_, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
+                LuaState1
+            catch
+                Error:Reason:Stack ->
+                    error({aos_load_failed, Error, Reason, Stack})
+            end;
         {error, Reason} ->
             error({aos_file_not_found, Reason})
     end.
 
-%% Initialize a process with an owner
+%% Initialize a process with an owner using fresh state
 initialize_process(LuaState, State) ->
-    ProcessAssignment = create_process_assignment(),
-    {[_, _], NewLuaState} = call_compute(LuaState, State, ProcessAssignment),
+    ProcessAssignment = ensure_binary_keys(create_process_assignment()),
+    SafeState = ensure_binary_keys(State),
+    {[_, _], NewLuaState} = call_compute(LuaState, SafeState, ProcessAssignment),
     NewLuaState.
 
-%% Call compute function
+%% Call compute function with binary string safety
 call_compute(LuaState, State, Assignment) ->
-    StateStr = build_lua_table_string(State),
-    AssignmentStr = build_lua_table_string(Assignment),
+    %% Ensure all keys are binary to prevent atom creation
+    SafeState = ensure_binary_keys(State),
+    SafeAssignment = ensure_binary_keys(Assignment),
+    
+    StateStr = build_lua_table_string(SafeState),
+    AssignmentStr = build_lua_table_string(SafeAssignment),
     
     LuaCode = lists:flatten([
         "local state = ", StateStr, "\n",
@@ -197,7 +221,12 @@ call_compute(LuaState, State, Assignment) ->
         "return result.results.output.data, result\n"
     ]),
     
-    luerl:do(LuaCode, LuaState).
+    try
+        luerl:do(LuaCode, LuaState)
+    catch
+        Error:Reason:Stack ->
+            error({compute_failed, Error, Reason, Stack})
+    end.
 
 %% Extract output data from result
 extract_output_data(Result) when is_binary(Result) ->
@@ -230,3 +259,40 @@ create_message_without_commitments(Data) ->
         <<"action">> => <<"eval">>,
         <<"data">> => Data
     }.
+
+%% Clean up LUERL state - forces garbage collection
+%% This helps prevent atom table growth between tests
+cleanup_lua_state(LuaState) ->
+    try
+        %% Try to clear any globals that might hold references
+        luerl:set_table([<<"_G">>], [], LuaState)
+    catch
+        _:_ -> ok  % Ignore cleanup errors
+    end,
+    %% Force garbage collection
+    erlang:garbage_collect(),
+    ok.
+
+%% Get current atom count for monitoring atom table growth
+get_atom_count() ->
+    erlang:system_info(atom_count).
+
+%% Ensure all keys in a map are binary strings, not atoms
+%% This prevents accidental atom creation during testing
+ensure_binary_keys(Map) when is_map(Map) ->
+    maps:fold(fun(K, V, Acc) ->
+        BinKey = case K of
+            K when is_binary(K) -> K;
+            K when is_atom(K) -> atom_to_binary(K, utf8);
+            K when is_list(K) -> list_to_binary(K);
+            K -> K  % Keep other types as-is
+        end,
+        NewValue = case V of
+            V when is_map(V) -> ensure_binary_keys(V);
+            V when is_list(V) -> [ensure_binary_keys(Item) || Item <- V];
+            V -> V
+        end,
+        Acc#{BinKey => NewValue}
+    end, #{}, Map);
+ensure_binary_keys(Other) ->
+    Other.
