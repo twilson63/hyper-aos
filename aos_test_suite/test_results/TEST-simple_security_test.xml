@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="6" failures="0" errors="0" skipped="0" time="0.030" name="module 'simple_security_test'">
+<testsuite tests="6" failures="0" errors="0" skipped="0" time="0.027" name="module 'simple_security_test'">
   <testcase time="0.002" name="simple_security_test:0 no_owner_initialized_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="simple_security_test:0 matching_commitment_test">
+  <testcase time="0.001" name="simple_security_test:0 matching_commitment_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="simple_security_test:0 missing_commitment_test">
+  <testcase time="0.001" name="simple_security_test:0 missing_commitment_test">
     <system-out>
     </system-out>
   </testcase>
@@ -20,7 +20,7 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="simple_security_test:0 hmac_commitment_test">
+  <testcase time="0.001" name="simple_security_test:0 hmac_commitment_test">
     <system-out>
     </system-out>
   </testcase>

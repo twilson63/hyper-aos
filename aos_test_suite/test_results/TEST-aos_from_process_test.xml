@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.021" name="module 'aos_from_process_test'">
+<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.024" name="module 'aos_from_process_test'">
   <testcase time="0.002" name="aos_from_process_test:0 from_process_precedence_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_from_process_test:0 from_process_wrong_value_test">
+  <testcase time="0.002" name="aos_from_process_test:0 from_process_wrong_value_test">
     <system-out>
     </system-out>
   </testcase>
@@ -12,11 +12,11 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_from_process_test:0 first_non_hmac_committer_test">
+  <testcase time="0.002" name="aos_from_process_test:0 first_non_hmac_committer_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_from_process_test:0 no_valid_from_test">
+  <testcase time="0.002" name="aos_from_process_test:0 no_valid_from_test">
     <system-out>
     </system-out>
   </testcase>

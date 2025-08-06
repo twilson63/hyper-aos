@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite tests="5" failures="0" errors="0" skipped="0" time="0.026" name="module 'aos_process_init_test'">
-  <testcase time="0.002" name="aos_process_init_test:0 process_message_sets_owner_test">
+  <testcase time="0.003" name="aos_process_init_test:0 process_message_sets_owner_test">
     <system-out>
     </system-out>
   </testcase>
@@ -8,7 +8,7 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.003" name="aos_process_init_test:0 hmac_commitment_skipped_test">
+  <testcase time="0.002" name="aos_process_init_test:0 hmac_commitment_skipped_test">
     <system-out>
     </system-out>
   </testcase>

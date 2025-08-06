@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="3" failures="0" errors="0" skipped="0" time="0.013" name="module 'aos_colors_test'">
-  <testcase time="0.001" name="aos_colors_test:0 colors_initialization_test">
+<testsuite tests="3" failures="0" errors="0" skipped="0" time="0.014" name="module 'aos_colors_test'">
+  <testcase time="0.002" name="aos_colors_test:0 colors_initialization_test">
     <system-out>
     </system-out>
   </testcase>

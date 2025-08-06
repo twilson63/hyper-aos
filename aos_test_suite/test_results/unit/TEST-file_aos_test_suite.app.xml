@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="12" failures="0" errors="0" skipped="0" time="0.152" name="file &quot;aos_test_suite.app&quot;">
-  <testcase time="0.069" name="aos_math_test:0 addition_test">
+<testsuite tests="12" failures="0" errors="0" skipped="0" time="0.094" name="file &quot;aos_test_suite.app&quot;">
+  <testcase time="0.032" name="aos_math_test:0 addition_test">
     <system-out>
     </system-out>
   </testcase>
@@ -12,15 +12,15 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_math_test:0 division_test">
+  <testcase time="0.001" name="aos_math_test:0 division_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_math_test:0 exponentiation_test">
+  <testcase time="0.001" name="aos_math_test:0 exponentiation_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.003" name="aos_math_test:0 complex_expression_test">
+  <testcase time="0.001" name="aos_math_test:0 complex_expression_test">
     <system-out>
     </system-out>
   </testcase>
@@ -32,19 +32,19 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.005" name="aos_security_test:0 eval_with_valid_commitments_test">
+  <testcase time="0.002" name="aos_security_test:0 eval_with_valid_commitments_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_security_test:0 eval_with_invalid_commitments_test">
+  <testcase time="0.002" name="aos_security_test:0 eval_with_invalid_commitments_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_security_test:0 eval_without_commitments_test">
+  <testcase time="0.001" name="aos_security_test:0 eval_without_commitments_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_security_test:0 process_initialization_test">
+  <testcase time="0.002" name="aos_security_test:0 process_initialization_test">
     <system-out>
     </system-out>
   </testcase>

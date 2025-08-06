@@ -27,13 +27,13 @@
   <testcase time="0.000" name="simple_utils_integration_test:24 -utils_basic_loading_test/0-fun-2- (Utils basic loading)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_basic_loading_test/0-fun-2-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 26)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>
@@ -42,13 +42,13 @@ in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
   <testcase time="0.000" name="simple_utils_integration_test:40 -utils_basic_functions_test/0-fun-6- (Utils basic functions)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_basic_functions_test/0-fun-6-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 42)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>
@@ -57,13 +57,13 @@ in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
   <testcase time="0.000" name="simple_utils_integration_test:70 -utils_pattern_matching_test/0-fun-4- (Utils pattern matching)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_pattern_matching_test/0-fun-4-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 72)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>
@@ -72,13 +72,13 @@ in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
   <testcase time="0.000" name="simple_utils_integration_test:101 -utils_curry_test/0-fun-1- (Utils curry function)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_curry_test/0-fun-1-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 103)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>
@@ -87,13 +87,13 @@ in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
   <testcase time="0.000" name="simple_utils_integration_test:120 -utils_message_spec_test/0-fun-3- (Utils message spec matching)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_message_spec_test/0-fun-3-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 122)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>
@@ -102,13 +102,13 @@ in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
   <testcase time="0.000" name="simple_utils_integration_test:161 -utils_array_functions_test/0-fun-6- (Utils array functions)">
     <error type="error">
 ::in function simple_utils_integration_test:'-utils_array_functions_test/0-fun-6-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/simple_utils_integration_test.erl, line 163)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
-in call from eunit_proc:run_group/2 (eunit_proc.erl, line 583)
+in call from eunit_proc:run_group/2 (eunit_proc.erl, line 593)
 **error:{badmatch,{error,enoent}}
     </error>
     <system-out>

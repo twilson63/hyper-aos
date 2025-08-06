@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.025" name="module 'aos_owner_test'">
+<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.023" name="module 'aos_owner_test'">
   <testcase time="0.002" name="aos_owner_test:0 matching_committer_test">
     <system-out>
     </system-out>
@@ -8,11 +8,11 @@
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_owner_test:0 no_owner_set_test">
+  <testcase time="0.001" name="aos_owner_test:0 no_owner_set_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_owner_test:0 hmac_committer_ignored_test">
+  <testcase time="0.001" name="aos_owner_test:0 hmac_committer_ignored_test">
     <system-out>
     </system-out>
   </testcase>
