@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite tests="5" failures="0" errors="0" skipped="0" time="0.026" name="module 'aos_stringify_test'">
-  <testcase time="0.002" name="aos_stringify_test:0 stringify_simple_array_test">
+  <testcase time="0.003" name="aos_stringify_test:0 stringify_simple_array_test">
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.003" name="aos_stringify_test:0 stringify_nested_table_test">
+  <testcase time="0.002" name="aos_stringify_test:0 stringify_nested_table_test">
     <system-out>
     </system-out>
   </testcase>

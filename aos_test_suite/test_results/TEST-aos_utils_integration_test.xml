@@ -36,12 +36,12 @@
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-utils_loading_test/0-fun-5-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 27)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -216,21 +216,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -270,12 +270,12 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-message_filtering_test/0-fun-1-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 51)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -450,21 +450,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -500,16 +500,16 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_utils_integration_test:90 -pattern_matching_test/0-fun-1- (Pattern matching with specs)">
+  <testcase time="0.003" name="aos_utils_integration_test:90 -pattern_matching_test/0-fun-1- (Pattern matching with specs)">
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-pattern_matching_test/0-fun-1-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 92)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -684,21 +684,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -738,12 +738,12 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-curry_functionality_test/0-fun-3-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 119)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -918,21 +918,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -972,12 +972,12 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-composition_test/0-fun-1-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 143)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -1152,21 +1152,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -1202,16 +1202,16 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.003" name="aos_utils_integration_test:162 -demo_utils_action_test/0-fun-1- (Demo utils action)">
+  <testcase time="0.002" name="aos_utils_integration_test:162 -demo_utils_action_test/0-fun-1- (Demo utils action)">
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-demo_utils_action_test/0-fun-1-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 164)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -1386,21 +1386,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -1436,16 +1436,16 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.003" name="aos_utils_integration_test:182 -array_manipulation_test/0-fun-5- (Array manipulation)">
+  <testcase time="0.002" name="aos_utils_integration_test:182 -array_manipulation_test/0-fun-5- (Array manipulation)">
     <error type="error">
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:'-array_manipulation_test/0-fun-5-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 184)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -1620,21 +1620,21 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
@@ -1675,11 +1675,11 @@ in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 359)
 ::in function aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 297)
 in call from aos_utils_integration_test:setup_test_environment_with_authorities/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 302)
 in call from aos_utils_integration_test:'-authority_validation_test/0-fun-2-'/0 (/Users/rakis/demos/hyper-aos-demo/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 216)
-in call from eunit_test:run_testfun/1 (eunit_test.erl, line 72)
-in call from eunit_proc:run_test/1 (eunit_proc.erl, line 544)
-in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 369)
-in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 527)
-in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
 **error:{badmatch,
  {error,function_clause,
   [{luerl_heap,alloc_funcdef,
@@ -1854,21 +1854,21 @@ in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 469)
          {...}|...]},
        {return,0}]},
      [[{&lt;&lt;"_version"&gt;&gt;,&lt;&lt;"1.0.0"&gt;&gt;},
-       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;},
-       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.117429323&gt;}]]],
+       {&lt;&lt;"compose"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"concat"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"curry"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"filter"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"find"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"includes"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"keys"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"map"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesPattern"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"matchesSpec"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"prop"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"propEq"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reduce"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"reverse"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;},
+       {&lt;&lt;"values"&gt;&gt;,#Fun&lt;luerl.6.57469438&gt;}]]],
     [{file,
       "/Users/rakis/demos/hyper-aos-demo/aos_test_suite/_build/default/lib/luerl/src/luerl_heap.erl"},
      {line,447}]},
