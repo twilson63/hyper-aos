@@ -44,6 +44,14 @@ test-handlers: compile
 	@echo "Running handlers module tests..."
 	@rebar3 eunit --module=aos_handlers_eunit_test
 
+test-bint: compile
+	@echo "Running bint module tests..."
+	@rebar3 eunit --module=aos_bint_eunit_test
+
+benchmark-bint-luerl: compile
+	@echo "Running bint_luerl benchmarks..."
+	@rebar3 shell --eval "bint_luerl_benchmark_test:bint_luerl_benchmark_test(), init:stop()."
+
 clean:
 	@echo "Cleaning..."
 	@rebar3 clean

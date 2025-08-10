@@ -9,6 +9,7 @@ local source_files = {
   "src/utils.lua",
   "src/handlers-utils.lua",
   "src/handlers.lua",
+  "src/bint_luerl.lua",  -- Will be loaded as .bint
   -- "src/eval.lua",
   -- aos.lua is automatically loaded last with special handling
 }
@@ -18,7 +19,19 @@ local function wrap_module(source, filename)
   -- Extract just the filename without path and extension for module name
   local module_name = filename:match("([^/]+)%.lua$") or filename
   
-  return string.format([[
+  -- Special handling for bint_luerl - load it as .bint
+  if module_name == "bint_luerl" then
+    return string.format([[
+do
+  local module = function()
+%s
+  end
+  -- Load bint_luerl as .bint module (returns the constructor function)
+  _G.package.loaded['.bint'] = module()
+end
+]], source)
+  else
+    return string.format([[
 do
   local module = function()
 %s
@@ -26,6 +39,7 @@ do
   _G.package.loaded['.%s'] = module()
 end
 ]], source, module_name)
+  end
 end
 
 -- Read file contents
