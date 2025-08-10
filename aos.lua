@@ -388,7 +388,7 @@ local SYSTEM_KEYS = {
   "coroutine", "debug", "io", "math", "os", "package", "string", "table", "utf8",
   
   -- AOS specific functions that shouldn't be serialized
-  "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
+  "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify", "Handlers",
   
   -- Private/temporary variables
   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
