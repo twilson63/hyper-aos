@@ -7,7 +7,8 @@ local version = "0.1.0" -- Update version as needed
 local source_files = {
   -- Add your source files here in the order they should be loaded
   "src/utils.lua",
-  -- "src/handlers.lua",
+  "src/handlers-utils.lua",
+  "src/handlers.lua",
   -- "src/eval.lua",
   -- aos.lua is automatically loaded last with special handling
 }

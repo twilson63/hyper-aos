@@ -36,6 +36,10 @@ test-utils: compile
 	@echo "Running utils module tests..."
 	@rebar3 eunit --module=aos_utils_eunit_test
 
+test-handlers-utils: compile
+	@echo "Running handlers-utils module tests..."
+	@rebar3 eunit --module=aos_handlers_utils_eunit_test
+
 clean:
 	@echo "Cleaning..."
 	@rebar3 clean
