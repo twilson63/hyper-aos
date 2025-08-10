@@ -32,6 +32,10 @@ test-outbox: compile
 	@echo "Running outbox/send functionality tests..."
 	@rebar3 shell --eval "aos_outbox_test:test_outbox_functionality(), init:stop()."
 
+test-utils: compile
+	@echo "Running utils module tests..."
+	@rebar3 eunit --module=aos_utils_eunit_test
+
 clean:
 	@echo "Cleaning..."
 	@rebar3 clean

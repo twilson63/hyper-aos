@@ -6,12 +6,9 @@ local version = "0.1.0" -- Update version as needed
 -- Ordered list of source files to concatenate (aos.lua will be added last automatically)
 local source_files = {
   -- Add your source files here in the order they should be loaded
-  -- Example:
-  -- "src/utils.lua",
+  "src/utils.lua",
   -- "src/handlers.lua",
   -- "src/eval.lua",
-  "src/test.lua",
-  "src/test2.lua"
   -- aos.lua is automatically loaded last with special handling
 }
 
