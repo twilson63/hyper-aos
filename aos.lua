@@ -523,9 +523,11 @@ function compute(state, assignment)
   -- Handle actions by calling global functions
   if action ~= "compute" and type(_G[action]) == "function" then
     status, result = pcall(_G[action], msg)
+  elseif action ~= "" then
+    status, result = pcall(Handlers.evaluate, msg, {})
   else
     -- If not handled, add to inbox
-    result = "New Message"
+    result = "New Message - "
     table.insert(_G.Inbox, msg)
     -- Implement FIFO rotation when inbox exceeds limit
     if #_G.Inbox > _G.MAX_INBOX_SIZE then
