@@ -10,6 +10,7 @@ local source_files = {
   "src/handlers-utils.lua",
   "src/handlers.lua",
   "src/bint_luerl.lua",  -- Will be loaded as .bint
+  "src/json.lua",  -- Will be loaded as json (not .json)
   -- "src/eval.lua",
   -- aos.lua is automatically loaded last with special handling
 }
@@ -28,6 +29,17 @@ do
   end
   -- Load bint_luerl as .bint module (returns the constructor function)
   _G.package.loaded['.bint'] = module()
+end
+]], source)
+  -- Special handling for json - load it as 'json' (not '.json')
+  elseif module_name == "json" then
+    return string.format([[
+do
+  local module = function()
+%s
+  end
+  -- Load json module without the dot prefix
+  _G.package.loaded['json'] = module()
 end
 ]], source)
   else
