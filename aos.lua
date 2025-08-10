@@ -1,5 +1,9 @@
 -- set version for hyper-aos
 _G.package.loaded['.process'] = { _version = "dev" }
+-- load handlers to global state if exists
+if _G.package.loaded['.handlers'] then
+  _G.Handlers = require('.handlers')
+end
 
 -- initialize inbox with max size
 Inbox = Inbox or {}
