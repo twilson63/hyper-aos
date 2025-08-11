@@ -197,6 +197,35 @@ function _G.meta.is_owner(msg)
   return false
 end
 
+-- Private function to format and return new message notification
+-- Formats the from address as first 3 + ... + last 3 chars in green
+-- Shows first 20 chars of message content in blue
+function _G.meta.printNewMessage(msg)
+  -- Format the from address: first 3 chars + ... + last 3 chars
+  local from_display = ""
+  if msg.from then
+    if #msg.from > 6 then
+      from_display = string.sub(msg.from, 1, 3) .. "..." .. string.sub(msg.from, -3)
+    else
+      from_display = msg.from
+    end
+  else
+    from_display = "unknown"
+  end
+  
+  -- Get the message content (first 20 characters)
+  local content = msg.data or msg.body or ""
+  if #content > 20 then
+    content = string.sub(content, 1, 20)
+  end
+  
+  -- Format and return the message with colors
+  return "New Message From " .. 
+         _G.colors.green .. from_display .. _G.colors.reset .. 
+         ": Data = " .. 
+         _G.colors.blue .. content .. _G.colors.reset
+end
+
 -- override print function with colorized table support
 ---@diagnostic disable-next-line
 function print(...)
@@ -527,7 +556,8 @@ function compute(state, assignment)
     status, result = pcall(Handlers.evaluate, msg, {})
   else
     -- If not handled, add to inbox
-    result = "New Message - "
+    result = _G.meta.printNewMessage(msg)
+    
     table.insert(_G.Inbox, msg)
     -- Implement FIFO rotation when inbox exceeds limit
     if #_G.Inbox > _G.MAX_INBOX_SIZE then
