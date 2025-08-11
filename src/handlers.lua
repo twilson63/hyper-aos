@@ -348,8 +348,9 @@ function handlers.evaluate(msg, env)
   end
   -- do default
   if not handled then
-    local idx = findIndexByProp(handlers.list, "name", "_default")
-    if handlers.list[idx] then handlers.list[idx].handle(msg,env) end
+    -- add to inbox
+    table.insert(Inbox, msg)
+    return true, _G.meta.printNewMessage(msg)
   end
 end
 
