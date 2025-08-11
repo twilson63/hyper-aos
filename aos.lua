@@ -79,6 +79,7 @@ function _G.meta.init(msg)
       magenta = "\27[35m",
       cyan = "\27[36m",
       white = "\27[37m",
+      gray = "\27[90m",  -- Same as bright_black
       
       -- Bright colors
       bright_black = "\27[90m",
@@ -550,7 +551,8 @@ function compute(state, assignment)
   local status, result = false, ""
 
   -- Handle actions by calling global functions
-  if action ~= "compute" and type(_G[action]) == "function" then
+  --if action ~= "compute" and type(_G[action]) == "function" then
+  if action == "eval" then
     status, result = pcall(_G[action], msg)
   elseif action ~= "" then
     status, result = pcall(Handlers.evaluate, msg, {})

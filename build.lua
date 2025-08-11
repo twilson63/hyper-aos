@@ -1,7 +1,7 @@
 -- Build script for hyper-aos
 -- Concatenates multiple Lua source files into a single distributable file
 
-local version = "0.1.0" -- Update version as needed
+local version = "0.1.1" -- Update version as needed
 
 -- Ordered list of source files to concatenate (aos.lua will be added last automatically)
 local source_files = {
