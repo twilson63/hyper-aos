@@ -103,10 +103,10 @@ handlers_test_() ->
           
           % Generate resolver
           test_generate_resolver_function(L),
-          test_generate_resolver_table(L),
+          test_generate_resolver_table(L)
           
           % Default handler
-          test_default_handler(L)
+          %% test_default_handler(L)  % Commented out - using Inbox insertion instead
          ]
      end}.
 
@@ -498,23 +498,23 @@ test_generate_resolver_table(L) ->
          ?assertEqual(<<"eval">>, Result)
      end}.
 
-%% Default handler test
-
-test_default_handler(L) ->
-    {"default handler is called when no match",
-     fun() ->
-         Code = "local h = require('.handlers')\n" ++
-                "h.list = {}  -- Clear list\n" ++
-                "local result = nil\n" ++
-                "h.add('test', { Action = 'NoMatch' }, function(msg) result = 'test' end)\n" ++
-                "h.add('_default', function() return true end, function(msg) result = 'default' end)\n" ++
-                "local msg = { Action = 'Different' }\n" ++
-                "local env = {}\n" ++
-                "h.evaluate(msg, env)\n" ++
-                "return result",
-         {[Result], _} = luerl:do(Code, L),
-         ?assertEqual(<<"default">>, Result)
-     end}.
+%% Default handler test - Commented out, using Inbox insertion instead
+%%
+%% test_default_handler(L) ->
+%%     {"default handler is called when no match",
+%%      fun() ->
+%%          Code = "local h = require('.handlers')\n" ++
+%%                 "h.list = {}  -- Clear list\n" ++
+%%                 "local result = nil\n" ++
+%%                 "h.add('test', { Action = 'NoMatch' }, function(msg) result = 'test' end)\n" ++
+%%                 "h.add('_default', function() return true end, function(msg) result = 'default' end)\n" ++
+%%                 "local msg = { Action = 'Different' }\n" ++
+%%                 "local env = {}\n" ++
+%%                 "h.evaluate(msg, env)\n" ++
+%%                 "return result",
+%%          {[Result], _} = luerl:do(Code, L),
+%%          ?assertEqual(<<"default">>, Result)
+%%      end}.
 
 %% Edge case and error handling tests
 

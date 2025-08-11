@@ -20,8 +20,8 @@ local utils = require('.utils')
 
 handlers.utils = require('.handlers-utils')
 -- if update we need to keep defined handlers
-if Handlers then
-  handlers.list = Handlers.list or {}
+if _G.Handlers then
+  handlers.list = _G.Handlers.list or {}
 else
   handlers.list = {}
 end
@@ -349,8 +349,14 @@ function handlers.evaluate(msg, env)
   -- do default
   if not handled then
     -- add to inbox
-    table.insert(Inbox, msg)
-    return true, _G.meta.printNewMessage(msg)
+    if _G.Inbox then
+      table.insert(_G.Inbox, msg)
+    end
+    if _G.meta and _G.meta.printNewMessage then
+      return true, _G.meta.printNewMessage(msg)
+    else
+      return true
+    end
   end
 end
 
