@@ -20,8 +20,13 @@ basic_message_test() ->
     Result = aos_test_helpers:call_compute(LuaState2, State, Assignment),
     Output = aos_test_helpers:extract_output_data(Result),
     
-    %% Verify message was added to inbox
-    ?assertEqual(<<"New Message">>, Output).
+    %% Verify message was added to inbox - now includes formatted from address and data
+    %% The message has no 'from' field, so it displays "unknown", and data is "Hello"
+    %% Note: Output includes ANSI color codes
+    ?assertMatch(<<"New Message From ", _/binary>>, Output),
+    %% Also verify it contains the expected parts
+    ?assert(binary:match(Output, <<"unknown">>) =/= nomatch),
+    ?assert(binary:match(Output, <<"Hello">>) =/= nomatch).
 
 %% Test eval action with math
 eval_math_test() ->
