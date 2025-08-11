@@ -12,6 +12,7 @@ local source_files = {
   "src/bint_luerl.lua",  -- Will be loaded as .bint
   "src/json.lua",  -- Will be loaded as json (not .json)
   "src/dump.lua",  -- Will be loaded as .dump
+  "src/chance.lua",  -- Will be loaded as .chance
   -- "src/eval.lua",
   -- aos.lua is automatically loaded last with special handling
 }
