@@ -349,7 +349,7 @@ function handlers.evaluate(msg, env)
   -- do default
   if not handled then
     local idx = findIndexByProp(handlers.list, "name", "_default")
-    handlers.list[idx].handle(msg,env)
+    if handlers.list[idx] then handlers.list[idx].handle(msg,env) end
   end
 end
 
