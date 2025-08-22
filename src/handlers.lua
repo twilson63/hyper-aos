@@ -353,7 +353,8 @@ function handlers.evaluate(msg, env)
       table.insert(_G.Inbox, msg)
     end
     if _G.meta and _G.meta.printNewMessage then
-      return true, _G.meta.printNewMessage(msg)
+      print(_G.meta.printNewMessage(msg))
+      return true
     else
       return true
     end

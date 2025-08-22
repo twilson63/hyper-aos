@@ -450,7 +450,8 @@ local function copy_table_recursive(tbl, visited)
         -- Unmark after processing
         visited[v] = nil
       end
-    elseif value_type ~= "function" then
+    --elseif value_type ~= "function" then
+    else
       -- Copy non-function values
       copy[k] = v
     end
