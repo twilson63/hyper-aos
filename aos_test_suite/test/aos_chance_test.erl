@@ -6,9 +6,9 @@ load_chance_module(LuaState) ->
     {ok, ChanceBin} = file:read_file("../src/chance.lua"),
     ChanceSrc = binary_to_list(ChanceBin),
     
-    % Load the chance module
-    LoadCode = "do local module = function() " ++ ChanceSrc ++ " end; _G.chance = module() end",
-    {_, LuaState2} = luerl:do(LoadCode, LuaState),
+    % Load the chance module - wrap it in a function to capture the return value
+    LoadCode = "do local chance_module = function() " ++ ChanceSrc ++ " end; _G.chance = chance_module() end",
+    {ok, _, LuaState2} = luerl:do(LoadCode, LuaState),
     LuaState2.
 
 %% Test setup
@@ -29,7 +29,7 @@ basic_random_test() ->
         return results[1], results[2], results[3], results[4], results[5]
     ",
     
-    {[R1, R2, R3, R4, R5], _} = luerl:do(Code, LuaState),
+    {ok, [R1, R2, R3, R4, R5], _} = luerl:do(Code, LuaState),
     
     % All values should be between 0 and 1
     ?assert(R1 >= 0 andalso R1 < 1),
@@ -65,7 +65,7 @@ seeded_random_test() ->
         return seq1[1], seq1[2], seq1[3], seq2[1], seq2[2], seq2[3]
     ",
     
-    {[S1_1, S1_2, S1_3, S2_1, S2_2, S2_3], _} = luerl:do(Code, LuaState),
+    {ok, [S1_1, S1_2, S1_3, S2_1, S2_2, S2_3], _} = luerl:do(Code, LuaState),
     
     % Same seed should produce same sequence
     ?assertEqual(S1_1, S2_1),
@@ -95,7 +95,7 @@ integer_test() ->
         return min_val, max_val, results[1], results[2], results[3]
     ",
     
-    {[MinVal, MaxVal, R1, R2, R3], _} = luerl:do(Code, LuaState),
+    {ok, [MinVal, MaxVal, R1, R2, R3], _} = luerl:do(Code, LuaState),
     
     % All values should be integers between 1 and 10
     ?assert(MinVal >= 1),
@@ -118,7 +118,7 @@ integer_error_test() ->
         return status, err
     ",
     
-    {[Status, Error], _} = luerl:do(Code, LuaState),
+    {ok, [Status, Error], _} = luerl:do(Code, LuaState),
     ?assertEqual(false, Status),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error)), "greater than") > 0).
 
@@ -145,7 +145,7 @@ bool_test() ->
         return true_count, results[1], results[2]
     ",
     
-    {[TrueCount, R1, R2], _} = luerl:do(Code, LuaState),
+    {ok, [TrueCount, R1, R2], _} = luerl:do(Code, LuaState),
     
     % Should be roughly 50/50 (within reasonable bounds)
     ?assert(TrueCount > 30 andalso TrueCount < 70),
@@ -176,7 +176,7 @@ bool_likelihood_test() ->
         return true_count
     ",
     
-    {[TrueCount], _} = luerl:do(Code, LuaState),
+    {ok, [TrueCount], _} = luerl:do(Code, LuaState),
     
     % Should be roughly 80% true (within reasonable bounds)
     ?assert(TrueCount > 60 andalso TrueCount < 95).
@@ -196,7 +196,7 @@ character_test() ->
         return alpha_char, numeric_char, mixed_char, lower_char, upper_char
     ",
     
-    {[AlphaChar, NumericChar, MixedChar, LowerChar, UpperChar], _} = luerl:do(Code, LuaState),
+    {ok, [AlphaChar, NumericChar, MixedChar, LowerChar, UpperChar], _} = luerl:do(Code, LuaState),
     
     % Convert to strings for easier testing
     AlphaStr = binary_to_list(iolist_to_binary(AlphaChar)),
@@ -236,7 +236,7 @@ string_test() ->
         return default_str, long_str, numeric_str, alpha_str
     ",
     
-    {[DefaultStr, LongStr, NumericStr, AlphaStr], _} = luerl:do(Code, LuaState),
+    {ok, [DefaultStr, LongStr, NumericStr, AlphaStr], _} = luerl:do(Code, LuaState),
     
     % Convert to strings
     DefaultString = binary_to_list(iolist_to_binary(DefaultStr)),
@@ -285,7 +285,7 @@ pick_test() ->
         return valid, results[1], results[2], results[3]
     ",
     
-    {[Valid, R1, R2, R3], _} = luerl:do(Code, LuaState),
+    {ok, [Valid, R1, R2, R3], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(true, Valid),
     
@@ -309,7 +309,7 @@ pick_error_test() ->
         return status1, err1, status2, err2
     ",
     
-    {[Status1, Error1, Status2, Error2], _} = luerl:do(Code, LuaState),
+    {ok, [Status1, Error1, Status2, Error2], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(false, Status1),
     ?assertEqual(false, Status2),
@@ -356,7 +356,7 @@ shuffle_test() ->
         return all_present, same_length, is_shuffled, shuffled[1], shuffled[2]
     ",
     
-    {[AllPresent, SameLength, IsShuffled, S1, S2], _} = luerl:do(Code, LuaState),
+    {ok, [AllPresent, SameLength, IsShuffled, S1, S2], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(true, AllPresent),
     ?assertEqual(true, SameLength),
@@ -395,7 +395,7 @@ weighted_test() ->
         return counts.rare, counts.common, counts.uncommon
     ",
     
-    {[RareCount, CommonCount, UncommonCount], _} = luerl:do(Code, LuaState),
+    {ok, [RareCount, CommonCount, UncommonCount], _} = luerl:do(Code, LuaState),
     
     % Common should be most frequent, rare should be least
     ?assert(CommonCount > UncommonCount),
@@ -412,7 +412,7 @@ weighted_error_test() ->
         return status1, err1, status2, err2
     ",
     
-    {[Status1, Error1, Status2, Error2], _} = luerl:do(Code, LuaState),
+    {ok, [Status1, Error1, Status2, Error2], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(false, Status1),
     ?assertEqual(false, Status2),
@@ -445,7 +445,7 @@ normal_test() ->
         return mean, custom, results[1], results[2]
     ",
     
-    {[Mean, Custom, R1, R2], _} = luerl:do(Code, LuaState),
+    {ok, [Mean, Custom, R1, R2], _} = luerl:do(Code, LuaState),
     
     % Mean should be close to 0 (within reasonable bounds for 100 samples)
     ?assert(abs_val(Mean) < 0.5),
@@ -465,7 +465,7 @@ version_test() ->
         return chance._version
     ",
     
-    {[Version], _} = luerl:do(Code, LuaState),
+    {ok, [Version], _} = luerl:do(Code, LuaState),
     ?assertEqual(<<"1.0.0">>, iolist_to_binary(Version)).
 
 %% Helper function for absolute value

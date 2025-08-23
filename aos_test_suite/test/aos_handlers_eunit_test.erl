@@ -33,7 +33,12 @@ setup() ->
                    "  _G.package.loaded['.utils'] = module()\n" ++
                    "end",
     
-    {_, L1} = luerl:do(WrappedUtils, L0),
+    L1 = case luerl:do(WrappedUtils, L0) of
+        {ok, _, NewState1} -> 
+            NewState1;
+        {error, Reason1} ->
+            error({failed_to_load_module, utils, Reason1})
+    end,
     
     % Then load handlers-utils module
     WrappedHandlersUtils = "do\n" ++
@@ -43,7 +48,12 @@ setup() ->
                           "  _G.package.loaded['.handlers-utils'] = module()\n" ++
                           "end",
     
-    {_, L2} = luerl:do(WrappedHandlersUtils, L1),
+    L2 = case luerl:do(WrappedHandlersUtils, L1) of
+        {ok, _, NewState2} -> 
+            NewState2;
+        {error, Reason2} ->
+            error({failed_to_load_module, handlers_utils, Reason2})
+    end,
     
     % Finally load handlers module
     WrappedHandlers = "do\n" ++
@@ -54,7 +64,12 @@ setup() ->
                       "  _G.Handlers = module()  -- Also set as global\n" ++
                       "end",
     
-    {_, L3} = luerl:do(WrappedHandlers, L2),
+    L3 = case luerl:do(WrappedHandlers, L2) of
+        {ok, _, NewState3} -> 
+            NewState3;
+        {error, Reason3} ->
+            error({failed_to_load_module, handlers, Reason3})
+    end,
     
     L3.
 
@@ -115,7 +130,7 @@ handlers_test_() ->
 test_version(L) ->
     {"handlers has correct version",
      fun() ->
-         {[Version], _} = luerl:do("return require('.handlers')._version", L),
+         {ok, [Version], _} = luerl:do("return require('.handlers')._version", L),
          ?assertEqual(<<"0.0.5">>, Version)
      end}.
 
@@ -128,7 +143,7 @@ test_add_handler(L) ->
                 "h.list = {}  -- Clear list\n" ++
                 "local count = h.add('test', { Action = 'Eval' }, function(msg) return 'handled' end)\n" ++
                 "return count, #h.list, h.list[1].name",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, ListSize, Name] = Results,
          ?assertEqual(1, Count),
          ?assertEqual(1, ListSize),
@@ -143,7 +158,7 @@ test_append_handler(L) ->
                 "h.add('first', 'Action1', function(msg) return end)\n" ++
                 "h.append('second', 'Action2', function(msg) return end)\n" ++
                 "return #h.list, h.list[1].name, h.list[2].name",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, First, Second] = Results,
          ?assertEqual(2, Count),
          ?assertEqual(<<"first">>, First),
@@ -158,7 +173,7 @@ test_prepend_handler(L) ->
                 "h.add('first', 'Action1', function(msg) return end)\n" ++
                 "h.prepend('second', 'Action2', function(msg) return end)\n" ++
                 "return #h.list, h.list[1].name, h.list[2].name",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, First, Second] = Results,
          ?assertEqual(2, Count),
          ?assertEqual(<<"second">>, First),
@@ -181,7 +196,7 @@ test_remove_handler(L) ->
                 "  table.insert(remaining, handler.name)\n" ++
                 "end\n" ++
                 "return before, after, remaining[1], remaining[2]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Before, After, Name1, Name2] = Results,
          ?assertEqual(3, Before),
          ?assertEqual(2, After),
@@ -198,7 +213,7 @@ test_update_existing_handler(L) ->
                 "h.add('test', 'Action1', function(msg) called = 1 end)\n" ++
                 "h.add('test', 'Action2', function(msg) called = 2 end)\n" ++
                 "return #h.list, h.list[1].pattern",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, Pattern] = Results,
          ?assertEqual(1, Count),  % Should still have only one handler
          ?assertEqual(<<"Action2">>, Pattern)  % Pattern should be updated
@@ -220,7 +235,7 @@ test_string_pattern(L) ->
                 "h.add('_default', function() return true end, function() end)\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return handled",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -237,7 +252,7 @@ test_table_pattern(L) ->
                 "h.add('_default', function() return true end, function() end)\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return handled",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -255,7 +270,7 @@ test_function_pattern(L) ->
                 "h.add('_default', function() return true end, function() end)\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return handled",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -273,7 +288,7 @@ test_evaluate_simple(L) ->
                 "local env = {}\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return result",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(<<"success">>, Result)
      end}.
 
@@ -292,7 +307,7 @@ test_evaluate_continue(L) ->
                 "local env = {}\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return #calls, calls[1], calls[2]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, First, Second] = Results,
          ?assertEqual(2, Count),
          ?assertEqual(<<"first">>, First),
@@ -314,7 +329,7 @@ test_evaluate_break(L) ->
                 "local env = {}\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return #calls, calls[1]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, First] = Results,
          ?assertEqual(1, Count),
          ?assertEqual(<<"first">>, First)
@@ -335,7 +350,7 @@ test_evaluate_skip(L) ->
                 "local env = {}\n" ++
                 "h.evaluate(msg, env)\n" ++
                 "return #calls, calls[1]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, First] = Results,
          ?assertEqual(1, Count),
          ?assertEqual(<<"second">>, First)
@@ -359,7 +374,7 @@ test_once_handler(L) ->
                 "local after = #h.list\n" ++
                 "h.evaluate(msg, env)  -- Should not increment calls\n" ++
                 "return before, after, calls",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Before, After, Calls] = Results,
          ?assertEqual(2, Before),  % once handler + default
          ?assertEqual(1, After),   % only default remains
@@ -374,7 +389,7 @@ test_once_handler_named(L) ->
                 "local calls = 0\n" ++
                 "h.once('myonce', function(msg) return -1 end, function(msg) calls = calls + 1 end)\n" ++
                 "return h.list[1].name, h.list[1].maxRuns",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Name, MaxRuns] = Results,
          ?assertEqual(<<"myonce">>, Name),
          ?assertEqual(1, MaxRuns)
@@ -398,7 +413,7 @@ test_maxruns(L) ->
                 "local after2 = #h.list\n" ++
                 "h.evaluate(msg, env)  -- Third call (should not increment)\n" ++
                 "return after1, after2, calls",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [After1, After2, Calls] = Results,
          ?assertEqual(2, After1),  % test + default
          ?assertEqual(1, After2),  % only default
@@ -419,7 +434,7 @@ test_maxruns_infinite(L) ->
                 "  h.evaluate(msg, env)\n" ++
                 "end\n" ++
                 "return #h.list, calls",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Count, Calls] = Results,
          ?assertEqual(2, Count),  % Still has both handlers
          ?assertEqual(5, Calls)
@@ -440,7 +455,7 @@ test_before_handler(L) ->
                 "  table.insert(names, handler.name)\n" ++
                 "end\n" ++
                 "return names[1], names[2], names[3]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [First, Second, Third] = Results,
          ?assertEqual(<<"first">>, First),
          ?assertEqual(<<"second">>, Second),
@@ -460,7 +475,7 @@ test_after_handler(L) ->
                 "  table.insert(names, handler.name)\n" ++
                 "end\n" ++
                 "return names[1], names[2], names[3]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [First, Second, Third] = Results,
          ?assertEqual(<<"first">>, First),
          ?assertEqual(<<"second">>, Second),
@@ -478,7 +493,7 @@ test_generate_resolver_function(L) ->
                 "local resolver = h.generateResolver(fn)\n" ++
                 "resolver({ Data = 'test' })\n" ++
                 "return result",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(<<"test">>, Result)
      end}.
 
@@ -494,7 +509,7 @@ test_generate_resolver_table(L) ->
                 "local resolver = h.generateResolver(resolverSpec)\n" ++
                 "resolver({ Action = 'Eval' })\n" ++
                 "return result",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(<<"eval">>, Result)
      end}.
 
@@ -512,7 +527,7 @@ test_generate_resolver_table(L) ->
 %%                 "local env = {}\n" ++
 %%                 "h.evaluate(msg, env)\n" ++
 %%                 "return result",
-%%          {[Result], _} = luerl:do(Code, L),
+%%          {ok, [Result], _} = luerl:do(Code, L),
 %%          ?assertEqual(<<"default">>, Result)
 %%      end}.
 
@@ -533,7 +548,7 @@ test_error_handling() ->
                        "  h.add(123, 'pattern', function() end)\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -545,7 +560,7 @@ test_error_handling() ->
                        "  h.remove(123)\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -557,7 +572,7 @@ test_error_handling() ->
                        "  h.evaluate('not-a-table', {})\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -569,7 +584,7 @@ test_error_handling() ->
                        "  h.evaluate({}, 'not-a-table')\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end}
           ]
@@ -604,7 +619,7 @@ test_complex_scenarios() ->
                        "local msg = { Continue = true, Break = true }\n" ++
                        "h.evaluate(msg, {})\n" ++
                        "return #log, log[1], log[2]",
-                {Results, _} = luerl:do(Code, L),
+                {ok, Results, _} = luerl:do(Code, L),
                 [Count, First, Second] = Results,
                 ?assertEqual(2, Count),
                 ?assertEqual(<<"continue">>, First),
@@ -628,7 +643,7 @@ test_complex_scenarios() ->
                        "}\n" ++
                        "h.evaluate(msg, {})\n" ++
                        "return result",
-                {[Result], _} = luerl:do(Code, L),
+                {ok, [Result], _} = luerl:do(Code, L),
                 ?assertEqual(<<"Processed">>, Result)
             end},
            
@@ -652,7 +667,7 @@ test_complex_scenarios() ->
                        "local msg = { Action = 'Multi' }\n" ++
                        "h.evaluate(msg, {})\n" ++
                        "return #results, results[1], results[2], results[3]",
-                {Results, _} = luerl:do(Code, L),
+                {ok, Results, _} = luerl:do(Code, L),
                 [Count, R1, R2, R3] = Results,
                 ?assertEqual(3, Count),
                 ?assertEqual(<<"first">>, R1),

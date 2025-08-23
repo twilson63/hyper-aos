@@ -6,9 +6,9 @@ load_json_module(LuaState) ->
     {ok, JsonBin} = file:read_file("../src/json.lua"),
     JsonSrc = binary_to_list(JsonBin),
     
-    % Load the json module
-    LoadCode = "do local module = function() " ++ JsonSrc ++ " end; _G.json = module() end",
-    {_, LuaState2} = luerl:do(LoadCode, LuaState),
+    % Load the json module - wrap it in a function to capture the return value
+    LoadCode = "do local json_module = function() " ++ JsonSrc ++ " end; _G.json = json_module() end",
+    {ok, _, LuaState2} = luerl:do(LoadCode, LuaState),
     LuaState2.
 
 %% Test setup
@@ -28,7 +28,7 @@ circular_reference_test() ->
         return status, err
     ",
     
-    {[Status, Error], _} = luerl:do(Code, LuaState),
+    {ok, [Status, Error], _} = luerl:do(Code, LuaState),
     
     % Should return false (error) and error message containing "circular"
     ?assertEqual(false, Status),
@@ -52,7 +52,7 @@ function_reference_test() ->
         return result, decoded.a, decoded.c, decoded.b
     ",
     
-    {[JsonStr, A, C, B], _} = luerl:do(Code, LuaState),
+    {ok, [JsonStr, A, C, B], _} = luerl:do(Code, LuaState),
     
     % Should encode without the functions
     ?assertEqual(1.0, A),
@@ -87,7 +87,7 @@ json_array_to_lua_table_test() ->
         return count, t[1], t[2], t[3], t[4], t[5], t[6], t[7]
     ",
     
-    {[Len, V1, V2, V3, V4, V5, V6, V7], _} = luerl:do(Code, LuaState),
+    {ok, [Len, V1, V2, V3, V4, V5, V6, V7], _} = luerl:do(Code, LuaState),
     
     % Arrays with trailing nil have length of last non-nil element
     ?assert(Len == 6 orelse Len == 7),
@@ -110,7 +110,7 @@ nested_array_test() ->
         return #t, t[1][1], t[1][2], t[2][1], t[2][2], t[3][1], t[3][2][1], t[3][2][2]
     ",
     
-    {[Len, V11, V12, V21, V22, V31, V321, V322], _} = luerl:do(Code, LuaState),
+    {ok, [Len, V11, V12, V21, V22, V31, V321, V322], _} = luerl:do(Code, LuaState),
     
     ?assert(Len == 3 orelse Len == 3.0),
     ?assert(V11 == 1 orelse V11 == 1.0),
@@ -131,7 +131,7 @@ json_object_to_lua_table_test() ->
         return t.name, t.age, t.active, t.balance, t['name'], t['age']
     ",
     
-    {[Name, Age, Active, Balance, Name2, Age2], _} = luerl:do(Code, LuaState),
+    {ok, [Name, Age, Active, Balance, Name2, Age2], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(<<"John">>, iolist_to_binary(Name)),
     ?assert(Age == 30 orelse Age == 30.0),
@@ -150,7 +150,7 @@ nested_object_test() ->
         return t.user.name, t.user.details.age, t.user.details.city
     ",
     
-    {[Name, Age, City], _} = luerl:do(Code, LuaState),
+    {ok, [Name, Age, City], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(<<"Alice">>, iolist_to_binary(Name)),
     ?assert(Age == 25 orelse Age == 25.0),
@@ -166,7 +166,7 @@ mixed_structure_test() ->
         return t.count, #t.items, t.items[1].id, t.items[1].name, t.items[2].id, t.items[2].name
     ",
     
-    {[Count, ItemsLen, Id1, Name1, Id2, Name2], _} = luerl:do(Code, LuaState),
+    {ok, [Count, ItemsLen, Id1, Name1, Id2, Name2], _} = luerl:do(Code, LuaState),
     
     ?assert(Count == 2 orelse Count == 2.0),
     ?assert(ItemsLen == 2 orelse ItemsLen == 2.0),
@@ -190,7 +190,7 @@ empty_structures_test() ->
         return array_len, object_count
     ",
     
-    {[ArrayLen, ObjectCount], _} = luerl:do(Code, LuaState),
+    {ok, [ArrayLen, ObjectCount], _} = luerl:do(Code, LuaState),
     
     ?assert(ArrayLen == 0 orelse ArrayLen == 0.0),
     ?assert(ObjectCount == 0 orelse ObjectCount == 0.0).
@@ -219,7 +219,7 @@ round_trip_test() ->
                decoded.object.a, decoded.object.b
     ",
     
-    {[Str, Num, Float, BoolT, BoolF, Null, ArrLen, A1, A2, A3, ObjA, ObjB], _} = luerl:do(Code, LuaState),
+    {ok, [Str, Num, Float, BoolT, BoolF, Null, ArrLen, A1, A2, A3, ObjA, ObjB], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(<<"hello world">>, iolist_to_binary(Str)),
     ?assert(Num == 42 orelse Num == 42.0),
@@ -245,7 +245,7 @@ special_characters_test() ->
         return decoded == test_str, encoded
     ",
     
-    {[Same, Encoded], _} = luerl:do(Code, LuaState),
+    {ok, [Same, Encoded], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(true, Same),
     % Check that encoded string contains escaped characters
@@ -266,7 +266,7 @@ unicode_test() ->
         return decoded == test_str
     ",
     
-    {[Same], _} = luerl:do(Code, LuaState),
+    {ok, [Same], _} = luerl:do(Code, LuaState),
     ?assertEqual(true, Same).
 
 %% Test invalid JSON handling
@@ -295,7 +295,7 @@ invalid_json_test() ->
             return status
         ", [EscapedJson]),
         
-        {[Status], _} = luerl:do(lists:flatten(Code), LuaState),
+        {ok, [Status], _} = luerl:do(lists:flatten(Code), LuaState),
         ?assertEqual(false, Status)
     end, InvalidTests).
 
@@ -311,7 +311,7 @@ sparse_array_test() ->
         return status, err
     ",
     
-    {[Status, Error], _} = luerl:do(Code, LuaState),
+    {ok, [Status, Error], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(false, Status),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error)), "sparse") > 0).
@@ -328,7 +328,7 @@ mixed_keys_test() ->
         return status, err
     ",
     
-    {[Status, Error], _} = luerl:do(Code, LuaState),
+    {ok, [Status, Error], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(false, Status),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error)), "mixed") > 0).
@@ -348,7 +348,7 @@ large_numbers_test() ->
         return decoded.large, decoded.negative, decoded.float
     ",
     
-    {[Large, Negative, Float], _} = luerl:do(Code, LuaState),
+    {ok, [Large, Negative, Float], _} = luerl:do(Code, LuaState),
     
     % Note: Lua numbers are floats, so there will be precision loss with large integers
     % The precision loss is more significant than expected (around 44 for 15-digit numbers)

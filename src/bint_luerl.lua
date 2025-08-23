@@ -43,7 +43,12 @@ local function newmodule(bits, wordbits)
   function bint.fromuinteger(x)
     x = tonumber(x)
     if x then
-      return setmetatable({value = math.floor(x)}, bint)
+      -- Use math.floor for normal numbers, but preserve large integers
+      if x >= -9007199254740992 and x <= 9007199254740992 then
+        return setmetatable({value = math.floor(x)}, bint)
+      else
+        return setmetatable({value = x}, bint)
+      end
     end
   end
   
@@ -51,7 +56,12 @@ local function newmodule(bits, wordbits)
   function bint.frominteger(x)
     x = tonumber(x)
     if x then
-      return setmetatable({value = math.floor(x)}, bint)
+      -- Use math.floor for normal numbers, but preserve large integers
+      if x >= -9007199254740992 and x <= 9007199254740992 then
+        return setmetatable({value = math.floor(x)}, bint)
+      else
+        return setmetatable({value = x}, bint)
+      end
     end
   end
   
@@ -65,34 +75,48 @@ local function newmodule(bits, wordbits)
       return nil
     end
     
-    -- Use native tonumber for conversion
-    local value = tonumber(s, base)
-    if value then
-      return setmetatable({value = math.floor(value)}, bint)
+    -- For small numbers, use tonumber for speed and compatibility
+    if #s <= 15 then
+      local value = tonumber(s, base)
+      if value then
+        return setmetatable({value = value}, bint)
+      end
     end
     
-    -- For very large numbers, parse manually
+    -- For large numbers, parse manually to avoid floating-point precision loss
     local sign, int = s:lower():match('^([+-]?)(%w+)$')
     if not int then
       return nil
     end
     
-    local result = 0
-    local power = 1
-    for i = #int, 1, -1 do
-      local digit = tonumber(int:sub(i, i), base)
-      if not digit then
+    -- Start with zero as a bint and build up the number
+    local result = setmetatable({value = 0}, bint)
+    local base_bint = setmetatable({value = base}, bint)
+    
+    for i = 1, #int do
+      local digit_char = int:sub(i, i)
+      local digit_val
+      if digit_char >= '0' and digit_char <= '9' then
+        digit_val = string.byte(digit_char) - string.byte('0')
+      elseif digit_char >= 'a' and digit_char <= 'z' then
+        digit_val = string.byte(digit_char) - string.byte('a') + 10
+      else
         return nil
       end
-      result = result + digit * power
-      power = power * base
+      
+      if digit_val >= base then
+        return nil
+      end
+      
+      -- result = result * base + digit_val
+      result = result * base_bint + setmetatable({value = digit_val}, bint)
     end
     
     if sign == '-' then
-      result = -result
+      result.value = -result.value
     end
     
-    return setmetatable({value = result}, bint)
+    return result
   end
   
   --- Create a bint from a string
@@ -155,7 +179,12 @@ local function newmodule(bits, wordbits)
   --- Convert to unsigned integer
   function bint.touinteger(x)
     if getmetatable(x) == bint then
-      return x.value
+      -- For very large numbers, return as-is. For smaller numbers, ensure integer format
+      if x.value >= -9007199254740992 and x.value <= 9007199254740992 then
+        return math.floor(x.value)
+      else
+        return x.value
+      end
     end
     return math.floor(tonumber(x) or 0)
   end
@@ -163,7 +192,12 @@ local function newmodule(bits, wordbits)
   --- Convert to signed integer
   function bint.tointeger(x)
     if getmetatable(x) == bint then
-      return x.value
+      -- For very large numbers, return as-is. For smaller numbers, ensure integer format
+      if x.value >= -9007199254740992 and x.value <= 9007199254740992 then
+        return math.floor(x.value)
+      else
+        return x.value
+      end
     end
     return math.floor(tonumber(x) or 0)
   end
@@ -207,7 +241,8 @@ local function newmodule(bits, wordbits)
     while value > 0 do
       local remainder = value % base
       table.insert(result, 1, digits:sub(remainder + 1, remainder + 1))
-      value = math.floor(value / base)
+      -- Use integer division to preserve precision in LUERL
+      value = value // base
     end
     
     return table.concat(result)
@@ -518,7 +553,8 @@ local function newmodule(bits, wordbits)
   
   --- To string
   function bint:__tostring()
-    return tostring(self.value)
+    -- Use tobase to get full decimal representation without scientific notation
+    return bint.tobase(self, 10)
   end
   
   --- Division and modulo operations

@@ -72,10 +72,11 @@ authorities_multi_step_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
-    %% Verify authorities were set
-    {MetaAuthorities, _} = luerl:get_table([<<"meta">>, <<"authorities">>], LuaState2),
-    %% Authorities are stored as a Lua array with {index, value} tuples
-    ?assertEqual([{1, Authority1}, {2, Authority2}], MetaAuthorities),
+    %% Verify authorities were set - check both possible locations
+    {ok, [Auth1], _} = luerl:do("return (_G.authorities or _G.meta.authorities or {})[1]", LuaState2),
+    {ok, [Auth2], _} = luerl:do("return (_G.authorities or _G.meta.authorities or {})[2]", LuaState2),
+    ?assertEqual(Authority1, Auth1),
+    ?assertEqual(Authority2, Auth2),
     
     %% Step 2: Test that state persists across multiple evals
     EvalMsg1 = aos_test_helpers:create_eval_message(

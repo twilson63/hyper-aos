@@ -23,7 +23,12 @@ setup() ->
                    "  _G.package.loaded['.utils'] = module()\n" ++
                    "end",
     
-    {_, L1} = luerl:do(WrappedUtils, L0),
+    L1 = case luerl:do(WrappedUtils, L0) of
+        {ok, _, NewState1} -> 
+            NewState1;
+        {error, Reason1} ->
+            error({failed_to_load_module, utils, Reason1})
+    end,
     L1.
 
 teardown(_) ->
@@ -86,7 +91,7 @@ utils_test_() ->
 test_version(L) ->
     {"utils has correct version",
      fun() ->
-         {[Version], _} = luerl:do("return require('.utils')._version", L),
+         {ok, [Version], _} = luerl:do("return require('.utils')._version", L),
          ?assertEqual(<<"0.0.5">>, Version)
      end}.
 
@@ -97,7 +102,7 @@ test_matches_pattern_wildcard(L) ->
      fun() ->
          Code = "local utils = require('.utils')\n" ++
                 "return utils.matchesPattern('_', 'anything', {})",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -106,12 +111,12 @@ test_matches_pattern_exact_string(L) ->
      fun() ->
          Code1 = "local utils = require('.utils')\n" ++
                  "return utils.matchesPattern('hello', 'hello', {})",
-         {[Result1], _} = luerl:do(Code1, L),
+         {ok, [Result1], _} = luerl:do(Code1, L),
          ?assert(Result1),
          
          Code2 = "local utils = require('.utils')\n" ++
                  "return utils.matchesPattern('hello', 'world', {})",
-         {[Result2], _} = luerl:do(Code2, L),
+         {ok, [Result2], _} = luerl:do(Code2, L),
          ?assertNot(Result2)
      end}.
 
@@ -120,12 +125,12 @@ test_matches_pattern_regex(L) ->
      fun() ->
          Code1 = "local utils = require('.utils')\n" ++
                  "return utils.matchesPattern('^test.*', 'testing123', {})",
-         {[Result1], _} = luerl:do(Code1, L),
+         {ok, [Result1], _} = luerl:do(Code1, L),
          ?assert(Result1),
          
          Code2 = "local utils = require('.utils')\n" ++
                  "return utils.matchesPattern('%d+', 'abc123def', {})",
-         {[Result2], _} = luerl:do(Code2, L),
+         {ok, [Result2], _} = luerl:do(Code2, L),
          ?assert(Result2)
      end}.
 
@@ -135,7 +140,7 @@ test_matches_pattern_function(L) ->
          Code = "local utils = require('.utils')\n" ++
                 "local pattern = function(value, msg) return value == 'test' end\n" ++
                 "return utils.matchesPattern(pattern, 'test', {})",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -145,7 +150,7 @@ test_matches_pattern_table(L) ->
          Code = "local utils = require('.utils')\n" ++
                 "local patterns = {'hello', 'world', 'test'}\n" ++
                 "return utils.matchesPattern(patterns, 'world', {})",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -154,7 +159,7 @@ test_matches_pattern_nil(L) ->
      fun() ->
          Code = "local utils = require('.utils')\n" ++
                 "return utils.matchesPattern(nil, 'anything', {})",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNot(Result)
      end}.
 
@@ -167,7 +172,7 @@ test_matches_spec_table(L) ->
                 "local msg = {action = 'eval', type = 'compute'}\n" ++
                 "local spec = {action = 'eval', type = '_'}\n" ++
                 "return utils.matchesSpec(msg, spec)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -178,7 +183,7 @@ test_matches_spec_function(L) ->
                 "local msg = {value = 10}\n" ++
                 "local spec = function(m) return m.value > 5 end\n" ++
                 "return utils.matchesSpec(msg, spec)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -188,7 +193,7 @@ test_matches_spec_string_action(L) ->
          Code = "local utils = require('.utils')\n" ++
                 "local msg = {action = 'eval'}\n" ++
                 "return utils.matchesSpec(msg, 'eval')",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -201,7 +206,7 @@ test_curry_basic(L) ->
                 "local add = function(a, b) return a + b end\n" ++
                 "local curriedAdd = utils.curry(add, 2)\n" ++
                 "return curriedAdd(5)(3)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(8, Result)
      end}.
 
@@ -213,7 +218,7 @@ test_curry_partial(L) ->
                 "local curried = utils.curry(add3, 3)\n" ++
                 "local add5 = curried(5)\n" ++
                 "return add5(2)(3)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(10, Result)
      end}.
 
@@ -227,7 +232,7 @@ test_concat(L) ->
                 "local b = {4, 5, 6}\n" ++
                 "local result = utils.concat(a)(b)\n" ++
                 "return result[1], result[3], result[6], #result",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual([1, 3, 6, 6], Results)
      end}.
 
@@ -238,7 +243,7 @@ test_reduce(L) ->
                 "local arr = {1, 2, 3, 4}\n" ++
                 "local sum = function(acc, v) return acc + v end\n" ++
                 "return utils.reduce(sum)(0)(arr)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(10, Result)
      end}.
 
@@ -250,7 +255,7 @@ test_map(L) ->
                 "local double = function(x) return x * 2 end\n" ++
                 "local result = utils.map(double)(arr)\n" ++
                 "return result[1], result[2], result[3]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual([2, 4, 6], Results)
      end}.
 
@@ -262,7 +267,7 @@ test_filter(L) ->
                 "local isEven = function(x) return x % 2 == 0 end\n" ++
                 "local result = utils.filter(isEven)(arr)\n" ++
                 "return result[1], result[2], #result",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual([2, 4, 2], Results)
      end}.
 
@@ -273,7 +278,7 @@ test_find(L) ->
                 "local arr = {1, 2, 3, 4, 5}\n" ++
                 "local isGT3 = function(x) return x > 3 end\n" ++
                 "return utils.find(isGT3)(arr)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(4, Result)
      end}.
 
@@ -284,7 +289,7 @@ test_reverse(L) ->
                 "local arr = {1, 2, 3, 4}\n" ++
                 "local result = utils.reverse(arr)\n" ++
                 "return result[1], result[2], result[3], result[4]",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual([4, 3, 2, 1], Results)
      end}.
 
@@ -294,13 +299,13 @@ test_includes(L) ->
          Code1 = "local utils = require('.utils')\n" ++
                  "local arr = {1, 2, 3, 4}\n" ++
                  "return utils.includes(3)(arr)",
-         {[Result1], _} = luerl:do(Code1, L),
+         {ok, [Result1], _} = luerl:do(Code1, L),
          ?assert(Result1),
          
          Code2 = "local utils = require('.utils')\n" ++
                  "local arr = {1, 2, 3, 4}\n" ++
                  "return utils.includes(5)(arr)",
-         {[Result2], _} = luerl:do(Code2, L),
+         {ok, [Result2], _} = luerl:do(Code2, L),
          ?assertNot(Result2)
      end}.
 
@@ -312,13 +317,13 @@ test_prop_eq(L) ->
          Code1 = "local utils = require('.utils')\n" ++
                  "local obj = {name = 'Lua', version = '5.4'}\n" ++
                  "return utils.propEq('name')('Lua')(obj)",
-         {[Result1], _} = luerl:do(Code1, L),
+         {ok, [Result1], _} = luerl:do(Code1, L),
          ?assert(Result1),
          
          Code2 = "local utils = require('.utils')\n" ++
                  "local obj = {name = 'Lua', version = '5.4'}\n" ++
                  "return utils.propEq('name')('Python')(obj)",
-         {[Result2], _} = luerl:do(Code2, L),
+         {ok, [Result2], _} = luerl:do(Code2, L),
          ?assertNot(Result2)
      end}.
 
@@ -328,7 +333,7 @@ test_prop(L) ->
          Code = "local utils = require('.utils')\n" ++
                 "local obj = {name = 'Lua', version = '5.4'}\n" ++
                 "return utils.prop('name')(obj)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(<<"Lua">>, Result)
      end}.
 
@@ -342,7 +347,7 @@ test_compose(L) ->
                 "local mul2 = function(x) return x * 2 end\n" ++
                 "local composed = utils.compose(add1)(mul2)\n" ++
                 "return composed(3)",  % Should be (3 * 2) + 1 = 7
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(7, Result)
      end}.
 
@@ -356,7 +361,7 @@ test_keys(L) ->
                 "local ks = utils.keys(obj)\n" ++
                 "table.sort(ks)\n" ++  % Sort for consistent ordering
                 "return ks[1], ks[2], #ks",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [K1, K2, Len] = Results,
          ?assertEqual(2, Len),
          Keys = lists:sort([K1, K2]),
@@ -375,7 +380,7 @@ test_values(L) ->
                 "  return tostring(a) < tostring(b)\n" ++
                 "end)\n" ++
                 "return vals[1], vals[2], #vals",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual(3, length(Results)),
          [V1, V2, Len] = Results,
          ?assertEqual(2, Len),
@@ -399,7 +404,7 @@ test_tab(L) ->
                 "}\n" ++
                 "local result = utils.Tab(msg)\n" ++
                 "return result.Action, result.Type, result.From",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          ?assertEqual([<<"Eval">>, <<"Message">>, <<"Process123">>], Results)
      end}.
 
@@ -420,7 +425,7 @@ test_error_handling() ->
                        "  return utils.concat({a = 1})({b = 2})\n" ++
                        "end)\n" ++
                        "return status, err",
-                {[Status, _Error], _} = luerl:do(Code, L),
+                {ok, [Status, _Error], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -432,7 +437,7 @@ test_error_handling() ->
                        "  return utils.reduce('not-a-function')(0)({1,2,3})\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -444,7 +449,7 @@ test_error_handling() ->
                        "  return utils.map(function(x) return x end)({a = 1})\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end}
           ]
@@ -468,7 +473,7 @@ test_complex_operations() ->
                        "local evens = utils.filter(function(x) return x > 5 end)(doubled)\n" ++
                        "local sum = utils.reduce(function(a,b) return a + b end)(0)(evens)\n" ++
                        "return sum",
-                {[Result], _} = luerl:do(Code, L),
+                {ok, [Result], _} = luerl:do(Code, L),
                 ?assertEqual(18, Result)  % (3*2 + 4*2 + 5*2) = 6+8+10 = 24, filtered >5 = 6+8+10 = 24
             end},
            
@@ -488,7 +493,7 @@ test_complex_operations() ->
                        "  recipient = 'addr123'\n" ++
                        "}\n" ++
                        "return utils.matchesSpec(msg, spec)",
-                {[Result], _} = luerl:do(Code, L),
+                {ok, [Result], _} = luerl:do(Code, L),
                 ?assert(Result)
             end}
           ]

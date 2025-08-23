@@ -1,211 +1,153 @@
 local dump = { _version = "1.0.0" }
 
-local type = type
-local floor = math.floor
-local tostring = tostring
-local tblsort = table.sort
-local tblconcat = table.concat
-local strmatch = string.match
-local strformat = string.format
-
-local INFINITE_POS = math.huge
-local LUA_FIELDNAME_PAT = '^[a-zA-Z_][a-zA-Z0-9_]*$'
-local FOR_KEY = 'key'
-local FOR_VAL = 'val'
-local FOR_CIRCULAR = 'circular'
-
-local RESERVED_WORD = {
-    ['nil'] = true,
-    ['true'] = true,
-    ['false'] = true,
-    ['local'] = true,
-    ['function'] = true,
-    ['and'] = true,
-    ['or'] = true,
-    ['not'] = true,
-    ['if'] = true,
-    ['elseif'] = true,
-    ['else'] = true,
-    ['for'] = true,
-    ['in'] = true,
-    ['while'] = true,
-    ['until'] = true,
-    ['repeat'] = true,
-    ['break'] = true,
-    ['goto'] = true,
-    ['return'] = true,
-    ['then'] = true,
-    ['do'] = true,
-    ['end'] = true,
+-- Reserved words that need to be quoted as keys
+local RESERVED_WORDS = {
+    ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true,
+    ['elseif'] = true, ['end'] = true, ['false'] = true, ['for'] = true,
+    ['function'] = true, ['if'] = true, ['in'] = true, ['local'] = true,
+    ['nil'] = true, ['not'] = true, ['or'] = true, ['repeat'] = true,
+    ['return'] = true, ['then'] = true, ['true'] = true, ['until'] = true, ['while'] = true
 }
 
-local DEFAULT_INDENT = 4
+-- Check if a number is a valid unsigned integer
+local function is_uint(v)
+    return type(v) == 'number' and v >= 0 and math.floor(v) == v and v < math.huge
+end
 
-local function DEFAULT_FILTER(val)
+-- Default filter function
+local function default_filter(val)
     return val
 end
 
-local function sort_index(a, b)
-    if a.typ == b.typ then
-        if a.typ == 'boolean' then
-            return b.key
-        end
-        return a.key < b.key
+-- Main dump implementation
+local function dump_value_impl(val, depth, indent_size, padding_size, filter, udata, seen)
+    if depth == nil then
+        depth = 0
     end
-    return a.typ == 'number'
-end
-
-local function dumptbl(tbl, depth, indent, nestIndent, ctx)
-    local ref = tostring(tbl)
-
-    if ctx.circular[ref] then
-        local val, nodump = ctx.filter(tbl, depth, type(tbl), FOR_CIRCULAR, tbl, ctx.udata)
-
-        if val ~= nil and val ~= tbl then
-            local t = type(val)
-
-            if t == 'table' then
-                if not nodump then
-                    return dumptbl(val, depth + 1, indent, nestIndent, ctx)
-                end
-                return tostring(val)
-            elseif t == 'string' then
-                return strformat('%q', val)
-            elseif t == 'number' or t == 'boolean' then
-                return tostring(val)
-            end
-
-            return strformat('%q', tostring(val))
-        end
-
-        return '"<Circular ' .. ref .. '>"'
+    if indent_size == nil then
+        indent_size = 4
     end
-
-    local res = {}
-    local arr = {}
-    local narr = 0
-    local fieldIndent = indent .. nestIndent
-
-    ctx.circular[ref] = true
-
-    for k, v in pairs(tbl) do
-        local key, nokdump = ctx.filter(k, depth, type(k), FOR_KEY, nil, ctx.udata)
-
-        if key ~= nil then
-            local val, novdump = ctx.filter(v, depth, type(v), FOR_VAL, key, ctx.udata)
-            local kv
-
-            if val ~= nil then
-                local kt = type(key)
-                local vt = type(val)
-
-                if kt == 'number' or kt == 'boolean' then
-                    k = key
-                    key = '[' .. tostring(key) .. ']'
-                elseif kt == 'table' and not nokdump then
-                    key = '[' .. dumptbl(key, depth + 1, fieldIndent, nestIndent, ctx) .. ']'
-                    k = key
-                    kt = 'string'
-                elseif kt ~= 'string' or RESERVED_WORD[key] or not strmatch(key, LUA_FIELDNAME_PAT) then
-                    key = strformat("[%q]", tostring(key))
-                    k = key
-                    kt = 'string'
-                end
-
-                if vt == 'number' or vt == 'boolean' then
-                    kv = strformat('%s%s = %s', fieldIndent, key, tostring(val))
-                elseif vt == 'string' then
-                    if not novdump then
-                        kv = strformat('%s%s = %q', fieldIndent, key, val)
-                    else
-                        kv = strformat('%s%s = %s', fieldIndent, key, val)
-                    end
-                elseif vt == 'table' and not novdump then
-                    kv = strformat('%s%s = %s', fieldIndent, key,
-                                   dumptbl(val, depth + 1, fieldIndent, nestIndent, ctx))
-                else
-                    kv = strformat('%s%s = %q', fieldIndent, key, tostring(val))
-                end
-
-                narr = narr + 1
-                arr[narr] = {
-                    typ = kt,
-                    key = k,
-                    val = kv,
-                }
-            end
-        end
+    if padding_size == nil then
+        padding_size = 0
     end
-
-    ctx.circular[ref] = nil
+    if filter == nil then
+        filter = default_filter
+    end
+    if seen == nil then
+        seen = {}
+    end
     
-    if narr > 0 then
-        tblsort(arr, sort_index)
-
-        for i = 1, narr do
-            res[i] = arr[i].val
-        end
-        res[1] = '{' .. ctx.LF .. res[1]
-        res = tblconcat(res, ',' .. ctx.LF) .. ctx.LF .. indent .. '}'
-    else
-        res = '{}'
+    -- Prevent infinite recursion by limiting depth
+    if depth > 10 then
+        return '"<max depth>"'
     end
-
-    return res
+    
+    local val_type = type(val)
+    
+    if val_type == 'nil' then
+        return '"nil"'
+    elseif val_type == 'boolean' then
+        return tostring(val)
+    elseif val_type == 'number' then
+        return tostring(val)
+    elseif val_type == 'string' then
+        return string.format('%q', val)
+    elseif val_type == 'table' then
+        -- Check for circular references
+        local obj_id = tostring(val)
+        if seen[obj_id] then
+            return '"<Circular ' .. obj_id .. '>"'
+        end
+        seen[obj_id] = true
+        
+        local parts = {}
+        local current_indent = string.rep(' ', padding_size)
+        local field_indent = current_indent .. string.rep(' ', indent_size)
+        
+        -- Apply filter to each key-value pair
+        for k, v in pairs(val) do
+            local filtered_key, key_nodump = filter(k, depth, type(k), 'key', nil, udata)
+            
+            if filtered_key ~= nil then
+                local filtered_val, val_nodump = filter(v, depth, type(v), 'val', filtered_key, udata)
+                
+                if filtered_val ~= nil then
+                    local key_str
+                    local k_type = type(filtered_key)
+                    
+                    -- Handle different key types
+                    if k_type == 'string' and string.match(filtered_key, '^[a-zA-Z_][a-zA-Z0-9_]*$') and not RESERVED_WORDS[filtered_key] then
+                        key_str = filtered_key
+                    else
+                        if k_type == 'string' then
+                            key_str = '[' .. string.format('%q', filtered_key) .. ']'
+                        else
+                            key_str = '[' .. tostring(filtered_key) .. ']'
+                        end
+                    end
+                    
+                    local val_str
+                    if type(filtered_val) == 'table' and not val_nodump then
+                        val_str = dump._dump_internal(filtered_val, depth + 1, indent_size, padding_size + indent_size, filter, udata, seen)
+                    else
+                        val_str = dump._dump_internal(filtered_val, depth + 1, indent_size, padding_size, filter, udata, seen)
+                    end
+                    
+                    parts[#parts + 1] = field_indent .. key_str .. ' = ' .. val_str
+                end
+            end
+        end
+        
+        seen[obj_id] = nil  -- Clean up circular reference tracking
+        
+        if #parts == 0 then
+            return '{}'
+        end
+        
+        -- Determine line endings based on indentation
+        if indent_size == 0 then
+            return '{' .. ' ' .. table.concat(parts, ', ') .. ' ' .. '}'
+        else
+            return '{\n' .. table.concat(parts, ',\n') .. '\n' .. current_indent .. '}'
+        end
+    else
+        return string.format('%q', tostring(val))
+    end
 end
 
-local function is_uint(v)
-    return type(v) == 'number' and v < INFINITE_POS and v >= 0 and floor(v) == v
-end
+-- Store the internal function in the module
+dump._dump_internal = dump_value_impl
 
-local function dump_value(val, indent, padding, filter, udata)
-    local t = type(val)
-
-    if indent == nil then
-        indent = DEFAULT_INDENT
-    elseif not is_uint(indent) then
+-- Main dump interface
+local function dump_interface(val, indent, padding, filter, udata)
+    -- Validate parameters
+    if indent ~= nil and not is_uint(indent) then
         error('indent must be unsigned integer', 2)
     end
-
-    if padding == nil then
-        padding = 0
-    elseif not is_uint(padding) then
+    if padding ~= nil and not is_uint(padding) then
         error('padding must be unsigned integer', 2)
     end
-
-    if filter == nil then
-        filter = DEFAULT_FILTER
-    elseif type(filter) ~= 'function' then
+    if filter ~= nil and type(filter) ~= 'function' then
         error('filter must be function', 2)
     end
-
-    if t == 'table' then
-        local ispace = ''
-        local pspace = ''
-
-        if indent > 0 then
-            ispace = strformat('%' .. tostring(indent) .. 's', '')
+    
+    -- Set defaults
+    local indent_size = indent or 4
+    local padding_size = padding or 0
+    local filter_func = filter or default_filter
+    
+    -- For non-table values, apply filter and format appropriately
+    if type(val) ~= 'table' then
+        local filtered_val, nodump = filter_func(val, 0, type(val), 'val', nil, udata)
+        if nodump == true then
+            return tostring(filtered_val)
         end
-
-        if padding > 0 then
-            pspace = strformat('%' .. tostring(padding) .. 's', '')
-        end
-
-        return dumptbl(val, 1, pspace, ispace, {
-            LF = ispace == '' and ' ' or '\n',
-            circular = {},
-            filter = filter,
-            udata = udata,
-        })
+        return string.format('%q', tostring(filtered_val))
     end
-
-    local v, nodump = filter(val, 0, t, FOR_VAL, nil, udata)
-    if nodump == true then
-        return tostring(v)
-    end
-    return strformat('%q', tostring(v))
+    
+    return dump._dump_internal(val, 0, indent_size, padding_size, filter_func, udata, {})
 end
 
-dump.dump = dump_value
+dump.dump = dump_interface
 
 return dump

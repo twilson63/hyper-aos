@@ -29,7 +29,12 @@ setup() ->
                    "  _G.package.loaded['.utils'] = module()\n" ++
                    "end",
     
-    {_, L1} = luerl:do(WrappedUtils, L0),
+    L1 = case luerl:do(WrappedUtils, L0) of
+        {ok, _, NewState1} -> 
+            NewState1;
+        {error, Reason1} ->
+            error({failed_to_load_module, utils, Reason1})
+    end,
     
     % Then load handlers-utils module
     WrappedHandlersUtils = "do\n" ++
@@ -39,11 +44,21 @@ setup() ->
                           "  _G.package.loaded['.handlers-utils'] = module()\n" ++
                           "end",
     
-    {_, L2} = luerl:do(WrappedHandlersUtils, L1),
+    L2 = case luerl:do(WrappedHandlersUtils, L1) of
+        {ok, _, NewState2} -> 
+            NewState2;
+        {error, Reason2} ->
+            error({failed_to_load_module, handlers_utils, Reason2})
+    end,
     
     % Create a mock Handlers global with utils reference for hasMatchingTagOf
     MockHandlers = "Handlers = { utils = require('.handlers-utils') }",
-    {_, L3} = luerl:do(MockHandlers, L2),
+    L3 = case luerl:do(MockHandlers, L2) of
+        {ok, _, NewState3} -> 
+            NewState3;
+        {error, Reason3} ->
+            error({failed_to_load_module, mock_handlers, Reason3})
+    end,
     
     L3.
 
@@ -92,7 +107,7 @@ handlers_utils_test_() ->
 test_version(L) ->
     {"handlers-utils has correct version",
      fun() ->
-         {[Version], _} = luerl:do("return require('.handlers-utils')._version", L),
+         {ok, [Version], _} = luerl:do("return require('.handlers-utils')._version", L),
          ?assertEqual(<<"0.0.2">>, Version)
      end}.
 
@@ -105,7 +120,7 @@ test_has_matching_tag_success(L) ->
                 "local msg = { Tags = { Action = 'Eval', Type = 'Message' } }\n" ++
                 "local checker = hu.hasMatchingTag('Action', 'Eval')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -116,7 +131,7 @@ test_has_matching_tag_failure(L) ->
                 "local msg = { Tags = { Action = 'Eval', Type = 'Message' } }\n" ++
                 "local checker = hu.hasMatchingTag('Action', 'Info')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNot(Result)
      end}.
 
@@ -127,7 +142,7 @@ test_has_matching_tag_missing_tag(L) ->
                 "local msg = { Tags = { Type = 'Message' } }\n" ++
                 "local checker = hu.hasMatchingTag('Action', 'Eval')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNot(Result)
      end}.
 
@@ -140,7 +155,7 @@ test_has_matching_tag_of_success(L) ->
                 "local msg = { Tags = { Action = 'Eval' } }\n" ++
                 "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval', 'Run'})\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          % The function should return a truthy value (not 0, false, or "skip")
          ?assertNotEqual(0, Result),
          ?assertNotEqual(false, Result)
@@ -153,7 +168,7 @@ test_has_matching_tag_of_multiple_values(L) ->
                 "local msg = { Tags = { Type = 'Query' } }\n" ++
                 "local checker = hu.hasMatchingTagOf('Type', {'Message', 'Query', 'Response'})\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNotEqual(0, Result)
      end}.
 
@@ -164,7 +179,7 @@ test_has_matching_tag_of_no_match(L) ->
                 "local msg = { Tags = { Action = 'Delete' } }\n" ++
                 "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval', 'Run'})\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(0, Result)
      end}.
 
@@ -177,7 +192,7 @@ test_has_matching_data_success(L) ->
                 "local msg = { Data = 'Hello World' }\n" ++
                 "local checker = hu.hasMatchingData('Hello World')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -188,7 +203,7 @@ test_has_matching_data_failure(L) ->
                 "local msg = { Data = 'Hello World' }\n" ++
                 "local checker = hu.hasMatchingData('Goodbye')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNot(Result)
      end}.
 
@@ -199,7 +214,7 @@ test_has_matching_data_nil(L) ->
                 "local msg = { }\n" ++
                 "local checker = hu.hasMatchingData('Hello')\n" ++
                 "return checker(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertNot(Result)
      end}.
 
@@ -216,7 +231,7 @@ test_reply_string(L) ->
                 "local replyFn = hu.reply('Test Response')\n" ++
                 "replyFn(msg)\n" ++
                 "return replyData.Data",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(<<"Test Response">>, Result)
      end}.
 
@@ -232,7 +247,7 @@ test_reply_table(L) ->
                 "local replyFn = hu.reply(response)\n" ++
                 "replyFn(msg)\n" ++
                 "return replyData.Data, replyData.Tags and replyData.Tags.Status or nil",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Data, Status] = Results,
          ?assertEqual(<<"Custom">>, Data),
          ?assertEqual(<<"OK">>, Status)
@@ -256,7 +271,7 @@ test_reply_with_tags(L) ->
                 "local replyFn = hu.reply(response)\n" ++
                 "replyFn(msg)\n" ++
                 "return replyData.Tags.Action, replyData.Tags.Status",
-         {Results, _} = luerl:do(Code, L),
+         {ok, Results, _} = luerl:do(Code, L),
          [Action, Status] = Results,
          ?assertEqual(<<"Response">>, Action),
          ?assertEqual(<<"200">>, Status)
@@ -272,7 +287,7 @@ test_continue_match(L) ->
                 "local pattern = { Action = 'Eval' }\n" ++
                 "local continueFn = hu.continue(pattern)\n" ++
                 "return continueFn(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(1, Result)
      end}.
 
@@ -285,7 +300,7 @@ test_continue_no_match(L) ->
                 "local continueFn = hu.continue(pattern)\n" ++
                 "local result = continueFn(msg)\n" ++
                 "return result == 0 or result == false or result == nil",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assert(Result)
      end}.
 
@@ -297,7 +312,7 @@ test_continue_with_function_pattern(L) ->
                 "local pattern = function(m) return m.Value > 5 end\n" ++
                 "local continueFn = hu.continue(pattern)\n" ++
                 "return continueFn(msg)",
-         {[Result], _} = luerl:do(Code, L),
+         {ok, [Result], _} = luerl:do(Code, L),
          ?assertEqual(1, Result)
      end}.
 
@@ -318,7 +333,7 @@ test_error_handling() ->
                        "  hu.hasMatchingTag(123, 'value')\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -330,7 +345,7 @@ test_error_handling() ->
                        "  hu.hasMatchingTagOf('Action', 'not-a-table')\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -342,7 +357,7 @@ test_error_handling() ->
                        "  hu.hasMatchingData(123)\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end},
            
@@ -354,7 +369,7 @@ test_error_handling() ->
                        "  hu.reply(123)\n" ++
                        "end)\n" ++
                        "return status",
-                {[Status], _} = luerl:do(Code, L),
+                {ok, [Status], _} = luerl:do(Code, L),
                 ?assertNot(Status)
             end}
           ]
@@ -386,7 +401,7 @@ test_integration() ->
                        "}\n" ++
                        "local continueFn = hu.continue(pattern)\n" ++
                        "return continueFn(msg)",
-                {[Result], _} = luerl:do(Code, L),
+                {ok, [Result], _} = luerl:do(Code, L),
                 ?assertEqual(1, Result)
             end},
            
@@ -410,7 +425,7 @@ test_integration() ->
                        "  replyFn(msg)\n" ++
                        "end\n" ++
                        "return #results, results[1] and results[1].Data or nil",
-                {Results, _} = luerl:do(Code, L),
+                {ok, Results, _} = luerl:do(Code, L),
                 [Count, Data] = Results,
                 ?assertEqual(1, Count),
                 ?assertEqual(<<"Processed">>, Data)

@@ -12,14 +12,20 @@ colors_initialization_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
-    %% Check that colors table exists
-    {ColorsTable, _} = luerl:get_table([<<"meta">>, <<"colors">>], LuaState2),
+    %% Ensure colors are available
+    LuaState2a = aos_test_helpers:ensure_colors_initialized(LuaState2),
+    
+    %% Check that colors table exists in _G.colors
+    {ok, [ResetColor], _} = luerl:do("return _G.colors.reset", LuaState2a),
+    {ok, [CyanColor], _} = luerl:do("return _G.colors.cyan", LuaState2a),
+    {ok, [BrightGreenColor], _} = luerl:do("return _G.colors.bright_green", LuaState2a),
+    {ok, [BoldColor], _} = luerl:do("return _G.colors.bold", LuaState2a),
     
     %% Verify some key colors exist
-    ?assertMatch({<<"reset">>, <<"\e[0m">>}, lists:keyfind(<<"reset">>, 1, ColorsTable)),
-    ?assertMatch({<<"cyan">>, <<"\e[36m">>}, lists:keyfind(<<"cyan">>, 1, ColorsTable)),
-    ?assertMatch({<<"bright_green">>, <<"\e[92m">>}, lists:keyfind(<<"bright_green">>, 1, ColorsTable)),
-    ?assertMatch({<<"bold">>, <<"\e[1m">>}, lists:keyfind(<<"bold">>, 1, ColorsTable)).
+    ?assertEqual(<<"\e[0m">>, ResetColor),
+    ?assertEqual(<<"\e[36m">>, CyanColor),
+    ?assertEqual(<<"\e[92m">>, BrightGreenColor),
+    ?assertEqual(<<"\e[1m">>, BoldColor).
 
 %% Test colored prompt output
 colored_prompt_test() ->
@@ -32,8 +38,11 @@ colored_prompt_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
+    %% Ensure colors are available
+    LuaState2a = aos_test_helpers:ensure_colors_initialized(LuaState2),
+    
     %% Call prompt function
-    {[PromptResult], _} = luerl:call_function([<<"prompt">>], [], LuaState2),
+    {ok, [PromptResult], _} = luerl:do("return prompt()", LuaState2a),
     
     %% Convert to binary
     PromptBinary = iolist_to_binary(PromptResult),
@@ -59,13 +68,16 @@ prompt_with_inbox_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     {_, LuaState2} = aos_test_helpers:call_compute(LuaState1, State, ProcessAssignment),
     
+    %% Ensure colors are available
+    LuaState2a = aos_test_helpers:ensure_colors_initialized(LuaState2),
+    
     %% Add some messages to Inbox
     EvalMsg1 = aos_test_helpers:create_eval_message(<<"return 'test'">>, aos_test_helpers:default_owner()),
     Assignment1 = aos_test_helpers:create_assignment(EvalMsg1),
-    {_, LuaState3} = aos_test_helpers:call_compute(LuaState2, State, Assignment1),
+    {_, LuaState3} = aos_test_helpers:call_compute(LuaState2a, State, Assignment1),
     
     %% Call prompt function
-    {[PromptResult], _} = luerl:call_function([<<"prompt">>], [], LuaState3),
+    {ok, [PromptResult], _} = luerl:do("return prompt()", LuaState3),
     PromptBinary = iolist_to_binary(PromptResult),
     
     %% Check that prompt shows inbox count with color

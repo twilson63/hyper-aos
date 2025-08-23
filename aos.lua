@@ -434,7 +434,7 @@ local SYSTEM_KEYS = {
 -- @param tbl table The table to copy
 -- @param visited table Table tracking visited tables for circular reference detection
 -- @return table The copied table
-local function copy_table_recursive(tbl, visited)
+function copy_table_recursive(tbl, visited)
   local copy = {}
   for k, v in pairs(tbl) do
     local value_type = type(v)
@@ -464,7 +464,7 @@ end
 -- Handles circular references properly to avoid infinite loops
 -- @param visited table Optional table to track visited tables for circular reference detection
 -- @return table The filtered state containing only user data
-local function extract_state_from_global(visited)
+function extract_state_from_global(visited)
   visited = visited or {}
   local state = {}
   

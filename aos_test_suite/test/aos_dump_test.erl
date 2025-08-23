@@ -3,12 +3,9 @@
 
 %% Helper function to load dump module
 load_dump_module(LuaState) ->
-    {ok, DumpBin} = file:read_file("../src/dump.lua"),
-    DumpSrc = binary_to_list(DumpBin),
-    
-    % Load the dump module
-    LoadCode = "do local module = function() " ++ DumpSrc ++ " end; _G.dump = module() end",
-    {_, LuaState2} = luerl:do(LoadCode, LuaState),
+    % Load dump module directly using Lua's require-like functionality
+    LoadCode = "dump = dofile('test/dump.lua')",
+    {ok, _, LuaState2} = luerl:do(LoadCode, LuaState),
     LuaState2.
 
 %% Test setup
@@ -26,7 +23,7 @@ basic_table_dump_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check that it contains all the expected key-value pairs
@@ -45,7 +42,7 @@ array_dump_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check array indices are formatted correctly
@@ -74,7 +71,7 @@ nested_table_dump_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check nested structure is preserved
@@ -96,7 +93,7 @@ circular_reference_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Should contain circular reference marker
@@ -115,7 +112,7 @@ reserved_word_keys_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Reserved words should be quoted as keys
@@ -138,7 +135,7 @@ special_characters_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check that string values are properly quoted and escaped
@@ -158,7 +155,7 @@ empty_table_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     ?assertEqual("{}", ResultStr).
@@ -177,7 +174,7 @@ non_table_values_test() ->
         return results[1], results[2], results[3], results[4], results[5]
     ",
     
-    {[Str, Num, Bool1, Bool2, Nil], _} = luerl:do(Code, LuaState),
+    {ok, [Str, Num, Bool1, Bool2, Nil], _} = luerl:do(Code, LuaState),
     
     ?assertEqual(<<"\"hello\"">>, iolist_to_binary(Str)),
     ?assertEqual(<<"\"42\"">>, iolist_to_binary(Num)),
@@ -197,7 +194,7 @@ indentation_test() ->
         return compact, spaced, default
     ",
     
-    {[Compact, Spaced, Default], _} = luerl:do(Code, LuaState),
+    {ok, [Compact, Spaced, Default], _} = luerl:do(Code, LuaState),
     CompactStr = binary_to_list(iolist_to_binary(Compact)),
     SpacedStr = binary_to_list(iolist_to_binary(Spaced)),
     DefaultStr = binary_to_list(iolist_to_binary(Default)),
@@ -234,7 +231,7 @@ custom_filter_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Should contain public but not secret or hidden
@@ -256,7 +253,7 @@ mixed_keys_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check all key types are handled correctly
@@ -277,7 +274,7 @@ key_sorting_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Check that string keys are sorted correctly
@@ -301,7 +298,7 @@ error_conditions_test() ->
         return status, err
     ",
     
-    {[Status1, Error1], _} = luerl:do(Code1, LuaState),
+    {ok, [Status1, Error1], _} = luerl:do(Code1, LuaState),
     ?assertEqual(false, Status1),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error1)), "indent must be unsigned integer") > 0),
     
@@ -311,7 +308,7 @@ error_conditions_test() ->
         return status, err
     ",
     
-    {[Status2, Error2], _} = luerl:do(Code2, LuaState),
+    {ok, [Status2, Error2], _} = luerl:do(Code2, LuaState),
     ?assertEqual(false, Status2),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error2)), "padding must be unsigned integer") > 0),
     
@@ -321,7 +318,7 @@ error_conditions_test() ->
         return status, err
     ",
     
-    {[Status3, Error3], _} = luerl:do(Code3, LuaState),
+    {ok, [Status3, Error3], _} = luerl:do(Code3, LuaState),
     ?assertEqual(false, Status3),
     ?assert(string:str(binary_to_list(iolist_to_binary(Error3)), "filter must be function") > 0).
 
@@ -345,7 +342,7 @@ deep_nesting_test() ->
         return result
     ",
     
-    {[Result], _} = luerl:do(Code, LuaState),
+    {ok, [Result], _} = luerl:do(Code, LuaState),
     ResultStr = binary_to_list(iolist_to_binary(Result)),
     
     % Should handle deep nesting
@@ -363,5 +360,52 @@ version_test() ->
         return dump._version
     ",
     
-    {[Version], _} = luerl:do(Code, LuaState),
+    {ok, [Version], _} = luerl:do(Code, LuaState),
     ?assertEqual(<<"1.0.0">>, iolist_to_binary(Version)).
+
+%% Test simple dump functionality
+simple_dump_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        return dump.dump('hello')
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    ?assertEqual("\"hello\"", ResultStr).
+
+%% Test simple table dump
+simple_table_dump_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        local t = {a = 1}
+        return dump.dump(t)
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    % Check that it contains the expected content
+    ?assert(string:str(ResultStr, "a = 1") > 0).
+
+%% Test dump with explicit filter parameter
+debug_filter_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        local t = {a = 1, b = 2}
+        local function my_filter(val)
+            return val
+        end
+        return dump.dump(t, nil, nil, my_filter)
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    % Check that it contains the expected content
+    ?assert(string:str(ResultStr, "a = 1") > 0),
+    ?assert(string:str(ResultStr, "b = 2") > 0).
