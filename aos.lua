@@ -560,7 +560,8 @@ function compute(state, assignment)
   else
     -- If not handled, add to inbox
     result = _G.meta.printNewMessage(msg)
-    
+    status = true
+
     table.insert(_G.Inbox, msg)
     -- Implement FIFO rotation when inbox exceeds limit
     if #_G.Inbox > _G.MAX_INBOX_SIZE then
