@@ -15,6 +15,11 @@ eunit: compile
 	@echo "Running EUnit tests..."
 	@rebar3 eunit
 
+# Verbose EUnit tests
+eunit-verbose: compile
+	@echo "Running EUnit tests with verbose output..."
+	@EUNIT_VERBOSE=true rebar3 eunit --verbose
+
 # Old manual tests (kept for reference)
 test-old: compile
 	@echo "Running old AOS sandbox tests..."
