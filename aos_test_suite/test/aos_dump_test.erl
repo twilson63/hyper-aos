@@ -4,7 +4,7 @@
 %% Helper function to load dump module
 load_dump_module(LuaState) ->
     % Load dump module directly using Lua's require-like functionality
-    LoadCode = "dump = dofile('test/dump.lua')",
+    LoadCode = "dump = dofile('../src/dump.lua')",
     {ok, _, LuaState2} = luerl:do(LoadCode, LuaState),
     LuaState2.
 
