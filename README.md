@@ -17,6 +17,12 @@ A next-generation console for working with AO (Arweave Operating System) process
 - [Hyperbeam](https://github.com/permaweb/hyperbeam) node access
 - [AOS Console](https://github.com/permaweb/aos) installed
 
+## Build aos
+
+```
+make build
+```
+
 ## Installation
 
 ### 1. Install ARX
@@ -34,7 +40,7 @@ export WALLET_PATH=/path/to/your/arweave-wallet.json
 ### 3. Publish aos.lua to Arweave
 
 ```bash
-arx upload aos.lua -w $WALLET_PATH -t arweave --content-type application/lua --tags Data-Protocol ao
+arx upload dist/hyper-aos-{version}.lua -w $WALLET_PATH -t arweave --content-type application/lua --tags Data-Protocol ao
 ```
 
 Save the returned transaction ID (TX_ID) - you'll need this to launch your AOS instance.
