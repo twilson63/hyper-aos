@@ -4,157 +4,180 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Hyper AOS (AO Operating System) demo project containing a Lua module script (`aos.lua`) designed to run on the Hyperbeam Lua device. The module implements a message processing environment within the AO protocol. AO is a protocol that uses message passing between processes in a decentralized supercomputer. aos is a set of core features that every ao process needs to provide the developer with the tools to create incredible processes that can do many things. This project consists of the aos (hyper-aos) lua script that runs on the lua device in hyperbeam. It is implemented using the luerl sandbox in the BEAM platform. The result is an extremly fast implementation. There are some tradeoffs, but for now, this is a very exiting project. This current implementation needs a lot of the features ported from legacy aos. And what we would like to do is port them over in a test driven approach.
-
-Core state initial properties:
-
-- id - when receiving the first message which MUST be type Process, we need to read the Commitments of the message and find the key that is not type of hmac and assign its value to the State.id variable.
-- owner - when receiving the first message which MUST be type Process, we need to read the Commitments of the message and reference the committer and assign its value to State.owner.
-
-
-
-Required validation checks:
-
-- is_owner - this validation MUST compare the committer key all of the non hmac committment types of the message and one should match the State.owner
-- dedupe validation - uses the hyperbeam dedupe device to make sure no duplicate messages are passed to the process
-- is trusted msg - looks at the authorities State key and checks to see if the has a "from-process" key and is signed by one of the authorities in the State.authorities then it is trusted
-- is assignable - some messages are provided as assignments, this message checks to see if the message that does not have the message id as the target
-
-## Project Structure
-
-```
-hyper-aos-demo/
-├── aos.lua                 # Core Lua module for AO compute environment
-├── CLAUDE.md              # This file - project documentation
-├── demo.json              # Demo configuration
-└── aos_test_suite/        # Erlang/LUERL test suite
-    ├── Makefile           # Build and test commands
-    ├── README_TEST.md     # Test suite documentation
-    ├── rebar.config       # Erlang build configuration
-    ├── test_runner.sh     # Shell script test runner
-    ├── src/               # Original test modules
-    │   ├── aos_sandbox_test.erl    # Main manual test suite
-    │   ├── aos_require_test.erl    # Require functionality tests
-    │   ├── aos_math_test.erl       # Math operations tests
-    │   ├── aos_outbox_test.erl     # Send/outbox tests
-    │   ├── aos_test_suite_app.erl  # OTP application
-    │   └── aos_test_suite_sup.erl  # OTP supervisor
-    └── test/              # EUnit test modules
-        ├── aos_test.erl             # Main EUnit test suite
-        └── aos_math_eunit_test.erl  # Math EUnit tests
-```
+Hyper-AOS is a high-performance implementation of the AO (Arweave Operating System) protocol using Hyperbeam's native Lua device with LUERL sandboxing on the BEAM platform. The project provides a secure, colorized console for interacting with AO processes through message passing in a decentralized supercomputer.
 
 ## Architecture
 
-- **aos.lua** - Core Lua module that processes messages in the AO compute environment
-- **aos_test_suite** - Unusual test suite using LUERL (Lua in Erlang) to sandbox and test aos.lua
+The system consists of four main components:
 
-## Build commands
+1. **aos.lua** - Core Lua module implementing the AO compute environment with:
+   - Commitment-based security (RSA-PSS-512 validation)
+   - Authority-based trust verification
+   - Message normalization and `from` field resolution
+   - Colorized output and enhanced developer experience
+   - Global state persistence across compute calls using `_G`
+   - Integrated utils module for functional programming operations
 
-### AOS Module
-test command - `hype run test.lua`
+2. **utils.lua** - Functional programming utilities module providing:
+   - Pattern matching functions (matchesPattern, matchesSpec)
+   - Functional primitives (curry, compose, reduce, map, filter)
+   - Array operations (concat, reverse, find, includes)
+   - Object operations (prop, propEq, keys, values)
+   - LUERL-optimized implementations with type safety
 
-publish command - `arx upload aos.lua -w demo.json -t arweave --content-type application/lua --tags Data-Protocol ao`
+3. **LUERL Sandbox** - Erlang-based Lua interpreter providing:
+   - Secure execution environment
+   - Type conversion between Erlang maps and Lua tables
+   - Protection against malicious code execution
 
-### Test Suite
+4. **Test Suite** - Comprehensive EUnit-based testing framework validating:
+   - Security features (ownership, authorities, trust)
+   - Message processing and state management
+   - Color output and stringify functionality
+   - Multi-step evaluation scenarios
+   - Utils module functionality with 51+ test cases
+
+## Critical Security Model
+
+### Process Initialization
+- **Owner**: Set from first non-HMAC commitment committer in Process message
+- **ID**: Set from first non-HMAC commitment key in Process message
+- **Authorities**: Parsed from comma-separated string (43-char addresses)
+
+### Message Validation
+1. **is_owner**: Validates RSA-PSS-512 commitments match `_G.owner`
+2. **is_trusted**: Checks if `from == from-process` AND committer in authorities
+3. **ensure_message**: Sets `from` field priority: existing > from-process > first committer
+
+### State Management
+- All persistent state stored directly in `_G` (not in State table)
+- Private functions in local `meta` table (inaccessible from eval)
+- System keys excluded from state serialization
+
+## Development Commands
+
+### Building and Testing
 ```bash
-cd aos_test_suite
+# Run Lua tests
+hype run test.lua
 
-# Run EUnit tests (recommended)
+# Run EUnit test suite (recommended)
+cd aos_test_suite
 make eunit
 
-# Run specific test types
-make test-require    # Test require('.process')._version
-make test-math      # Test math operations
-make test-outbox    # Test send/outbox functionality
+# Run specific test modules
+rebar3 eunit -m aos_colors_test
+rebar3 eunit -m aos_stringify_test
+rebar3 eunit -m aos_authorities_test
+rebar3 eunit -m aos_utils_test
+
+# Run with authorities profile
+rebar3 as authorities_test eunit
 
 # Clean and rebuild
-make clean
-make all
+make clean && make all
 ```
 
+### Publishing to Arweave
+```bash
+arx upload aos.lua -w demo.json -t arweave --content-type application/lua --tags Data-Protocol ao
+```
 
-## Security Features
+### Launching AOS Console
+```bash
+aos console --module <TX_ID> --mainnet <HYPERBEAM_SERVER> <PROCESS_NAME>
+```
 
-### Commitment-Based Access Control
-The `eval` function now includes RSA-PSS-512 commitment validation:
-- Only RSA-PSS-512 commitments are valid for ownership verification
-- Other commitment types (like hmac-sha256) are explicitly not accepted for ownership
-- Messages must include a matching RSA-PSS-512 commitment with committer matching State.owner
-- Security validation is implemented via a private `is_owner` function
-- The private functions table is local to the module and cannot be accessed from eval'd code
-- Backward compatible - if no State.owner is set, access is allowed
+## Code Conventions
 
-### Automatic Owner Initialization
-- The process owner is automatically set from the first Process message
-- When a message with `type = "process"` is received, the system finds the first non-hmac commitment and sets its committer as State.owner
-- The State.initialized flag prevents the owner from being changed after initialization
-- This ensures a process is bound to its initial creator
+### Lua Modules
+**aos.lua:**
+- State persisted in `_G` namespace
+- Private functions in local `meta` table
+- Binary string keys for message fields
+- Return `{ok, State}` from compute function
+- Utils module integrated in `_G.utils`
 
-Example commitment structure:
+**utils.lua:**
+- Functional programming utilities in `_G.utils`
+- LUERL-optimized with type safety checks
+- No side effects (immutable operations)
+- Compatible with AO message processing patterns
+
+### Erlang Tests
+- Use EUnit framework with assertions
+- Test helpers in `aos_test_helpers.erl`
+- Profile-based conditional compilation for authorities tests
+- Pattern: `aos_*_test.erl` for test modules
+
+### Message Structure
 ```lua
-commitment = {
-  type = "RSA-PSS-512",
-  commit = "commitment-hash",
-  committer = "AR8wJBpKbBS7kZbHtUmB9V7VfQYxKCh7kyTkrLGS4N0"  -- 43-char address
+message = {
+  type = "process" | "message",
+  action = "eval" | "send" | ...,
+  commitments = {
+    [key] = {
+      type = "RSA-PSS-512" | "hmac-sha256",
+      committer = "43-char-address",
+      commit = "hash"
+    }
+  },
+  ["from-process"] = "address",
+  authority = "addr1,addr2,addr3"  -- Process messages only
 }
 ```
 
-## Critical Security Considerations
+## Required Validations
 
-1. **Arbitrary Code Execution**: The `eval` function uses Lua's `load()` function to execute code from message inputs. This is now protected by commitment validation.
+These validations MUST be implemented:
 
-2. **Input Validation**: Messages with eval actions require matching RSA-PSS-512 commitments for authorization.
+1. **Dedupe validation** - Use hyperbeam dedupe device to prevent duplicate messages
+2. **Owner validation** - Compare non-HMAC commitment committers with `_G.owner`
+3. **Trust validation** - Check authorities and from-process for trusted messages
+4. **Assignable validation** - Check if message target differs from message ID
 
-3. **Global State Exposure**: Direct manipulation of global `State` variable - consider additional access controls for other sensitive operations.
+## Test Coverage Areas
+
+- ✅ Security (owner/authorities/trust validation)
+- ✅ Message processing and state persistence
+- ✅ Color output and table stringify
+- ✅ Multi-step evaluation scenarios
+- ✅ Process initialization from commitments
+- ✅ Message `from` field resolution
+- ✅ Utils module functional programming operations (51+ tests)
+- ✅ Pattern matching and message specifications
+- ✅ Array and object operations with LUERL compatibility
 
 ## Performance Considerations
 
-1. **String Concatenation**: The `print` function uses inefficient string concatenation that could cause performance issues with large outputs.
+- String concatenation in print() function needs optimization for large outputs
+- Consider buffer pooling for output management
+- LUERL sandbox adds overhead but provides security
+- Utils module optimized for LUERL with `#array` operator instead of `ipairs`
+- Type safety checks add minimal overhead but prevent runtime errors
+- Function composition and currying have LUERL-specific limitations
 
-## Core Functions
+## Common Issues and Solutions
 
-### Public Functions
-- `compute(state, assignment)` - Main entry point for message processing
-- `eval(msg)` - Evaluates Lua expressions (protected by commitment validation)
-- `print(txt)` - Appends text to output buffer
-- `send(msg)` - Adds messages to outbox
-- `prompt()` - Returns formatted prompt string
+1. **Test failures with authorities**: Enable profile with `rebar3 as authorities_test eunit`
+2. **State not persisting**: Ensure using `_G` namespace, not local variables
+3. **Security validation failing**: Check commitment types (must be non-HMAC for ownership)
+4. **Colors not showing**: Terminal must support ANSI escape codes
+5. **Utils curry limitation**: LUERL has issues with partial application - use direct function calls
+6. **Utils not loading**: Ensure utils.lua is in same directory as aos.lua
+7. **Type conversion errors**: Check Erlang map to Lua table conversions with utils functions
 
-### Private Functions (not accessible from eval or external code)
-- `private.is_owner(state, msg)` - Validates RSA-PSS-512 commitments for security
+## Agent Usage
 
-## Message Processing Flow
+The project includes specialized Claude agents in `.claude/agents/`:
+- **erlang_developer**: For Erlang/OTP implementation following HyperBEAM conventions
+- **luerl_lua_dev**: For Lua code targeting LUERL VM with aos patterns
 
-1. Messages arrive with an optional `action` field
-2. If action matches a global function name, it's executed
-3. Otherwise, message is added to Inbox
-4. Results are returned via `State.results`
-
-## Safety Improvements Needed
-
-- Implement sandboxed execution environment
-- Add input validation and sanitization
-- Set resource limits (memory, CPU time)
-- Use protected calls (pcall) for error handling
-- Implement proper access controls for state modifications:
-
-## Test Suite Details
-
-The aos_test_suite is an unusual testing approach that uses LUERL (Lua in Erlang) to create a sandboxed environment for testing the aos.lua module. Key features:
-
-- **Sandboxed Execution**: Lua code runs inside Erlang's LUERL interpreter
-- **Type Conversion**: Automatic conversion between Erlang maps and Lua tables
-- **EUnit Integration**: Professional test framework with assertions and fixtures
-- **Comprehensive Coverage**: Tests all major functions (compute, eval, send, print, require)
+Use these agents when implementing features in their respective domains.
 
 ## References
 
-### GitHub Repositories
 - Hyperbeam: https://github.com/permaweb/hyperbeam
 - AOS: https://github.com/permaweb/aos
 - LUERL: https://github.com/rvirding/luerl
-
-### Documentation
-- Hyperbeam Documentation: https://hyperbeam.ar.io
 - AO Cookbook: https://cookbook_ao.ar.io

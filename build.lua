@@ -21,7 +21,7 @@ local source_files = {
 local function wrap_module(source, filename)
   -- Extract just the filename without path and extension for module name
   local module_name = filename:match("([^/]+)%.lua$") or filename
-  
+
   -- Special handling for bint_luerl - load it as .bint
   if module_name == "bint_luerl" then
     return string.format([[
@@ -71,7 +71,7 @@ end
 local function write_file(filepath, content)
   -- Create dist directory if it doesn't exist
   os.execute("mkdir -p dist")
-  
+
   local file = io.open(filepath, "w")
   if not file then
     error("Could not write file: " .. filepath)
@@ -83,7 +83,7 @@ end
 -- Main build process
 local function build()
   print("Building hyper-aos v" .. version .. "...")
-  
+
   -- Start with ASCII art header
   local output = "--[[\n" ..
     "    ██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗      █████╗  ██████╗ ███████╗\n" ..
@@ -96,42 +96,42 @@ local function build()
     "    Hyper-AOS v" .. version .. "\n" ..
     "    Built: " .. os.date("%Y-%m-%d %H:%M:%S") .. "\n" ..
     "--]]\n\n"
-  
+
   local module_count = 0
-  
+
   -- Process each source file
   for i, filepath in ipairs(source_files) do
     print("  Processing: " .. filepath)
-    
+
     local source = read_file(filepath)
     local wrapped = wrap_module(source, filepath)
-    
+
     output = output .. wrapped
-    
+
     -- Add separator comment between modules
     output = output .. "\n-- next file\n\n"
-    
+
     module_count = module_count + 1
   end
-  
+
   -- Check if aos.lua exists and add it last with special handling
   local aos_file = io.open("aos.lua", "r")
   if aos_file then
     print("  Processing: aos.lua (main module)")
     local aos_source = aos_file:read("*all")
     aos_file:close()
-    
+
     -- Wrap aos.lua with simple do...end block
     output = output .. "do\n" .. aos_source .. "\nend\n"
     module_count = module_count + 1
   end
-  
+
   -- Output filename with version
   local output_file = string.format("dist/hyper-aos-%s.lua", version)
-  
+
   -- Write the concatenated result
   write_file(output_file, output)
-  
+
   print(string.format("✓ Built %d modules -> %s", module_count, output_file))
   print(string.format("  Output size: %d bytes", #output))
 end

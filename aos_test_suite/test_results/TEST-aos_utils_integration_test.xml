@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="16" failures="0" errors="8" skipped="0" time="0.048" name="module 'aos_utils_integration_test'">
+  <testcase time="0.000" name="aos_utils_integration_test:0 utils_loading_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 message_filtering_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 pattern_matching_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 curry_functionality_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 composition_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 demo_utils_action_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 array_manipulation_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:0 authority_validation_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:25 -utils_loading_test/0-fun-5- (Utils module loading)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[4503059521283015313|...],[]}},
+       #Ref&lt;0.3950608929.4114874370.131849&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-utils_loading_test/0-fun-5-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 27)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:49 -message_filtering_test/0-fun-1- (Message filtering with utils)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[10300610713273009591|...],[]}},
+       #Ref&lt;0.3950608929.4114874369.130556&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-message_filtering_test/0-fun-1-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 51)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:90 -pattern_matching_test/0-fun-1- (Pattern matching with specs)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[6143574574788224444|...],[]}},
+       #Ref&lt;0.3950608929.4114874370.131857&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-pattern_matching_test/0-fun-1-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 92)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:117 -curry_functionality_test/0-fun-3- (Curry functionality)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[626225817104793207|...],[]}},
+       #Ref&lt;0.3950608929.4114874369.130575&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-curry_functionality_test/0-fun-3-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 119)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:141 -composition_test/0-fun-1- (Function composition)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[13732507797455281306|...],[]}},
+       #Ref&lt;0.3950608929.4114874369.130593&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-composition_test/0-fun-1-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 143)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:162 -demo_utils_action_test/0-fun-1- (Demo utils action)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[2164262447090449684|...],[]}},
+       #Ref&lt;0.3950608929.4114874375.129664&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-demo_utils_action_test/0-fun-1-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 164)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:182 -array_manipulation_test/0-fun-5- (Array manipulation)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[4725449048299217073|...],[]}},
+       #Ref&lt;0.3950608929.4114874375.129671&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:'-array_manipulation_test/0-fun-5-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 184)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_utils_integration_test:214 -authority_validation_test/0-fun-2- (Authority validation)">
+    <error type="error">
+::in function luerl:eval/2
+  called as eval(&lt;&lt;"--- The Utils module provides a collection of utility fu"...&gt;&gt;,{luerl,{tstruct,#{0 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{empty,&lt;&lt;"_G"&gt;&gt;,{...},...},
+                                &lt;&lt;"assert"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...},...},
+                               &lt;&lt;"dofile"&gt;&gt;,
+                               {erl_mfa,luerl_lib_basic,...},
+                               {{...},...}},
+                              &lt;&lt;"ipairs"&gt;&gt;,
+                              {erl_mfa,luerl_lib_basic,ipairs,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"rawe"...&gt;&gt;,{...},...},
+                             nil},
+                  1 =&gt; {table,{array,3,10,nil,{nil,{...},...}},empty,nil},
+                  2 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"_G"&gt;&gt;,{tref,...},empty},
+                               &lt;&lt;"bit32"&gt;&gt;,
+                               {tref,5},
+                               {empty,...},
+                               &lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"os"&gt;&gt;,
+                              {tref,8},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  3 =&gt; {table,{array,0,10,nil,10},empty,nil},
+                  4 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{empty,&lt;&lt;"config"&gt;&gt;,&lt;&lt;"/\n;\n?\n!\n"...&gt;&gt;,empty},
+                              &lt;&lt;"loaded"&gt;&gt;,
+                              {tref,2},
+                              {empty,&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"prel"...&gt;&gt;,{...},...},
+                             nil},
+                  5 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"arshift"&gt;&gt;,{erl_mfa,...},empty,...},
+                               &lt;&lt;"bnot"&gt;&gt;,
+                               {erl_mfa,luerl_lib_bit32,...},
+                               {empty,...}},
+                              &lt;&lt;"btest"&gt;&gt;,
+                              {erl_mfa,luerl_lib_bit32,fbtest,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"lshi"...&gt;&gt;,{...},...},
+                             nil},
+                  6 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {empty,&lt;&lt;"flush"&gt;&gt;,
+                                    {erl_mfa,luerl_lib_io,flush,...},
+                                    empty,&lt;&lt;"writ"...&gt;&gt;,{...},...},
+                             nil},
+                  7 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{{{empty,&lt;&lt;...&gt;&gt;,...},&lt;&lt;"acos"&gt;&gt;,{...},...},
+                                &lt;&lt;"atan"&gt;&gt;,
+                                {erl_mfa,...},
+                                {...}},
+                               &lt;&lt;"cosh"&gt;&gt;,
+                               {erl_mfa,luerl_lib_math,...},
+                               {{...},...}},
+                              &lt;&lt;"log"&gt;&gt;,
+                              {erl_mfa,luerl_lib_math,log,...},
+                              {{{...},...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  8 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"clock"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"date"&gt;&gt;,
+                               {erl_mfa,luerl_lib_os,...},
+                               {empty,...}},
+                              &lt;&lt;"execute"&gt;&gt;,
+                              {erl_mfa,luerl_lib_os,execute,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...}},
+                             nil},
+                  9 =&gt;
+                      {table,{array,0,10,nil,10},
+                             {{{empty,&lt;&lt;"byte"&gt;&gt;,{erl_mfa,...},empty},
+                               &lt;&lt;"char"&gt;&gt;,
+                               {erl_mfa,luerl_lib_string,...},
+                               {empty,...}},
+                              &lt;&lt;"find"&gt;&gt;,
+                              {erl_mfa,luerl_lib_string,find,...},
+                              {{empty,...},&lt;&lt;...&gt;&gt;,...},
+                              &lt;&lt;"len"&gt;&gt;,{...},...},
+                             nil},...},
+                [],14},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tstruct,#{},[],0},
+       {tref,0},
+       [],[],
+       {meta,nil,nil,nil,{...}},
+       {#{max =&gt; 18446744073709551615,type =&gt; exs1024,
+          next =&gt; #Fun&lt;rand.11.17836546&gt;,...},
+        {[16814666936859211754|...],[]}},
+       #Ref&lt;0.3950608929.4114874375.129677&gt;,none,undefined,#{}})
+in call from aos_utils_integration_test:setup_test_environment/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 293)
+in call from aos_utils_integration_test:setup_test_environment_with_authorities/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 302)
+in call from aos_utils_integration_test:'-authority_validation_test/0-fun-2-'/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_utils_integration_test.erl, line 216)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:undef
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

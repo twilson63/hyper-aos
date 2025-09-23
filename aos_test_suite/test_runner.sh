@@ -1,13 +1,9 @@
 #!/bin/bash
 
-echo "Building AOS Test Suite..."
-rebar3 compile
-
-if [ $? -ne 0 ]; then
-    echo "Build failed!"
-    exit 1
-fi
-
+# Legacy test runner - redirects to new comprehensive test runner
+echo "Note: This is the legacy test runner. Redirecting to new comprehensive test runner..."
+echo "Use ./run_tests.sh directly for more options."
 echo ""
-echo "Running tests..."
-rebar3 shell --eval "aos_sandbox_test:run_tests(), init:stop()."
+
+# Run the new test runner with all tests
+./run_tests.sh all

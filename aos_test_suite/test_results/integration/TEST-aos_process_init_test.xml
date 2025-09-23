@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.024" name="module 'aos_process_init_test'">
+  <testcase time="0.002" name="aos_process_init_test:0 process_message_sets_owner_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_process_init_test:0 non_process_message_ignored_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_process_init_test:0 hmac_commitment_skipped_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_process_init_test:0 initialized_flag_prevents_reset_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_process_init_test:0 eval_after_process_init_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

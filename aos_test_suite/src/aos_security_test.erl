@@ -56,7 +56,7 @@ process_initialization_test() ->
     ProcessAssignment = aos_test_helpers:create_assignment(ProcessMsg),
     
     %% Initialize process
-    {[_, _], LuaState2} = aos_test_helpers:call_compute(LuaState, State, ProcessAssignment),
+    {ok, [_, _], LuaState2} = aos_test_helpers:call_compute(LuaState, State, ProcessAssignment),
     
     %% Try eval with matching owner
     EvalMsg = aos_test_helpers:create_eval_message(<<"return 'owner matches'">>, CustomOwner),

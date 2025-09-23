@@ -27,7 +27,7 @@ trace_extraction_test(Verbose) ->
 
     %% Just verify that call_compute returns successfully
     case Result of
-        {[<<"ok">>, _], _} ->
+        {ok, [Data, _], _} when is_binary(Data); is_list(Data) ->
             case Verbose of
                 true -> ?debugFmt("call_compute returned successfully with expected format", []);
                 _ -> ok

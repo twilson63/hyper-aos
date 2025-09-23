@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.023" name="module 'aos_eval_security_test'">
+  <testcase time="0.002" name="aos_eval_security_test:0 eval_with_matching_commitment_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_eval_security_test:0 eval_with_non_matching_commitment_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.002" name="aos_eval_security_test:0 eval_with_missing_commitment_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_eval_security_test:0 eval_with_wrong_type_test">
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.001" name="aos_eval_security_test:0 eval_with_no_owner_test">
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

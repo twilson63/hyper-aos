@@ -88,7 +88,7 @@ function utils.matchesSpec(msg, spec)
   end
   if type(spec) == 'table' then
     for key, pattern in pairs(spec) do
-      -- The key can either be in the top level of the 'msg' object  
+      -- The key can either be in the top level of the 'msg' object
       -- or in the body table of the msg
       local msgValue = msg[key] or (msg.body and msg.body[key])
       if not msgValue then
@@ -277,7 +277,7 @@ utils.propEq = utils.curry(function (propName, value, object)
   assert(type(propName) == "string", "first argument should be a string")
   assert(type(value) == "string", "second argument should be a string")
   assert(type(object) == "table", "third argument should be a table<object>")
-  
+
   return object[propName] == value
 end, 3)
 
@@ -325,7 +325,7 @@ end, 2)
 -- @tparam {string} propName The property name to get
 -- @tparam {table} object The object to get the property from
 -- @treturn The value of the property
-utils.prop = utils.curry(function (propName, object) 
+utils.prop = utils.curry(function (propName, object)
   return object[propName]
 end, 2)
 

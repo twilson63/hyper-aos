@@ -1,0 +1,179 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Lua files
+[*.lua]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Erlang files
+[*.erl]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Erlang header files
+[*.hrl]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Erlang app files
+[*.app.src]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Rebar configuration
+[rebar.{config,lock}]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# JSON files (config, package files, etc.)
+[*.json]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown files
+[*.md]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+insert_final_newline = true
+trim_trailing_whitespace = false  # Allow trailing spaces for line breaks
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Shell scripts
+[*.sh]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Makefile
+[{Makefile,makefile,GNUmakefile,*.mk}]
+indent_style = tab
+tab_width = 8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# XML files
+[*.xml]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Configuration files
+[*.{conf,cfg,ini}]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Git files
+[.gitignore]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[.gitattributes]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Docker files
+[Dockerfile*]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.dockerfile]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Log files - don't modify
+[*.log]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+# Binary files - don't modify
+[*.{png,jpg,jpeg,gif,ico,svg,woff,woff2,ttf,otf,eot}]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+# License and legal files
+[LICENSE*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Documentation specific settings
+[CHANGELOG.md]
+max_line_length = 80
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[README.md]
+max_line_length = 80
+insert_final_newline = true
+trim_trailing_whitespace = false  # Allow trailing spaces for markdown formatting
+
+[CONTRIBUTING.md]
+max_line_length = 80
+insert_final_newline = true
+trim_trailing_whitespace = false  # Allow trailing spaces for markdown formatting
+
+[CODE_OF_CONDUCT.md]
+max_line_length = 80
+insert_final_newline = true
+trim_trailing_whitespace = false  # Allow trailing spaces for markdown formatting
+
+# Test files
+[test/**/*.erl]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[test/**/*.lua]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Build and output directories - minimal formatting
+[{_build,dist,coverage,logs}/**]
+insert_final_newline = false
+trim_trailing_whitespace = false

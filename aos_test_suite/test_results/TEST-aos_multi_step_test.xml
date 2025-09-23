@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="3" failures="0" errors="3" skipped="0" time="0.009" name="module 'aos_multi_step_test'">
+  <testcase time="0.000" name="aos_multi_step_test:0 multi_step_eval_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_multi_step_test:multi_step_eval_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_multi_step_test.erl, line 7)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_multi_step_test:0 authorities_multi_step_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_multi_step_test:authorities_multi_step_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_multi_step_test.erl, line 54)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_multi_step_test:0 state_isolation_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_multi_step_test:state_isolation_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/integration/aos_multi_step_test.erl, line 104)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>

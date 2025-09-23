@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="8" failures="0" errors="8" skipped="0" time="0.024" name="module 'aos_math_eunit_test'">
+  <testcase time="0.000" name="aos_math_eunit_test:0 addition_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:addition_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 6)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 subtraction_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:subtraction_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 11)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 multiplication_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:multiplication_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 16)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 division_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:division_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 21)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 exponentiation_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:exponentiation_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 26)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 modulo_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:modulo_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 31)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 complex_expression_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:complex_expression_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 36)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+  <testcase time="0.000" name="aos_math_eunit_test:0 floating_point_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_math_eunit_test:test_math_expression/1 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 47)
+in call from aos_math_eunit_test:floating_point_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/unit/aos_math_eunit_test.erl, line 41)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+**error:{badmatch,{error,enoent}}
+    </error>
+    <system-out>
+    </system-out>
+  </testcase>
+</testsuite>
