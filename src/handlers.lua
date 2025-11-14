@@ -23,9 +23,11 @@ handlers.utils = require('.handlers-utils')
 if _G.Handlers then
   handlers.list = _G.Handlers.list or {}
   handlers.nameIndex = _G.Handlers.nameIndex or {}
+  handlers.allowHandlerOverwrite = _G.Handlers.allowHandlerOverwrite or true
 else
   handlers.list = {}
   handlers.nameIndex = {}
+  handlers.allowHandlerOverwrite = true  -- Default: allow overwrites for backward compatibility
 end
 handlers.onceNonce = 0
 
@@ -90,7 +92,11 @@ local function addHandlerInternal(name, pattern, handle, maxRuns, position)
   -- update existing handler by name
   local idx = findIndexByProp(handlers.list, "name", name)
   if idx ~= nil and idx > 0 then
-    -- found, update in place
+    -- found existing handler
+    if not handlers.allowHandlerOverwrite then
+      error("Handler with name '" .. name .. "' already exists. Set handlers.allowHandlerOverwrite = true to allow overwriting.")
+    end
+    -- update in place
     handlers.list[idx].pattern = pattern
     handlers.list[idx].handle = handle
     handlers.list[idx].maxRuns = maxRuns
