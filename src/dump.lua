@@ -54,11 +54,10 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
         return string.format('%q', val)
     elseif val_type == 'table' then
         -- Check for circular references
-        local obj_id = tostring(val)
-        if seen[obj_id] then
-            return '"<Circular ' .. obj_id .. '>"'
+        if seen[val] then
+            return '"<Circular reference>"'
         end
-        seen[obj_id] = true
+        seen[val] = true
         
         local parts = {}
         local current_indent = string.rep(' ', padding_size)
@@ -98,7 +97,7 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
             end
         end
         
-        seen[obj_id] = nil  -- Clean up circular reference tracking
+        seen[val] = nil  -- Clean up circular reference tracking
         
         if #parts == 0 then
             return '{}'
