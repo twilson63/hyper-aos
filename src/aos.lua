@@ -20,6 +20,67 @@ _G.meta = _G.meta or { initialized = false }
 -- Initialize authorities_set for O(1) lookups
 -- This is a companion to _G.authorities (array) and used for fast membership checks
 _G.authorities_set = _G.authorities_set or {}
+
+-- Initialize inbox metadata for efficient queue management
+-- Instead of using table.remove(inbox, 1) which is O(n), we track the start index
+-- This allows us to implement efficient FIFO queue semantics in O(1)
+_G.inbox_start = _G.inbox_start or 1
+_G.inbox_end = _G.inbox_end or 0
+
+-- Private function to add message to inbox efficiently
+-- Maintains O(1) insertion by using circular indexing
+function _G.meta.add_to_inbox(msg)
+  _G.inbox_end = _G.inbox_end + 1
+  _G.Inbox[_G.inbox_end] = msg
+  
+  -- When we exceed MAX_INBOX_SIZE, start removing old messages
+  local inbox_size = _G.inbox_end - _G.inbox_start + 1
+  if inbox_size > _G.MAX_INBOX_SIZE then
+    -- Remove oldest message by advancing start pointer
+    _G.Inbox[_G.inbox_start] = nil
+    _G.inbox_start = _G.inbox_start + 1
+  end
+end
+
+-- Private function to get inbox as contiguous array
+-- Returns only the valid messages (from inbox_start to inbox_end)
+function _G.meta.get_inbox_array()
+  local result = {}
+  for i = _G.inbox_start, _G.inbox_end do
+    if _G.Inbox[i] ~= nil then
+      table.insert(result, _G.Inbox[i])
+    end
+  end
+  return result
+end
+
+-- Private function to get current inbox size
+function _G.meta.get_inbox_size()
+  if _G.inbox_end < _G.inbox_start then
+    return 0
+  end
+  return _G.inbox_end - _G.inbox_start + 1
+end
+
+-- Private function to rebuild inbox indices from stored array
+-- This is called during state restoration to rebuild the start/end indices
+function _G.meta.rebuild_inbox_indices()
+  if _G.Inbox and next(_G.Inbox) then
+    -- Find the highest index in the Inbox table
+    local max_idx = 0
+    for k in pairs(_G.Inbox) do
+      if type(k) == "number" and k > max_idx then
+        max_idx = k
+      end
+    end
+    _G.inbox_end = max_idx
+    _G.inbox_start = 1
+  else
+    _G.inbox_start = 1
+    _G.inbox_end = 0
+  end
+end
+
 function _G.meta.init(msg)
   -- Initialize owner from first Process message
   if not _G.meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
@@ -355,6 +416,7 @@ end
 ---@diagnostic disable-next-line
 function prompt()
   -- Use colors if available, otherwise fallback to plain text
+  local inbox_size = _G.meta.get_inbox_size()
   if _G.colors and _G.colors.cyan then
     local c = _G.colors
     return c.cyan .. c.bold .. "hyper" .. c.reset ..
@@ -363,11 +425,11 @@ function prompt()
            c.white .. "@" .. c.reset ..
            c.yellow .. require('.process')._version .. c.reset ..
            c.white .. "[" .. c.reset ..
-           c.bright_magenta .. #Inbox .. c.reset ..
+           c.bright_magenta .. inbox_size .. c.reset ..
            c.white .. "]" .. c.reset ..
            c.bright_blue .. "> " .. c.reset
   else
-    return "hyper~aos@" .. require('.process')._version .. "[" .. #Inbox .. "]> "
+    return "hyper~aos@" .. require('.process')._version .. "[" .. inbox_size .. "]> "
   end
 end
 
@@ -425,14 +487,15 @@ local SYSTEM_KEYS = {
   "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify", "Handlers",
 
    -- Private/temporary variables
-   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta", "authorities_set",
+    "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta", "authorities_set", "inbox_start", "inbox_end",
 
-   -- These will be handled specially or excluded
-   "State", "_G"
+    -- These will be handled specially or excluded
+    "State", "_G"
 
-   -- NOTE: We explicitly DO NOT exclude: id, owner, authorities, colors, Inbox
-   -- These are process state that should be persisted
-   -- NOTE: authorities_set is derived from authorities and rebuilt on init, so it's excluded
+    -- NOTE: We explicitly DO NOT exclude: id, owner, authorities, colors, Inbox
+    -- These are process state that should be persisted
+    -- NOTE: authorities_set is derived from authorities and rebuilt on init, so it's excluded
+    -- NOTE: inbox_start and inbox_end are rebuilt from Inbox array, so they're excluded
 }
 
 --- Recursively copy a table, handling circular references
@@ -525,12 +588,15 @@ function compute(state, assignment)
       system_keys_set[key] = true
     end
 
-    for key, value in pairs(state) do
-      -- Don't overwrite system keys or functions
-      if type(_G[key]) ~= "function" and not system_keys_set[key] then
-        _G[key] = value
-      end
-    end
+   for key, value in pairs(state) do
+     -- Don't overwrite system keys or functions
+     if type(_G[key]) ~= "function" and not system_keys_set[key] then
+       _G[key] = value
+     end
+   end
+   
+   -- Rebuild inbox indices after state restoration
+   _G.meta.rebuild_inbox_indices()
   end
 
   -- Initialize results structure in _G
@@ -567,11 +633,8 @@ function compute(state, assignment)
     result = _G.meta.printNewMessage(msg)
     status = true
 
-    table.insert(_G.Inbox, msg)
-    -- Implement FIFO rotation when inbox exceeds limit
-    if #_G.Inbox > _G.MAX_INBOX_SIZE then
-      table.remove(_G.Inbox, 1)
-    end
+     -- Add to inbox using efficient O(1) queue management
+     _G.meta.add_to_inbox(msg)
   end
 
   -- Set execution status
