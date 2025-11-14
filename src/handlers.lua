@@ -289,6 +289,7 @@ end
 -- @treturn The response from the handler(s). Returns a default message if no handler matches.
 function handlers.evaluate(msg, env)
   local handled = false
+  local handlersToRemove = {}
   assert(type(msg) == 'table', 'msg is not valid')
   assert(type(env) == 'table', 'env is not valid')
   for _, o in ipairs(handlers.list) do
@@ -324,18 +325,26 @@ function handlers.evaluate(msg, env)
         if not status then
           error(err)
         end
-        -- remove handler if maxRuns is reached. maxRuns can be either a number or "inf"
+        -- track handlers to remove if maxRuns is reached. maxRuns can be either a number or "inf"
         if o.maxRuns ~= nil and o.maxRuns ~= "inf" then
           o.maxRuns = o.maxRuns - 1
           if o.maxRuns == 0 then
-            handlers.remove(o.name)
+            table.insert(handlersToRemove, o.name)
           end
         end
       end
       if match < 0 then
+        -- Remove handlers after breaking from iteration
+        for _, name in ipairs(handlersToRemove) do
+          handlers.remove(name)
+        end
         return handled
       end
     end
+  end
+  -- Remove handlers after iteration completes
+  for _, name in ipairs(handlersToRemove) do
+    handlers.remove(name)
   end
   -- do default
   if not handled then
