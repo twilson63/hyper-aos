@@ -83,11 +83,13 @@ handlers_utils_test_() ->
            test_has_matching_tag_nil_tags(L),
            
            % hasMatchingTagOf tests
-          test_has_matching_tag_of_success(L),
-          test_has_matching_tag_of_multiple_values(L),
-          test_has_matching_tag_of_no_match(L),
-          
-           % hasMatchingData tests
+           test_has_matching_tag_of_success(L),
+           test_has_matching_tag_of_multiple_values(L),
+           test_has_matching_tag_of_no_match(L),
+           test_has_matching_tag_of_nil_msg(L),
+           test_has_matching_tag_of_nil_tags(L),
+           
+            % hasMatchingData tests
            test_has_matching_data_success(L),
            test_has_matching_data_failure(L),
            test_has_matching_data_nil(L),
@@ -200,15 +202,37 @@ test_has_matching_tag_of_multiple_values(L) ->
      end}.
 
 test_has_matching_tag_of_no_match(L) ->
-    {"hasMatchingTagOf returns 0 when no values match",
-     fun() ->
-         Code = "local hu = require('.handlers-utils')\n" ++
-                "local msg = { Tags = { Action = 'Delete' } }\n" ++
-                "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval', 'Run'})\n" ++
-                "return checker(msg)",
-         {ok, [Result], _} = luerl:do(Code, L),
-         ?assertEqual(0, Result)
-     end}.
+     {"hasMatchingTagOf returns 0 when no values match",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = { Tags = { Action = 'Delete' } }\n" ++
+                 "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval', 'Run'})\n" ++
+                 "return checker(msg)",
+          {ok, [Result], _} = luerl:do(Code, L),
+          ?assertEqual(0, Result)
+      end}.
+
+test_has_matching_tag_of_nil_msg(L) ->
+     {"hasMatchingTagOf returns 0 when msg is nil",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = nil\n" ++
+                 "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval'})\n" ++
+                 "return checker(msg)",
+          {ok, [Result], _} = luerl:do(Code, L),
+          ?assertEqual(0, Result)
+      end}.
+
+test_has_matching_tag_of_nil_tags(L) ->
+     {"hasMatchingTagOf returns 0 when Tags is nil",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = { Data = 'test' }\n" ++
+                 "local checker = hu.hasMatchingTagOf('Action', {'Info', 'Eval'})\n" ++
+                 "return checker(msg)",
+          {ok, [Result], _} = luerl:do(Code, L),
+          ?assertEqual(0, Result)
+      end}.
 
 %% hasMatchingData tests
 

@@ -41,11 +41,15 @@ function _utils.hasMatchingTagOf(name, values)
   end
   
   return function (msg)
+    -- Check if msg and Tags exist once
+    if not msg or not msg.Tags then
+      return 0
+    end
+    
+    local tagValue = msg.Tags[name]
     for _, value in ipairs(values) do
-      local patternResult = Handlers.utils.hasMatchingTag(name, value)(msg)
-
-      if patternResult ~= 0 and patternResult ~= false and patternResult ~= "skip" then
-        return patternResult
+      if tagValue == value then
+        return true
       end
     end
 
