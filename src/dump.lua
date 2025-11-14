@@ -68,6 +68,12 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
         end
         seen[val] = true
         
+        -- Early check for empty tables
+        if next(val) == nil then
+            seen[val] = nil
+            return '{}'
+        end
+        
         local parts = {}
         local current_indent = get_indent(padding_size)
         local field_indent = get_indent(padding_size + indent_size)
