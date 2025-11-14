@@ -82,6 +82,7 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
                 if filtered_val ~= nil then
                     local key_str
                     local k_type = type(filtered_key)
+                    local v_type = type(filtered_val)
                     
                     -- Handle different key types
                     if k_type == 'string' and string.match(filtered_key, '^[a-zA-Z_][a-zA-Z0-9_]*$') and not RESERVED_WORDS[filtered_key] then
@@ -95,7 +96,7 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
                     end
                     
                     local val_str
-                    if type(filtered_val) == 'table' and not val_nodump then
+                    if v_type == 'table' and not val_nodump then
                         val_str = dump._dump_internal(filtered_val, depth + 1, indent_size, padding_size + indent_size, filter, udata, seen)
                     else
                         val_str = dump._dump_internal(filtered_val, depth + 1, indent_size, padding_size, filter, udata, seen)
