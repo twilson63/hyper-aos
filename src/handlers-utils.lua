@@ -22,7 +22,7 @@ function _utils.hasMatchingTag(name, value)
   assert(type(name) == 'string' and type(value) == 'string', 'invalid arguments: (name : string, value : string)')
 
   return function (msg)
-    return msg.Tags[name] == value
+    return (msg and msg.Tags and msg.Tags[name] == value) or false
   end
 end
 
