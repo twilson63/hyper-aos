@@ -33,6 +33,13 @@ end
 -- @treturn {function} A function that takes a message and returns whether there is a tag match (-1 if matches, 0 otherwise)
 function _utils.hasMatchingTagOf(name, values)
   assert(type(name) == 'string' and type(values) == 'table', 'invalid arguments: (name : string, values : string[])')
+  assert(#values > 0, 'values table cannot be empty')
+  
+  -- Validate all values are strings
+  for i, value in ipairs(values) do
+    assert(type(value) == 'string', 'all values must be strings, got ' .. type(value) .. ' at index ' .. i)
+  end
+  
   return function (msg)
     for _, value in ipairs(values) do
       local patternResult = Handlers.utils.hasMatchingTag(name, value)(msg)

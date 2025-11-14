@@ -411,6 +411,30 @@ test_error_handling() ->
                 ?assertNot(Status)
             end},
            
+           % Test hasMatchingTagOf with empty table
+           {"hasMatchingTagOf with empty table should error",
+            fun() ->
+                Code = "local hu = require('.handlers-utils')\n" ++
+                       "local status = pcall(function()\n" ++
+                       "  hu.hasMatchingTagOf('Action', {})\n" ++
+                       "end)\n" ++
+                       "return status",
+                {ok, [Status], _} = luerl:do(Code, L),
+                ?assertNot(Status)
+            end},
+           
+           % Test hasMatchingTagOf with non-string values in table
+           {"hasMatchingTagOf with non-string values in table should error",
+            fun() ->
+                Code = "local hu = require('.handlers-utils')\n" ++
+                       "local status = pcall(function()\n" ++
+                       "  hu.hasMatchingTagOf('Action', {'Eval', 123, 'Run'})\n" ++
+                       "end)\n" ++
+                       "return status",
+                {ok, [Status], _} = luerl:do(Code, L),
+                ?assertNot(Status)
+            end},
+           
            % Test hasMatchingData with non-string value
            {"hasMatchingData with non-string value should error",
             fun() ->
