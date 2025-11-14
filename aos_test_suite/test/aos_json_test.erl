@@ -364,6 +364,84 @@ large_numbers_test() ->
     ?assert(abs_val(-9876543210987654 - Negative) < 100),
     ?assert(abs_val(1.23456789012345 - Float) < 0.00000001).
 
+%% Test control character encoding (should use \uXXXX format)
+control_character_encoding_test() ->
+    LuaState = setup(),
+    
+    % Test that control characters are properly escaped with \uXXXX format
+    Code = "
+        -- String with a control character (ASCII 1, SOH - Start of Heading)
+        local test_str = string.char(1) .. 'hello' .. string.char(31)
+        local encoded = json.encode(test_str)
+        -- Should contain \\u0001 and \\u001f
+        return encoded, string.match(encoded, '\\\\u0001'), string.match(encoded, '\\\\u001f')
+    ",
+    
+    {ok, [Encoded, Match1, Match31], _} = luerl:do(Code, LuaState),
+    
+    EncodedBin = iolist_to_binary(Encoded),
+    % Verify the encoded string contains proper Unicode escapes
+    ?assertNotEqual(nomatch, binary:match(EncodedBin, <<"\\u0001">>)),
+    ?assertNotEqual(nomatch, binary:match(EncodedBin, <<"\\u001f">>)),
+    % Also verify the Lua pattern matching found them
+    ?assertEqual(<<"\\u0001">>, iolist_to_binary(Match1)),
+    ?assertEqual(<<"\\u001f">>, iolist_to_binary(Match31)).
+
+%% Test invalid surrogate pair handling
+invalid_surrogate_test() ->
+    LuaState = setup(),
+    
+    % Test lone high surrogate (0xD800-0xDBFF without matching low surrogate)
+    Code1 = "
+        local test_str = '\"\\\\uD800\"'  -- Lone high surrogate
+        local status, err = pcall(json.decode, test_str)
+        return status, err
+    ",
+    {ok, [Status1, Error1], _} = luerl:do(Code1, LuaState),
+    ?assertEqual(false, Status1),
+    ?assert(string:str(binary_to_list(iolist_to_binary(Error1)), "surrogate") > 0 orelse
+            string:str(binary_to_list(iolist_to_binary(Error1)), "invalid") > 0),
+    
+    % Test lone low surrogate (0xDC00-0xDFFF without matching high surrogate)
+    Code2 = "
+        local test_str = '\"\\\\uDC00\"'  -- Lone low surrogate
+        local status, err = pcall(json.decode, test_str)
+        return status, err
+    ",
+    {ok, [Status2, Error2], _} = luerl:do(Code2, LuaState),
+    ?assertEqual(false, Status2),
+    ?assert(string:str(binary_to_list(iolist_to_binary(Error2)), "surrogate") > 0 orelse
+            string:str(binary_to_list(iolist_to_binary(Error2)), "invalid") > 0),
+    
+    % Test high surrogate followed by non-surrogate
+    Code3 = "
+        local test_str = '\"\\\\uD800\\\\u0041\"'  -- High surrogate + 'A'
+        local status, err = pcall(json.decode, test_str)
+        return status, err
+    ",
+    {ok, [Status3, Error3], _} = luerl:do(Code3, LuaState),
+    ?assertEqual(false, Status3),
+    ?assert(string:str(binary_to_list(iolist_to_binary(Error3)), "surrogate") > 0 orelse
+            string:str(binary_to_list(iolist_to_binary(Error3)), "invalid") > 0).
+
+%% Test valid surrogate pair
+valid_surrogate_test() ->
+    LuaState = setup(),
+    
+    % Test valid surrogate pair for 𝄞 (U+1D11E, musical symbol G clef)
+    % High surrogate: 0xD834, Low surrogate: 0xDD1E
+    Code = "
+        local test_str = '\"\\\\uD834\\\\uDD1E\"'
+        local status, result = pcall(json.decode, test_str)
+        return status, result
+    ",
+    {ok, [Status, Result], _} = luerl:do(Code, LuaState),
+    ?assertEqual(true, Status),
+    % The result should be the UTF-8 encoding of U+1D11E
+    % U+1D11E in UTF-8 is: F0 9D 84 9E (4 bytes)
+    ResultBin = iolist_to_binary(Result),
+    ?assertEqual(<<240, 157, 132, 158>>, ResultBin).
+
 %% Helper function for absolute value (renamed to avoid conflict with erlang:abs)
 abs_val(X) when X < 0 -> -X;
 abs_val(X) -> X.

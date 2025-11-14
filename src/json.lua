@@ -149,9 +149,24 @@ end
 local function parse_unicode_escape(s)
   local n1 = tonumber(s:sub(1, 4), 16)
   local n2 = tonumber(s:sub(7, 10), 16)
-  if n2 then
-    return
-    codepoint_to_utf8((n1 - 0xd800) * 0x400 + (n2 - 0xdc00) + 0x10000)
+  
+  -- Check if n1 is a high surrogate (0xD800-0xDBFF)
+  if n1 >= 0xd800 and n1 <= 0xdbff then
+    -- High surrogate must be followed by low surrogate
+    if not n2 then
+      error("invalid unicode escape: lone high surrogate")
+    end
+    if n2 < 0xdc00 or n2 > 0xdfff then
+      error("invalid unicode escape: high surrogate not followed by low surrogate")
+    end
+    -- Valid surrogate pair
+    return codepoint_to_utf8((n1 - 0xd800) * 0x400 + (n2 - 0xdc00) + 0x10000)
+  -- Check if n1 is a low surrogate (0xDC00-0xDFFF)
+  elseif n1 >= 0xdc00 and n1 <= 0xdfff then
+    error("invalid unicode escape: lone low surrogate")
+  elseif n2 then
+    -- n2 exists but n1 is not a high surrogate - this shouldn't happen in valid JSON
+    error("invalid unicode escape: unexpected surrogate sequence")
   else
     return codepoint_to_utf8(n1)
   end
