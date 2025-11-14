@@ -1,7 +1,8 @@
 local dump = { _version = "1.0.0" }
 
--- Security limit: maximum number of entries to dump per table
-local MAX_ENTRIES = 10000
+-- Security limits
+local MAX_ENTRIES = 10000  -- Maximum number of entries to dump per table
+local MAX_KEY_LENGTH = 1000  -- Maximum string key length before pattern matching
 
 -- Reserved words that need to be quoted as keys
 local RESERVED_WORDS = {
@@ -100,7 +101,7 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
                     local v_type = type(filtered_val)
                     
                     -- Handle different key types
-                    if k_type == 'string' and string.match(filtered_key, '^[a-zA-Z_][a-zA-Z0-9_]*$') and not RESERVED_WORDS[filtered_key] then
+                    if k_type == 'string' and #filtered_key <= MAX_KEY_LENGTH and string.match(filtered_key, '^[a-zA-Z_][a-zA-Z0-9_]*$') and not RESERVED_WORDS[filtered_key] then
                         key_str = filtered_key
                     else
                         if k_type == 'string' then

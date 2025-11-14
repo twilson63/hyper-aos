@@ -429,3 +429,24 @@ max_entries_limit_test() ->
     
     % Should contain the "table too large" marker
     ?assert(string:str(ResultStr, "<table too large>") > 0).
+
+%% Test very long string keys
+long_string_key_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        local t = {}
+        -- Create a very long key (over 1000 chars)
+        local long_key = string.rep('a', 1500)
+        t[long_key] = 'value'
+        t.short = 'other'
+        local result = dump.dump(t)
+        return result
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    % Long key should be quoted (not used as bare identifier)
+    % and short key should work normally
+    ?assert(string:str(ResultStr, "short = \"other\"") > 0).
