@@ -1,3 +1,29 @@
+--[[
+chance.lua - Random value generator using Mersenne Twister (MT19937)
+
+WARNING: This implementation is NOT cryptographically secure and should NEVER be used for:
+  - Security tokens or session IDs
+  - Password generation
+  - Cryptographic keys
+  - Any security-sensitive random value generation
+
+The Mersenne Twister algorithm is:
+  - Predictable: Given 624 sequential outputs, the internal state can be reconstructed
+  - Not suitable for security applications
+  - Designed for simulation, games, and non-security use cases
+
+SEEDING: You MUST call chance.seed() with a unique value before use.
+  - Without seeding, a fixed default seed (5489) is used
+  - The default seed produces the same sequence every time
+  - For non-deterministic behavior, seed with a time-based or external entropy source
+  - Same seed will always produce the same sequence (useful for testing/reproducibility)
+
+Usage:
+  chance.seed(12345)           -- Initialize with a seed value
+  local num = chance.random()  -- Generate random number [0, 1)
+  local int = chance.integer(1, 10)  -- Random integer in range
+]]--
+
 local chance = { _version = "1.0.0" }
 
 local N = 624
@@ -56,14 +82,24 @@ local MersenneTwister = {}
 MersenneTwister.mt = {}
 MersenneTwister.mti = N + 1
 
+-- Initialize the random number generator with a seed value
+-- Same seed will always produce the same sequence of random numbers
+-- @param seed: integer seed value
 function chance.seed(seed)
     init_genrand(MersenneTwister, seed)
 end
 
+-- Generate a random floating point number in the range [0, 1)
+-- Note: The upper bound of 1 is exclusive (never returned)
+-- @return: number between 0 (inclusive) and 1 (exclusive)
 function chance.random()
     return genrand_int32(MersenneTwister) * (1.0 / 4294967296.0)
 end
 
+-- Generate a random integer in the range [min, max] (inclusive on both ends)
+-- @param min: minimum value (inclusive)
+-- @param max: maximum value (inclusive)
+-- @return: random integer between min and max
 function chance.integer(min, max)
     if max < min then
         error("max must be greater than or equal to min", 2)
@@ -71,6 +107,9 @@ function chance.integer(min, max)
     return math.floor(chance.random() * (max - min + 1) + min)
 end
 
+-- Generate a random boolean value
+-- @param likelihood: optional probability of returning true (0.0 to 1.0), defaults to 0.5
+-- @return: true or false
 function chance.bool(likelihood)
     likelihood = likelihood or 0.5
     return chance.random() < likelihood
