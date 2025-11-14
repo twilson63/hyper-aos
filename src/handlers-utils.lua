@@ -64,6 +64,10 @@ end
 function _utils.reply(input) 
   assert(type(input) == 'table' or type(input) == 'string', 'invalid arguments: (input : table or string)')
   return function (msg)
+    if not msg or type(msg.reply) ~= 'function' then
+      error('Invalid message: reply function not available')
+    end
+    
     if type(input) == 'string' then
       msg.reply({ Data = input })
       return

@@ -94,11 +94,13 @@ handlers_utils_test_() ->
            test_has_matching_data_nil_msg(L),
            
            % reply tests
-          test_reply_string(L),
-          test_reply_table(L),
-          test_reply_with_tags(L),
-          
-          % continue tests
+           test_reply_string(L),
+           test_reply_table(L),
+           test_reply_with_tags(L),
+           test_reply_nil_msg(L),
+           test_reply_missing_reply_function(L),
+           
+           % continue tests
           test_continue_match(L),
           test_continue_no_match(L),
           test_continue_with_function_pattern(L)
@@ -309,9 +311,33 @@ test_reply_with_tags(L) ->
                 "return replyData.Tags.Action, replyData.Tags.Status",
          {ok, Results, _} = luerl:do(Code, L),
          [Action, Status] = Results,
-         ?assertEqual(<<"Response">>, Action),
-         ?assertEqual(<<"200">>, Status)
-     end}.
+          ?assertEqual(<<"Response">>, Action),
+          ?assertEqual(<<"200">>, Status)
+      end}.
+
+test_reply_nil_msg(L) ->
+     {"reply with nil msg should error",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = nil\n" ++
+                 "local replyFn = hu.reply('Test')\n" ++
+                 "local status, err = pcall(function() replyFn(msg) end)\n" ++
+                 "return status",
+          {ok, [Status], _} = luerl:do(Code, L),
+          ?assertNot(Status)
+      end}.
+
+test_reply_missing_reply_function(L) ->
+     {"reply with msg missing reply function should error",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = { Data = 'test' }\n" ++
+                 "local replyFn = hu.reply('Test')\n" ++
+                 "local status, err = pcall(function() replyFn(msg) end)\n" ++
+                 "return status",
+          {ok, [Status], _} = luerl:do(Code, L),
+          ?assertNot(Status)
+      end}.
 
 %% continue tests
 
