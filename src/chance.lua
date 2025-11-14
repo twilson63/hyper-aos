@@ -6,6 +6,8 @@ local MATRIX_A = 0x9908b0df
 local UPPER_MASK = 0x80000000
 local LOWER_MASK = 0x7fffffff
 
+local mag01 = {[0] = 0x0, [1] = MATRIX_A}
+
 local function init_genrand(o, s)
     o.mt[0] = s & 0xffffffff
     for i = 1, N - 1 do
@@ -17,9 +19,6 @@ end
 
 local function genrand_int32(o)
     local y
-    local mag01 = {}
-    mag01[0] = 0x0
-    mag01[1] = MATRIX_A
     
     if o.mti >= N then
         if o.mti == N + 1 then
