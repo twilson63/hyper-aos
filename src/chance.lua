@@ -76,7 +76,7 @@ function chance.bool(likelihood)
     return chance.random() < likelihood
 end
 
-function chance.character(options)
+local function build_char_pool(options)
     options = options or {}
     local pool = ""
     
@@ -102,6 +102,11 @@ function chance.character(options)
         pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     end
     
+    return pool
+end
+
+function chance.character(options)
+    local pool = build_char_pool(options)
     local index = chance.integer(1, #pool)
     return string.sub(pool, index, index)
 end
@@ -109,10 +114,12 @@ end
 function chance.string(options)
     options = options or {}
     local length = options.length or 8
+    local pool = build_char_pool(options)
     local result = {}
     
     for i = 1, length do
-        result[i] = chance.character(options)
+        local index = chance.integer(1, #pool)
+        result[i] = string.sub(pool, index, index)
     end
     
     return table.concat(result)
