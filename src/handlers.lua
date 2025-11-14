@@ -24,10 +24,14 @@ if _G.Handlers then
   handlers.list = _G.Handlers.list or {}
   handlers.nameIndex = _G.Handlers.nameIndex or {}
   handlers.allowHandlerOverwrite = _G.Handlers.allowHandlerOverwrite or true
+  handlers.patternTimeoutMs = _G.Handlers.patternTimeoutMs
+  handlers.enablePatternLogging = _G.Handlers.enablePatternLogging or false
 else
   handlers.list = {}
   handlers.nameIndex = {}
   handlers.allowHandlerOverwrite = true  -- Default: allow overwrites for backward compatibility
+  handlers.patternTimeoutMs = nil  -- Default: no timeout
+  handlers.enablePatternLogging = false  -- Default: no pattern execution logging
 end
 handlers.onceNonce = 0
 
@@ -312,9 +316,12 @@ function handlers.evaluate(msg, env)
   local handlersToRemove = {}
   assert(type(msg) == 'table', 'msg is not valid')
   assert(type(env) == 'table', 'env is not valid')
-  for _, o in ipairs(handlers.list) do
-    if o.name ~= "_default" then
-      local match = utils.matchesSpec(msg, o.pattern)
+   for _, o in ipairs(handlers.list) do
+     if o.name ~= "_default" then
+       if handlers.enablePatternLogging then
+         print("[handlers] Evaluating pattern for handler: " .. tostring(o.name))
+       end
+       local match = utils.matchesSpec(msg, o.pattern)
       if not (type(match) == 'number' or type(match) == 'string' or type(match) == 'boolean') then
         error("Pattern result is not valid, it MUST be string, number, or boolean")
       end
