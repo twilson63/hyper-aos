@@ -78,6 +78,7 @@ end
 function utils.matchesSpec(msg, spec)
   if type(spec) == 'function' then
     return spec(msg)
+  end
   -- If the spec is a table, step through every key/value pair in the pattern and check if the msg matches
   -- Supported pattern types:
   --   - Exact string match
@@ -85,7 +86,6 @@ function utils.matchesSpec(msg, spec)
   --   - '_' (wildcard: Message has tag, but can be any value)
   --   - Function execution on the tag, optionally using the msg as the second argument
   --   - Table of patterns, where ANY of the sub-patterns matching the tag will result in a match
-  end
   if type(spec) == 'table' then
     for key, pattern in pairs(spec) do
       -- The key can either be in the top level of the 'msg' object
