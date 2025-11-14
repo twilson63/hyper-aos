@@ -74,16 +74,23 @@ end
 -- @treturn {function} A function that takes a message and replies to it
 function _utils.reply(input) 
   assert(type(input) == 'table' or type(input) == 'string', 'invalid arguments: (input : table or string)')
-  return function (msg)
-    if not msg or type(msg.reply) ~= 'function' then
-      error('Invalid message: reply function not available')
+  
+  -- Cache type check and create appropriate closure
+  if type(input) == 'string' then
+    local replyData = { Data = input }
+    return function (msg)
+      if not msg or type(msg.reply) ~= 'function' then
+        error('Invalid message: reply function not available')
+      end
+      msg.reply(replyData)
     end
-    
-    if type(input) == 'string' then
-      msg.reply({ Data = input })
-      return
+  else
+    return function (msg)
+      if not msg or type(msg.reply) ~= 'function' then
+        error('Invalid message: reply function not available')
+      end
+      msg.reply(input)
     end
-    msg.reply(input)
   end
 end
 
