@@ -18,6 +18,7 @@
     initialize_process/2,
     call_compute/3,
     extract_output_data/1,
+    extract_status/1,
     create_unauthorized_eval_message/1,
     create_message_without_commitments/1,
     cleanup_lua_state/1,
@@ -239,6 +240,14 @@ extract_output_data({ok, [Data, _Result], _LuaState}) when is_binary(Data) ->
 extract_output_data({ok, [Data, _Result], _LuaState}) when is_list(Data) ->
     iolist_to_binary(Data);
 extract_output_data(_) ->
+    undefined.
+
+%% Extract status from compute result
+extract_status({ok, [_, Result], _LuaState}) when is_map(Result) ->
+    maps:get(<<"status">>, Result, undefined);
+extract_status({ok, Status, _LuaState}) when is_binary(Status) ->
+    Status;
+extract_status(_) ->
     undefined.
 
 %% Create an unauthorized eval message (different committer)

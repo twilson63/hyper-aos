@@ -16,6 +16,10 @@ _G._OUTPUT = ""
 -- We keep meta separate as it contains private functions and initialization state
 ---@diagnostic disable-next-line
 _G.meta = _G.meta or { initialized = false }
+
+-- Initialize authorities_set for O(1) lookups
+-- This is a companion to _G.authorities (array) and used for fast membership checks
+_G.authorities_set = _G.authorities_set or {}
 function _G.meta.init(msg)
   -- Initialize owner from first Process message
   if not _G.meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
@@ -27,37 +31,42 @@ function _G.meta.init(msg)
         _G.owner = commitment.committer
         _G.meta.initialized = true
 
-        -- Initialize authorities array in _G
-        _G.authorities = _G.authorities or {}
+        -- Initialize authorities array and set in _G
+         _G.authorities = _G.authorities or {}
+         _G.authorities_set = _G.authorities_set or {}
 
-        -- Parse authorities from comma-separated string
-        if msg.authority then
-          -- Split comma-separated authorities string manually
-          local authorities_str = msg.authority
-          local start_pos = 1
-          while true do
-            local comma_pos = string.find(authorities_str, ",", start_pos)
-            local authority
-            if comma_pos then
-              authority = string.sub(authorities_str, start_pos, comma_pos - 1)
-            else
-              authority = string.sub(authorities_str, start_pos)
-            end
+         -- Parse authorities from comma-separated string
+         if msg.authority then
+           -- Split comma-separated authorities string manually
+           local authorities_str = msg.authority
+           local start_pos = 1
+           while true do
+             local comma_pos = string.find(authorities_str, ",", start_pos)
+             local authority
+             if comma_pos then
+               authority = string.sub(authorities_str, start_pos, comma_pos - 1)
+             else
+               authority = string.sub(authorities_str, start_pos)
+             end
 
-            -- Trim whitespace
-            authority = string.match(authority, "^%s*(.-)%s*$") or authority
+             -- Trim whitespace
+             authority = string.match(authority, "^%s*(.-)%s*$") or authority
 
-            -- Check if it's 43 characters (valid Arweave address)
-            if #authority == 43 then
-              table.insert(_G.authorities, authority)
-            end
+             -- Check if it's 43 characters (valid Arweave address)
+             if #authority == 43 then
+               -- Only add if not already present (avoid duplicates)
+               if not _G.authorities_set[authority] then
+                 table.insert(_G.authorities, authority)
+                 _G.authorities_set[authority] = true
+               end
+             end
 
-            if not comma_pos then
-              break
-            end
-            start_pos = comma_pos + 1
-          end
-        end
+             if not comma_pos then
+               break
+             end
+             start_pos = comma_pos + 1
+           end
+         end
 
         break
       end
@@ -133,16 +142,11 @@ function _G.meta.is_trusted(msg)
     return false
   end
 
-  -- Check if any commitment's committer is in the authorities list
-  if msg.commitments and _G.authorities then
+  -- Check if any commitment's committer is in the authorities set (O(1) lookup)
+  if msg.commitments and _G.authorities_set then
     for _, commitment in pairs(msg.commitments) do
-      if commitment.committer then
-        -- Check if this committer is in the authorities list
-        for _, authority in ipairs(_G.authorities) do
-          if commitment.committer == authority then
-            return true
-          end
-        end
+      if commitment.committer and _G.authorities_set[commitment.committer] then
+        return true
       end
     end
   end
@@ -420,14 +424,15 @@ local SYSTEM_KEYS = {
   -- AOS specific functions that shouldn't be serialized
   "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify", "Handlers",
 
-  -- Private/temporary variables
-  "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
+   -- Private/temporary variables
+   "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta", "authorities_set",
 
-  -- These will be handled specially or excluded
-  "State", "_G"
+   -- These will be handled specially or excluded
+   "State", "_G"
 
-  -- NOTE: We explicitly DO NOT exclude: id, owner, authorities, colors, Inbox
-  -- These are process state that should be persisted
+   -- NOTE: We explicitly DO NOT exclude: id, owner, authorities, colors, Inbox
+   -- These are process state that should be persisted
+   -- NOTE: authorities_set is derived from authorities and rebuilt on init, so it's excluded
 }
 
 --- Recursively copy a table, handling circular references
