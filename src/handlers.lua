@@ -22,10 +22,21 @@ handlers.utils = require('.handlers-utils')
 -- if update we need to keep defined handlers
 if _G.Handlers then
   handlers.list = _G.Handlers.list or {}
+  handlers.nameIndex = _G.Handlers.nameIndex or {}
 else
   handlers.list = {}
+  handlers.nameIndex = {}
 end
 handlers.onceNonce = 0
+
+--- Rebuilds the name-to-index mapping for all handlers in the list.
+-- @lfunction rebuildNameIndex
+local function rebuildNameIndex()
+  handlers.nameIndex = {}
+  for index, handler in ipairs(handlers.list) do
+    handlers.nameIndex[handler.name] = index
+  end
+end
 
 --- Given an array, a property name, and a value, returns the index of the object in the array that has the property with the value.
 -- @lfunction findIndexByProp
@@ -34,6 +45,11 @@ handlers.onceNonce = 0
 -- @tparam {any} value The value to check for in the property
 -- @treturn {number | nil} The index of the object in the array that has the property with the value, or nil if no such object is found
 local function findIndexByProp(array, prop, value)
+  -- Use O(1) lookup for name searches
+  if prop == "name" and array == handlers.list then
+    return handlers.nameIndex[value]
+  end
+  -- Fallback to O(n) search for other properties
   for index, object in ipairs(array) do
     if object[prop] == value then
       return index
@@ -148,7 +164,7 @@ function handlers.add(...)
   else
     -- not found then add    
     table.insert(handlers.list, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-
+    handlers.nameIndex[name] = #handlers.list
   end
   return #handlers.list
 end
@@ -187,6 +203,7 @@ function handlers.append(...)
     handlers.list[idx].maxRuns = maxRuns
   else
     table.insert(handlers.list, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+    handlers.nameIndex[name] = #handlers.list
   end
 end
 
@@ -225,6 +242,7 @@ function handlers.prepend(...)
     handlers.list[idx].maxRuns = maxRuns
   else  
     table.insert(handlers.list, 1, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+    rebuildNameIndex()  -- Rebuild index since we inserted at position 1
   end
 end
 
@@ -242,6 +260,7 @@ function handlers.before(handleName)
       handle = handlers.generateResolver(handle)
       if idx then
         table.insert(handlers.list, idx, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+        rebuildNameIndex()  -- Rebuild index since we inserted in the middle
       end
     end
   }
@@ -260,6 +279,7 @@ function handlers.after(handleName)
       handle = handlers.generateResolver(handle)
       if idx then
         table.insert(handlers.list, idx + 1, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+        rebuildNameIndex()  -- Rebuild index since we inserted in the middle
       end
     end
   }
@@ -273,11 +293,14 @@ function handlers.remove(name)
   assert(type(name) == 'string', 'name MUST be string')
   if #handlers.list == 1 and handlers.list[1].name == name then
     handlers.list = {}
+    handlers.nameIndex = {}
+    return
   end
 
   local idx = findIndexByProp(handlers.list, "name", name)
   if idx ~= nil and idx > 0 then
     table.remove(handlers.list, idx)
+    rebuildNameIndex()  -- Rebuild index since removal shifts indices
   end
 end
 
