@@ -3,6 +3,7 @@ local dump = { _version = "1.0.0" }
 -- Security limits
 local MAX_ENTRIES = 10000  -- Maximum number of entries to dump per table
 local MAX_KEY_LENGTH = 1000  -- Maximum string key length before pattern matching
+local MAX_DEPTH = 100  -- Maximum nesting depth to prevent stack overflow
 
 -- Reserved words that need to be quoted as keys
 local RESERVED_WORDS = {
@@ -50,8 +51,8 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
         seen = {}
     end
     
-    -- Prevent infinite recursion by limiting depth
-    if depth > 10 then
+    -- Prevent infinite recursion and stack overflow by limiting depth
+    if depth > MAX_DEPTH then
         return '"<max depth>"'
     end
     

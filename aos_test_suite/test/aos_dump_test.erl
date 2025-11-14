@@ -450,3 +450,27 @@ long_string_key_test() ->
     % Long key should be quoted (not used as bare identifier)
     % and short key should work normally
     ?assert(string:str(ResultStr, "short = \"other\"") > 0).
+
+%% Test maximum depth limit
+max_depth_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        -- Create a deeply nested table (beyond max depth)
+        local function create_deep_table(depth)
+            if depth == 0 then
+                return 'bottom'
+            end
+            return { nested = create_deep_table(depth - 1) }
+        end
+        
+        local t = create_deep_table(150)
+        local result = dump.dump(t)
+        return result
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    % Should contain the max depth marker
+    ?assert(string:str(ResultStr, "<max depth>") > 0).
