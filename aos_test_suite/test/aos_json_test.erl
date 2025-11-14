@@ -442,6 +442,36 @@ valid_surrogate_test() ->
     ResultBin = iolist_to_binary(Result),
     ?assertEqual(<<240, 157, 132, 158>>, ResultBin).
 
+%% Test maximum depth protection
+max_depth_test() ->
+    LuaState = setup(),
+    
+    % Test that deeply nested structures are rejected after a reasonable depth
+    % JSON.lua should have a maximum depth limit to prevent stack overflow
+    Code = "
+        -- Create a deeply nested array (1001 levels)
+        local deep = string.rep('[', 1001) .. '1' .. string.rep(']', 1001)
+        local status, err = pcall(json.decode, deep)
+        return status, err
+    ",
+    {ok, [Status, Error], _} = luerl:do(Code, LuaState),
+    
+    % Should fail with max depth error
+    ?assertEqual(false, Status),
+    ErrorStr = binary_to_list(iolist_to_binary(Error)),
+    ?assert(string:str(ErrorStr, "depth") > 0 orelse 
+            string:str(ErrorStr, "nested") > 0 orelse
+            string:str(ErrorStr, "deep") > 0),
+    
+    % Test that reasonable nesting (100 levels) still works
+    Code2 = "
+        local ok = string.rep('[', 100) .. '1' .. string.rep(']', 100)
+        local status2, result2 = pcall(json.decode, ok)
+        return status2
+    ",
+    {ok, [Status2], _} = luerl:do(Code2, LuaState),
+    ?assertEqual(true, Status2).
+
 %% Helper function for absolute value (renamed to avoid conflict with erlang:abs)
 abs_val(X) when X < 0 -> -X;
 abs_val(X) -> X.

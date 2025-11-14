@@ -1,5 +1,8 @@
 local json = { _version = "0.2.0" }
 
+-- Maximum nesting depth to prevent stack overflow
+local MAX_DEPTH = 1000
+
 -------------------------------------------------------------------------------
 -- Encode
 -------------------------------------------------------------------------------
@@ -31,6 +34,13 @@ local function encode_table(val, stack)
   
   -- Circular reference?
   if stack[val] then error("circular reference") end
+  
+  -- Check depth
+  local depth = 0
+  for _ in pairs(stack) do depth = depth + 1 end
+  if depth >= MAX_DEPTH then
+    error("maximum nesting depth exceeded")
+  end
   
   stack[val] = true
   if rawget(val, 1) ~= nil or next(val) == nil then
@@ -172,7 +182,7 @@ local function parse_unicode_escape(s)
   end
 end
 
-local function parse_string(str, i)
+local function parse_string(str, i, depth)
   local res = {}
   local j = i + 1
   local k = j
@@ -212,7 +222,7 @@ local function parse_string(str, i)
   decode_error(str, i, "expected closing quote for string")
 end
 
-local function parse_number(str, i)
+local function parse_number(str, i, depth)
   local x = next_char(str, i, delim_chars)
   local s = str:sub(i, x - 1)
   local n = tonumber(s)
@@ -220,7 +230,7 @@ local function parse_number(str, i)
   return n, x
 end
 
-local function parse_literal(str, i)
+local function parse_literal(str, i, depth)
   local x = next_char(str, i, delim_chars)
   local word = str:sub(i, x - 1)
   if not literals[word] then
@@ -229,9 +239,16 @@ local function parse_literal(str, i)
   return literal_map[word], x
 end
 
-local function parse_array(str, i)
+local function parse_array(str, i, depth)
   local res = {}
   local n = 1
+  depth = depth or 0
+  
+  -- Check depth
+  if depth >= MAX_DEPTH then
+    decode_error(str, i, "maximum nesting depth exceeded")
+  end
+  
   i = i + 1
   while true do
     local x
@@ -240,7 +257,7 @@ local function parse_array(str, i)
       i = i + 1
       break
     end
-    x, i = parse(str, i)
+    x, i = parse(str, i, depth + 1)
     res[n] = x
     n = n + 1
     i = next_char(str, i, space_chars, true)
@@ -252,8 +269,15 @@ local function parse_array(str, i)
   return res, i
 end
 
-local function parse_object(str, i)
+local function parse_object(str, i, depth)
   local res = {}
+  depth = depth or 0
+  
+  -- Check depth
+  if depth >= MAX_DEPTH then
+    decode_error(str, i, "maximum nesting depth exceeded")
+  end
+  
   i = i + 1
   while true do
     local key, val
@@ -265,13 +289,13 @@ local function parse_object(str, i)
     if str:sub(i, i) ~= '"' then
       decode_error(str, i, "expected string for key")
     end
-    key, i = parse(str, i)
+    key, i = parse(str, i, depth + 1)
     i = next_char(str, i, space_chars, true)
     if str:sub(i, i) ~= ":" then
       decode_error(str, i, "expected ':' after key")
     end
     i = next_char(str, i + 1, space_chars, true)
-    val, i = parse(str, i)
+    val, i = parse(str, i, depth + 1)
     res[key] = val
     i = next_char(str, i, space_chars, true)
     local chr = str:sub(i, i)
@@ -302,10 +326,10 @@ local char_func_map = {
   [ "{" ] = parse_object
 }
 
-parse = function(str, idx)
+parse = function(str, idx, depth)
   local chr = str:sub(idx, idx)
   local f = char_func_map[chr]
-  if f then return f(str, idx) end
+  if f then return f(str, idx, depth) end
   decode_error(str, idx, "unexpected character '" .. chr .. "'")
 end
 
@@ -313,7 +337,7 @@ function json.decode(str)
   if type(str) ~= "string" then
     error("expected argument of type string, got " .. type(str))
   end
-  local res, idx = parse(str, next_char(str, 1, space_chars, true))
+  local res, idx = parse(str, next_char(str, 1, space_chars, true), 0)
   idx = next_char(str, idx, space_chars, true)
   if idx <= #str then decode_error(str, idx, "trailing garbage") end
   return res
