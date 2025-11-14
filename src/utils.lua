@@ -38,11 +38,7 @@ function utils.matchesPattern(pattern, value, msg)
   end
   -- if the patternMatchSpec is a function, then it is executed on the tag value
   if type(pattern) == "function" then
-    if pattern(value, msg) then
-      return true
-    else
-      return false
-    end
+    return pattern(value, msg) == true
   end
   -- if the patternMatchSpec is a string, check it for special symbols (less `-` alone)
   -- and exact string match mode
@@ -187,11 +183,13 @@ utils.concat = utils.curry(function (a, b)
 end, 2)
 
 --- Applies a function to each element of a table, reducing it to a single value.
+-- If the initial value is nil, the first element of the array becomes the initial value
+-- and the reduction function is not called on it.
 -- @function utils.reduce
 -- @usage utils.reduce(fn)(initial)(t)
 -- @usage utils.reduce(function(acc, x) return acc + x end)(0)({1, 2, 3}) --> 6
 -- @tparam {function} fn The function to apply
--- @param initial The initial value
+-- @param initial The initial value (if nil, first array element is used)
 -- @tparam {table<Array>} t The table to reduce
 -- @return The reduced value
 utils.reduce = utils.curry(function (fn, initial, t)
@@ -258,6 +256,7 @@ end, 2)
 utils.find = utils.curry(function (fn, t)
   assert(type(fn) == "function", "first argument should be a unary function")
   assert(type(t) == "table", "second argument should be a table that is an array")
+  assert(isArray(t), "second argument should be a table that is an array")
   for _, v in pairs(t) do
     if fn(v) then
       return v
@@ -269,13 +268,13 @@ end, 2)
 -- @function utils.propEq
 -- @usage utils.propEq(propName)(value)(object)
 -- @usage utils.propEq("name")("Lua")({name = "Lua"}) --> true
+-- @usage utils.propEq("age")(25)({age = 25}) --> true
 -- @tparam {string} propName The property name to check
--- @tparam {string} value The value to check against
+-- @param value The value to check against (any type)
 -- @tparam {table} object The object to check
 -- @treturn {boolean} Whether the property is equal to the value
 utils.propEq = utils.curry(function (propName, value, object)
   assert(type(propName) == "string", "first argument should be a string")
-  assert(type(value) == "string", "second argument should be a string")
   assert(type(object) == "table", "third argument should be a table<object>")
 
   return object[propName] == value
