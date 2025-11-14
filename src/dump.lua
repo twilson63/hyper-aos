@@ -1,5 +1,8 @@
 local dump = { _version = "1.0.0" }
 
+-- Security limit: maximum number of entries to dump per table
+local MAX_ENTRIES = 10000
+
 -- Reserved words that need to be quoted as keys
 local RESERVED_WORDS = {
     ['and'] = true, ['break'] = true, ['do'] = true, ['else'] = true,
@@ -77,9 +80,15 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
         local parts = {}
         local current_indent = get_indent(padding_size)
         local field_indent = get_indent(padding_size + indent_size)
+        local entry_count = 0
         
         -- Apply filter to each key-value pair
         for k, v in pairs(val) do
+            entry_count = entry_count + 1
+            if entry_count > MAX_ENTRIES then
+                parts[#parts + 1] = field_indent .. '"<table too large>"'
+                break
+            end
             local filtered_key, key_nodump = filter(k, depth, type(k), 'key', nil, udata)
             
             if filtered_key ~= nil then

@@ -409,3 +409,23 @@ debug_filter_test() ->
     % Check that it contains the expected content
     ?assert(string:str(ResultStr, "a = 1") > 0),
     ?assert(string:str(ResultStr, "b = 2") > 0).
+
+%% Test maximum entries limit for security
+max_entries_limit_test() ->
+    LuaState = setup(),
+    
+    Code = "
+        -- Create a table with more than 10000 entries
+        local t = {}
+        for i = 1, 15000 do
+            t[i] = i
+        end
+        local result = dump.dump(t)
+        return result
+    ",
+    
+    {ok, [Result], _} = luerl:do(Code, LuaState),
+    ResultStr = binary_to_list(iolist_to_binary(Result)),
+    
+    % Should contain the "table too large" marker
+    ?assert(string:str(ResultStr, "<table too large>") > 0).
