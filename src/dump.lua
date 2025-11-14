@@ -19,6 +19,15 @@ local function default_filter(val)
     return val
 end
 
+-- Cache for indentation strings to avoid repeated string.rep calls
+local indent_cache = {}
+local function get_indent(size)
+    if not indent_cache[size] then
+        indent_cache[size] = string.rep(' ', size)
+    end
+    return indent_cache[size]
+end
+
 -- Main dump implementation
 local function dump_value_impl(val, depth, indent_size, padding_size, filter, udata, seen)
     if depth == nil then
@@ -60,8 +69,8 @@ local function dump_value_impl(val, depth, indent_size, padding_size, filter, ud
         seen[val] = true
         
         local parts = {}
-        local current_indent = string.rep(' ', padding_size)
-        local field_indent = current_indent .. string.rep(' ', indent_size)
+        local current_indent = get_indent(padding_size)
+        local field_indent = get_indent(padding_size + indent_size)
         
         -- Apply filter to each key-value pair
         for k, v in pairs(val) do
