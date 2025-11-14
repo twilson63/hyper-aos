@@ -53,7 +53,7 @@ end
 function _utils.hasMatchingData(value)
   assert(type(value) == 'string', 'invalid arguments: (value : string)')
   return function (msg)
-    return msg.Data == value
+    return (msg and msg.Data == value) or false
   end
 end
 

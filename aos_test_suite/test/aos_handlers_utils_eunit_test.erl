@@ -87,12 +87,13 @@ handlers_utils_test_() ->
           test_has_matching_tag_of_multiple_values(L),
           test_has_matching_tag_of_no_match(L),
           
-          % hasMatchingData tests
-          test_has_matching_data_success(L),
-          test_has_matching_data_failure(L),
-          test_has_matching_data_nil(L),
-          
-          % reply tests
+           % hasMatchingData tests
+           test_has_matching_data_success(L),
+           test_has_matching_data_failure(L),
+           test_has_matching_data_nil(L),
+           test_has_matching_data_nil_msg(L),
+           
+           % reply tests
           test_reply_string(L),
           test_reply_table(L),
           test_reply_with_tags(L),
@@ -232,15 +233,26 @@ test_has_matching_data_failure(L) ->
      end}.
 
 test_has_matching_data_nil(L) ->
-    {"hasMatchingData returns false when data is nil",
-     fun() ->
-         Code = "local hu = require('.handlers-utils')\n" ++
-                "local msg = { }\n" ++
-                "local checker = hu.hasMatchingData('Hello')\n" ++
-                "return checker(msg)",
-         {ok, [Result], _} = luerl:do(Code, L),
-         ?assertNot(Result)
-     end}.
+     {"hasMatchingData returns false when data is nil",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = { }\n" ++
+                 "local checker = hu.hasMatchingData('Hello')\n" ++
+                 "return checker(msg)",
+          {ok, [Result], _} = luerl:do(Code, L),
+          ?assertNot(Result)
+      end}.
+
+test_has_matching_data_nil_msg(L) ->
+     {"hasMatchingData returns false when msg is nil",
+      fun() ->
+          Code = "local hu = require('.handlers-utils')\n" ++
+                 "local msg = nil\n" ++
+                 "local checker = hu.hasMatchingData('Hello')\n" ++
+                 "return checker(msg)",
+          {ok, [Result], _} = luerl:do(Code, L),
+          ?assertNot(Result)
+      end}.
 
 %% reply tests
 
