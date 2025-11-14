@@ -76,6 +76,42 @@ local function assertAddArgs(name, pattern, handle, maxRuns)
     '\tMaxRuns? : number | "inf" | nil')
 end
 
+--- Internal function to add or update a handler at a specific position.
+-- @lfunction addHandlerInternal
+-- @tparam {string} name The name of the handler
+-- @tparam {table | function | string} pattern The pattern to check for in the message
+-- @tparam {function} handle The function to call if the pattern matches
+-- @tparam {number | string | nil} maxRuns The maximum number of times the handler should run
+-- @tparam {number | nil} position Position to insert (nil = append, 1 = prepend, other = insert at position)
+local function addHandlerInternal(name, pattern, handle, maxRuns, position)
+  assertAddArgs(name, pattern, handle, maxRuns)
+  handle = handlers.generateResolver(handle)
+  
+  -- update existing handler by name
+  local idx = findIndexByProp(handlers.list, "name", name)
+  if idx ~= nil and idx > 0 then
+    -- found, update in place
+    handlers.list[idx].pattern = pattern
+    handlers.list[idx].handle = handle
+    handlers.list[idx].maxRuns = maxRuns
+  else
+    -- not found, add new handler
+    if position == nil then
+      -- append to end
+      table.insert(handlers.list, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+      handlers.nameIndex[name] = #handlers.list
+    elseif position == 1 then
+      -- prepend to beginning
+      table.insert(handlers.list, 1, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+      rebuildNameIndex()
+    else
+      -- insert at specific position
+      table.insert(handlers.list, position, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
+      rebuildNameIndex()
+    end
+  end
+end
+
 --- Given a resolver specification, returns a resolver function.
 -- @function generateResolver
 -- @tparam {table | function} resolveSpec The resolver specification
@@ -150,22 +186,8 @@ function handlers.add(...)
   else
     error("handlers.add requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
-  assertAddArgs(name, pattern, handle, maxRuns)
-
-  handle = handlers.generateResolver(handle)
-
-  -- update existing handler by name
-  local idx = findIndexByProp(handlers.list, "name", name)
-  if idx ~= nil and idx > 0 then
-    -- found update
-    handlers.list[idx].pattern = pattern
-    handlers.list[idx].handle = handle
-    handlers.list[idx].maxRuns = maxRuns
-  else
-    -- not found then add    
-    table.insert(handlers.list, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-    handlers.nameIndex[name] = #handlers.list
-  end
+  
+  addHandlerInternal(name, pattern, handle, maxRuns, nil)
   return #handlers.list
 end
 
@@ -191,20 +213,8 @@ function handlers.append(...)
   else
     error("handlers.append requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
-  assertAddArgs(name, pattern, handle, maxRuns)
-
-  handle = handlers.generateResolver(handle)
-  -- update existing handler by name
-  local idx = findIndexByProp(handlers.list, "name", name)
-  if idx ~= nil and idx > 0 then
-    -- found update
-    handlers.list[idx].pattern = pattern
-    handlers.list[idx].handle = handle
-    handlers.list[idx].maxRuns = maxRuns
-  else
-    table.insert(handlers.list, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-    handlers.nameIndex[name] = #handlers.list
-  end
+  
+  addHandlerInternal(name, pattern, handle, maxRuns, nil)
 end
 
 --- Prepends a new handler to the beginning of the handlers list.
@@ -229,21 +239,8 @@ function handlers.prepend(...)
   else
     error("handlers.prepend requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
-  assertAddArgs(name, pattern, handle, maxRuns)
-
-  handle = handlers.generateResolver(handle)
-
-  -- update existing handler by name
-  local idx = findIndexByProp(handlers.list, "name", name)
-  if idx ~= nil and idx > 0 then
-    -- found update
-    handlers.list[idx].pattern = pattern
-    handlers.list[idx].handle = handle
-    handlers.list[idx].maxRuns = maxRuns
-  else  
-    table.insert(handlers.list, 1, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-    rebuildNameIndex()  -- Rebuild index since we inserted at position 1
-  end
+  
+  addHandlerInternal(name, pattern, handle, maxRuns, 1)
 end
 
 --- Returns an object that allows adding a new handler before a specified handler.
@@ -256,11 +253,8 @@ function handlers.before(handleName)
   local idx = findIndexByProp(handlers.list, "name", handleName)
   return {
     add = function (name, pattern, handle, maxRuns) 
-      assertAddArgs(name, pattern, handle, maxRuns)
-      handle = handlers.generateResolver(handle)
       if idx then
-        table.insert(handlers.list, idx, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-        rebuildNameIndex()  -- Rebuild index since we inserted in the middle
+        addHandlerInternal(name, pattern, handle, maxRuns, idx)
       end
     end
   }
@@ -275,11 +269,8 @@ function handlers.after(handleName)
   local idx = findIndexByProp(handlers.list, "name", handleName)
   return {
     add = function (name, pattern, handle, maxRuns)
-      assertAddArgs(name, pattern, handle, maxRuns)
-      handle = handlers.generateResolver(handle)
       if idx then
-        table.insert(handlers.list, idx + 1, { pattern = pattern, handle = handle, name = name, maxRuns = maxRuns })
-        rebuildNameIndex()  -- Rebuild index since we inserted in the middle
+        addHandlerInternal(name, pattern, handle, maxRuns, idx + 1)
       end
     end
   }
