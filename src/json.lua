@@ -3,6 +3,11 @@ local json = { _version = "0.2.0" }
 -- Maximum nesting depth to prevent stack overflow
 local MAX_DEPTH = 1000
 
+-- Character byte codes for better code readability
+local BACKSLASH = 92   -- '\'
+local QUOTE = 34       -- '"'
+local SPACE = 32       -- ' '
+
 -------------------------------------------------------------------------------
 -- Encode
 -------------------------------------------------------------------------------
@@ -190,9 +195,9 @@ local function parse_string(str, i, depth)
   while j <= #str do
     local x = str:byte(j)
     
-    if x < 32 then
+    if x < SPACE then
       decode_error(str, j, "control character in string")
-    elseif x == 92 then -- `\`: Escape
+    elseif x == BACKSLASH then -- '\': Escape
       res[#res + 1] = str:sub(k, j - 1)
       j = j + 1
       local c = str:sub(j, j)
@@ -211,7 +216,7 @@ local function parse_string(str, i, depth)
         res[#res + 1] = escape_char_map_inv[c]
       end
       k = j + 1
-    elseif x == 34 then -- `"`: End of string
+    elseif x == QUOTE then -- '"': End of string
       res[#res + 1] = str:sub(k, j - 1)
       return table.concat(res), j + 1
     end
