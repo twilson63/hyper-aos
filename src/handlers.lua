@@ -121,21 +121,18 @@ end
 function handlers.add(...)
   local name, pattern, handle, maxRuns
   local args = select("#", ...)
-  if args == 2 then
-    name = select(1, ...)
-    pattern = select(1, ...)
-    handle = select(2, ...)
-    maxRuns = nil
-  elseif args == 3 then
+  if args == 3 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = nil
-  else
+  elseif args == 4 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = select(4, ...)
+  else
+    error("handlers.add requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
   assertAddArgs(name, pattern, handle, maxRuns)
 
@@ -165,21 +162,18 @@ end
 function handlers.append(...)
   local name, pattern, handle, maxRuns
   local args = select("#", ...)
-  if args == 2 then
-    name = select(1, ...)
-    pattern = select(1, ...)
-    handle = select(2, ...)
-    maxRuns = nil
-  elseif args == 3 then
+  if args == 3 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = nil
-  else
+  elseif args == 4 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = select(4, ...)
+  else
+    error("handlers.append requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
   assertAddArgs(name, pattern, handle, maxRuns)
 
@@ -205,21 +199,18 @@ end
 function handlers.prepend(...)
   local name, pattern, handle, maxRuns
   local args = select("#", ...)
-  if args == 2 then
-    name = select(1, ...)
-    pattern = select(1, ...)
-    handle = select(2, ...)
-    maxRuns = nil
-  elseif args == 3 then
+  if args == 3 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = nil
-  else 
+  elseif args == 4 then
     name = select(1, ...)
     pattern = select(2, ...)
     handle = select(3, ...)
     maxRuns = select(4, ...)
+  else
+    error("handlers.prepend requires 3 or 4 arguments: name, pattern, handle, [maxRuns]")
   end
   assertAddArgs(name, pattern, handle, maxRuns)
 
