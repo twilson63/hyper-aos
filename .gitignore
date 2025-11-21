@@ -128,6 +128,7 @@ ENV/
 # Misc
 .cache/
 .history/
+aos_test_suite/test_results/*
 
 # Arweave wallet files - NEVER COMMIT THESE!
 *.json
@@ -135,3 +136,4 @@ wallet.json
 keyfile.json
 arweave-wallet.json
 demo.json
+dist

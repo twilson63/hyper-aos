@@ -1,0 +1,243 @@
+--[[
+chance.lua - Random value generator using Mersenne Twister (MT19937)
+
+WARNING: This implementation is NOT cryptographically secure and should NEVER be used for:
+  - Security tokens or session IDs
+  - Password generation
+  - Cryptographic keys
+  - Any security-sensitive random value generation
+
+The Mersenne Twister algorithm is:
+  - Predictable: Given 624 sequential outputs, the internal state can be reconstructed
+  - Not suitable for security applications
+  - Designed for simulation, games, and non-security use cases
+
+SEEDING: You MUST call chance.seed() with a unique value before use.
+  - Without seeding, a fixed default seed (5489) is used
+  - The default seed produces the same sequence every time
+  - For non-deterministic behavior, seed with a time-based or external entropy source
+  - Same seed will always produce the same sequence (useful for testing/reproducibility)
+
+Usage:
+  chance.seed(12345)           -- Initialize with a seed value
+  local num = chance.random()  -- Generate random number [0, 1)
+  local int = chance.integer(1, 10)  -- Random integer in range
+]]--
+
+local chance = { _version = "1.0.0" }
+
+local N = 624
+local M = 397
+local MATRIX_A = 0x9908b0df
+local UPPER_MASK = 0x80000000
+local LOWER_MASK = 0x7fffffff
+
+local mag01 = {[0] = 0x0, [1] = MATRIX_A}
+
+local function init_genrand(o, s)
+    o.mt[0] = s & 0xffffffff
+    for i = 1, N - 1 do
+        o.mt[i] = (1812433253 * (o.mt[i - 1] ~ (o.mt[i - 1] >> 30))) + i
+        o.mt[i] = o.mt[i] & 0xffffffff
+    end
+    o.mti = N
+end
+
+local function genrand_int32(o)
+    local y
+    
+    if o.mti >= N then
+        if o.mti == N + 1 then
+            init_genrand(o, 5489)
+        end
+        
+        for kk = 0, N - M - 1 do
+            y = (o.mt[kk] & UPPER_MASK) | (o.mt[kk + 1] & LOWER_MASK)
+            o.mt[kk] = o.mt[kk + M] ~ (y >> 1) ~ mag01[y & 0x1]
+        end
+        
+        for kk = N - M, N - 2 do
+            y = (o.mt[kk] & UPPER_MASK) | (o.mt[kk + 1] & LOWER_MASK)
+            o.mt[kk] = o.mt[kk + (M - N)] ~ (y >> 1) ~ mag01[y & 0x1]
+        end
+        
+        y = (o.mt[N - 1] & UPPER_MASK) | (o.mt[0] & LOWER_MASK)
+        o.mt[N - 1] = o.mt[M - 1] ~ (y >> 1) ~ mag01[y & 0x1]
+
+        o.mti = 0
+    end
+
+    y = o.mt[o.mti]
+    o.mti = o.mti + 1
+
+    y = y ~ (y >> 11)
+    y = y ~ ((y << 7) & 0x9d2c5680)
+    y = y ~ ((y << 15) & 0xefc60000)
+    y = y ~ (y >> 18)
+
+    return y
+end
+
+local MersenneTwister = {}
+MersenneTwister.mt = {}
+MersenneTwister.mti = N + 1
+
+-- Initialize the random number generator with a seed value
+-- Same seed will always produce the same sequence of random numbers
+-- @param seed: integer seed value
+function chance.seed(seed)
+    init_genrand(MersenneTwister, seed)
+end
+
+-- Generate a random floating point number in the range [0, 1)
+-- Note: The upper bound of 1 is exclusive (never returned)
+-- @return: number between 0 (inclusive) and 1 (exclusive)
+function chance.random()
+    return genrand_int32(MersenneTwister) * (1.0 / 4294967296.0)
+end
+
+-- Generate a random integer in the range [min, max] (inclusive on both ends)
+-- @param min: minimum value (inclusive)
+-- @param max: maximum value (inclusive)
+-- @return: random integer between min and max
+function chance.integer(min, max)
+    if max < min then
+        error("max must be greater than or equal to min", 2)
+    end
+    return math.floor(chance.random() * (max - min + 1) + min)
+end
+
+-- Generate a random boolean value
+-- @param likelihood: optional probability of returning true (0.0 to 1.0), defaults to 0.5
+-- @return: true or false
+function chance.bool(likelihood)
+    likelihood = likelihood or 0.5
+    return chance.random() < likelihood
+end
+
+local function build_char_pool(options)
+    options = options or {}
+    local pool = ""
+    
+    if options.alpha or not (options.numeric or options.symbols) then
+        pool = pool .. "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    end
+    
+    if options.numeric then
+        pool = pool .. "0123456789"
+    end
+    
+    if options.symbols then
+        pool = pool .. "!@#$%^&*()"
+    end
+    
+    if options.casing == "lower" then
+        pool = string.lower(pool)
+    elseif options.casing == "upper" then
+        pool = string.upper(pool)
+    end
+    
+    if #pool == 0 then
+        pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    end
+    
+    return pool
+end
+
+function chance.character(options)
+    local pool = build_char_pool(options)
+    local index = chance.integer(1, #pool)
+    return string.sub(pool, index, index)
+end
+
+function chance.string(options)
+    options = options or {}
+    local length = options.length or 8
+    local pool = build_char_pool(options)
+    local result = {}
+    
+    for i = 1, length do
+        local index = chance.integer(1, #pool)
+        result[i] = string.sub(pool, index, index)
+    end
+    
+    return table.concat(result)
+end
+
+function chance.pick(array)
+    if type(array) ~= "table" or #array == 0 then
+        error("pick requires a non-empty table", 2)
+    end
+    
+    local index = chance.integer(1, #array)
+    return array[index]
+end
+
+function chance.shuffle(array)
+    if type(array) ~= "table" then
+        error("shuffle requires a table", 2)
+    end
+    
+    local result = {}
+    for i, v in ipairs(array) do
+        result[i] = v
+    end
+    
+    for i = #result, 2, -1 do
+        local j = chance.integer(1, i)
+        result[i], result[j] = result[j], result[i]
+    end
+    
+    return result
+end
+
+function chance.weighted(choices, weights)
+    if type(choices) ~= "table" or type(weights) ~= "table" then
+        error("weighted requires two tables", 2)
+    end
+    
+    if #choices ~= #weights then
+        error("choices and weights must have the same length", 2)
+    end
+    
+    local total = 0
+    for i = 1, #weights do
+        total = total + weights[i]
+    end
+    
+    if total <= 0 then
+        error("total weight must be positive", 2)
+    end
+    
+    local random = chance.random() * total
+    local cumulative = 0
+    
+    for i = 1, #weights do
+        cumulative = cumulative + weights[i]
+        if random <= cumulative then
+            return choices[i]
+        end
+    end
+    
+    return choices[#choices]
+end
+
+function chance.normal(options)
+    options = options or {}
+    local mean = options.mean or 0
+    local dev = options.dev or 1
+    
+    local u = 0
+    local v = 0
+    while u == 0 do
+        u = chance.random()
+    end
+    while v == 0 do
+        v = chance.random()
+    end
+    
+    local z = math.sqrt(-2.0 * math.log(u)) * math.cos(2.0 * math.pi * v)
+    return z * dev + mean
+end
+
+return chance

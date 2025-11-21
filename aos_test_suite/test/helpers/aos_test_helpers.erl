@@ -18,6 +18,7 @@
     initialize_process/2,
     call_compute/3,
     extract_output_data/1,
+    extract_status/1,
     create_unauthorized_eval_message/1,
     create_message_without_commitments/1,
     cleanup_lua_state/1,
@@ -114,7 +115,7 @@ build_lua_table_string(Map) when is_map(Map) ->
                 true -> K
             end,
             %% Wrap key in brackets if it contains special characters
-            SafeKey = case lists:any(fun(C) -> not (C >= $a andalso C =< $z) andalso 
+            SafeKey = case lists:any(fun(C) -> not (C >= $a andalso C =< $z) andalso
                                                not (C >= $A andalso C =< $Z) andalso
                                                not (C >= $0 andalso C =< $9) andalso
                                                C =/= $_ end, Key) of
@@ -165,10 +166,10 @@ initialize_aos() ->
 initialize_fresh_aos() ->
     %% Always create a completely fresh LUERL state
     LuaState0 = luerl:init(),
-    
+
     %% Ensure we have a clean environment by forcing garbage collection
     erlang:garbage_collect(),
-    
+
     %% Try different possible locations for aos.lua
     AosPath = case file:read_file("../../src/aos.lua") of
         {ok, Content} -> {ok, Content};
@@ -183,12 +184,12 @@ initialize_fresh_aos() ->
                     end
             end
     end,
-    
+
     case AosPath of
         {ok, AosContent} ->
             try
                 %% Load the AOS code with binary strings to avoid atom creation
-                {_, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
+                {ok, _, LuaState1} = luerl:do(binary_to_list(AosContent), LuaState0),
                 LuaState1
             catch
                 Error:Reason:Stack ->
@@ -202,7 +203,7 @@ initialize_fresh_aos() ->
 initialize_process(LuaState, State) ->
     ProcessAssignment = ensure_binary_keys(create_process_assignment()),
     SafeState = ensure_binary_keys(State),
-    {[_, _], NewLuaState} = call_compute(LuaState, SafeState, ProcessAssignment),
+    {ok, [_, _], NewLuaState} = call_compute(LuaState, SafeState, ProcessAssignment),
     NewLuaState.
 
 %% Call compute function with binary string safety
@@ -210,32 +211,43 @@ call_compute(LuaState, State, Assignment) ->
     %% Ensure all keys are binary to prevent atom creation
     SafeState = ensure_binary_keys(State),
     SafeAssignment = ensure_binary_keys(Assignment),
-    
+
     StateStr = build_lua_table_string(SafeState),
     AssignmentStr = build_lua_table_string(SafeAssignment),
-    
+
     LuaCode = lists:flatten([
         "local state = ", StateStr, "\n",
         "local assignment = ", AssignmentStr, "\n",
         "local status, result = compute(state, assignment)\n",
         "return result.results.output.data, result\n"
     ]),
-    
+
     try
-        luerl:do(LuaCode, LuaState)
+        case luerl:do(LuaCode, LuaState) of
+            {ok, [Data, Result], NewLS} -> {ok, [Data, Result], NewLS};
+            {error, Err, _NewLS} -> {error, Err}
+        end
     catch
-        Error:Reason:Stack ->
-            error({compute_failed, Error, Reason, Stack})
+        Class:Reason:Stack ->
+            error({compute_failed, Class, Reason, Stack})
     end.
 
 %% Extract output data from result
 extract_output_data(Result) when is_binary(Result) ->
     Result;
-extract_output_data({[Data, _Result], _LuaState}) when is_binary(Data) ->
+extract_output_data({ok, [Data, _Result], _LuaState}) when is_binary(Data) ->
     Data;
-extract_output_data({[Data, _Result], _LuaState}) when is_list(Data) ->
+extract_output_data({ok, [Data, _Result], _LuaState}) when is_list(Data) ->
     iolist_to_binary(Data);
 extract_output_data(_) ->
+    undefined.
+
+%% Extract status from compute result
+extract_status({ok, [_, Result], _LuaState}) when is_map(Result) ->
+    maps:get(<<"status">>, Result, undefined);
+extract_status({ok, Status, _LuaState}) when is_binary(Status) ->
+    Status;
+extract_status(_) ->
     undefined.
 
 %% Create an unauthorized eval message (different committer)

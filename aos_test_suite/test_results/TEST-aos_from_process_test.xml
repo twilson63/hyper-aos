@@ -1,22 +1,77 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="5" failures="0" errors="0" skipped="0" time="0.024" name="module 'aos_from_process_test'">
-  <testcase time="0.002" name="aos_from_process_test:0 from_process_precedence_test">
+<testsuite tests="5" failures="0" errors="5" skipped="0" time="0.015" name="module 'aos_from_process_test'">
+  <testcase time="0.000" name="aos_from_process_test:0 from_process_precedence_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_from_process_test:from_process_precedence_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/security/aos_from_process_test.erl, line 7)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_from_process_test:0 from_process_wrong_value_test">
+  <testcase time="0.000" name="aos_from_process_test:0 from_process_wrong_value_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_from_process_test:from_process_wrong_value_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/security/aos_from_process_test.erl, line 39)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.001" name="aos_from_process_test:0 existing_from_preserved_test">
+  <testcase time="0.000" name="aos_from_process_test:0 existing_from_preserved_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_from_process_test:existing_from_preserved_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/security/aos_from_process_test.erl, line 71)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_from_process_test:0 first_non_hmac_committer_test">
+  <testcase time="0.000" name="aos_from_process_test:0 first_non_hmac_committer_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_from_process_test:first_non_hmac_committer_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/security/aos_from_process_test.erl, line 104)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
     <system-out>
     </system-out>
   </testcase>
-  <testcase time="0.002" name="aos_from_process_test:0 no_valid_from_test">
+  <testcase time="0.000" name="aos_from_process_test:0 no_valid_from_test">
+    <error type="error">
+::in function aos_test_helpers:initialize_aos/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/helpers/aos_test_helpers.erl, line 163)
+in call from aos_from_process_test:no_valid_from_test/0 (/Users/rakis/sandbox/hyper-aos/aos_test_suite/test/security/aos_from_process_test.erl, line 140)
+in call from eunit_test:'-mf_wrapper/2-fun-0-'/2 (eunit_test.erl, line 285)
+in call from eunit_test:run_testfun/1 (eunit_test.erl, line 83)
+in call from eunit_proc:run_test/1 (eunit_proc.erl, line 554)
+in call from eunit_proc:with_timeout/3 (eunit_proc.erl, line 379)
+in call from eunit_proc:handle_test/2 (eunit_proc.erl, line 537)
+in call from eunit_proc:tests_inorder/3 (eunit_proc.erl, line 479)
+**error:{badmatch,{error,enoent}}
+    </error>
     <system-out>
     </system-out>
   </testcase>

@@ -44,6 +44,11 @@ eunit: compile
 	@mkdir -p test_results
 	@rebar3 eunit
 
+# Verbose EUnit tests
+eunit-verbose: compile
+	@echo "Running EUnit tests with verbose output..."
+	@EUNIT_VERBOSE=true rebar3 eunit --verbose
+
 # Old manual tests (kept for reference)
 test-old: compile
 	@echo "Running old AOS sandbox tests..."
@@ -60,6 +65,26 @@ test-math: compile
 test-outbox: compile
 	@echo "Running outbox/send functionality tests..."
 	@rebar3 shell --eval "aos_outbox_test:test_outbox_functionality(), init:stop()."
+
+test-utils: compile
+	@echo "Running utils module tests..."
+	@rebar3 eunit --module=aos_utils_eunit_test
+
+test-handlers-utils: compile
+	@echo "Running handlers-utils module tests..."
+	@rebar3 eunit --module=aos_handlers_utils_eunit_test
+
+test-handlers: compile
+	@echo "Running handlers module tests..."
+	@rebar3 eunit --module=aos_handlers_eunit_test
+
+test-bint: compile
+	@echo "Running bint module tests..."
+	@rebar3 eunit --module=aos_bint_eunit_test
+
+benchmark-bint-luerl: compile
+	@echo "Running bint_luerl benchmarks..."
+	@rebar3 shell --eval "bint_luerl_benchmark_test:bint_luerl_benchmark_test(), init:stop()."
 
 clean:
 	@echo "Cleaning..."

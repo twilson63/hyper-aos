@@ -49,7 +49,24 @@ Hyper-AOS is an enhanced implementation of the AO protocol using Hyperbeam's nat
 
 ## 🚀 Quick Start
 
+<<<<<<< HEAD
+- [Permaweb/ARX](https://github.com/permaweb/arx) - Arweave transaction toolkit
+- Arweave wallet keyfile (JSON format)
+- [Hyperbeam](https://github.com/permaweb/hyperbeam) node access
+- [AOS Console](https://github.com/permaweb/aos) installed
+
+## Build aos
+
+```
+make build
+```
+
+## Installation
+
+### 1. Install ARX
+=======
 Get up and running in under a minute:
+>>>>>>> main
 
 ```bash
 # Clone the repository
@@ -212,6 +229,9 @@ Our professional Makefile provides comprehensive automation:
 ### Example Usage
 
 ```bash
+<<<<<<< HEAD
+arx upload dist/hyper-aos-{version}.lua -w $WALLET_PATH -t arweave --content-type application/lua --tags Data-Protocol ao
+=======
 # Full development cycle
 make clean         # Clean previous builds
 make build         # Build the module
@@ -227,6 +247,7 @@ make watch         # Auto-rebuild on changes
 make lint          # Check code style
 make format        # Auto-format code
 make check         # Lint + test
+>>>>>>> main
 ```
 
 ## 💻 Development

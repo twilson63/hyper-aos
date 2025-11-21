@@ -1,469 +1,387 @@
---- The Utils module provides a collection of utility functions for functional programming in Lua.
--- Optimized for LUERL VM compatibility in Hyper-AOS environment.
--- Includes functions for array manipulation, pattern matching, functional composition,
--- and object property operations.
+--- The Utils module provides a collection of utility functions for functional programming in Lua. It includes functions for array manipulation such as concatenation, mapping, reduction, filtering, and finding elements, as well as a property equality checker.
 -- @module utils
--- @author Hyper-AOS Team
--- @version 1.0.0
 
--- Store utils in global namespace following Hyper-AOS patterns
-_G.utils = _G.utils or {}
-
--- Set version for tracking
-_G.utils._version = "1.0.0"
-
--- Provide backwards compatibility alias: _G.Utils -> _G.utils
--- This ensures code using Utils.map() continues to work with both cases
-_G.Utils = _G.utils
-
---- LUERL-optimized helper function to check if a table is an array.
--- An 'array' is defined as a table with integer keys starting from 1 and
--- having no gaps between the keys. Optimized for LUERL VM performance.
--- @param t table The table to check
--- @return boolean Whether the table is an array
-local function isArray(t)
-  -- Early type check for performance
-  if type(t) ~= "table" then
-    return false
-  end
-  
-  -- Handle empty table case
-  local len = #t
-  if len == 0 then
-    -- Check if truly empty or has non-numeric keys
-    for _ in pairs(t) do
-      return false -- Has keys but length is 0, not an array
-    end
-    return true -- Truly empty table is considered an array
-  end
-  
-  -- LUERL optimization: use # operator instead of pairs iteration
-  -- Check that all keys from 1 to len exist and no other keys exist
-  local count = 0
-  for k, _ in pairs(t) do
-    if type(k) ~= "number" or k < 1 or math.floor(k) ~= k or k > len then
-      return false
-    end
-    count = count + 1
-  end
-  
-  -- Array if count equals length (no gaps, no extra keys)
-  return count == len
-end
+--- The utils table
+-- @table utils
+-- @field _version The version number of the utils module
+-- @field matchesPattern The matchesPattern function
+-- @field matchesSpec The matchesSpec function
+-- @field curry The curry function
+-- @field concat The concat function
+-- @field reduce The reduce function
+-- @field map The map function
+-- @field filter The filter function
+-- @field find The find function
+-- @field propEq The propEq function
+-- @field reverse The reverse function
+-- @field compose The compose function
+-- @field prop The prop function
+-- @field includes The includes function
+-- @field keys The keys function
+-- @field values The values function
+local utils = { _version = "0.0.5" }
 
 --- Given a pattern, a value, and a message, returns whether there is a pattern match.
--- Supports wildcards, functions, strings (exact and regex), and nested tables.
--- LUERL-optimized with explicit nil handling and reduced function calls.
--- @param pattern any The pattern to match against
--- @param value any The value to check for in the pattern  
--- @param msg table The message context for function patterns
--- @return boolean Whether there is a pattern match
-function _G.utils.matchesPattern(pattern, value, msg)
-  -- Explicit nil check for LUERL compatibility
-  if pattern == nil then
+-- @usage utils.matchesPattern(pattern, value, msg)
+-- @param pattern The pattern to match
+-- @param value The value to check for in the pattern
+-- @param msg The message to check for the pattern
+-- @treturn {boolean} Whether there is a pattern match
+function utils.matchesPattern(pattern, value, msg)
+  -- If the key is not in the message, then it does not match
+  if (not pattern) then
     return false
   end
-  
-  -- Wildcard pattern always matches
+  -- if the patternMatchSpec is a wildcard, then it always matches
   if pattern == '_' then
     return true
   end
-  
-  -- Function pattern execution
+  -- if the patternMatchSpec is a function, then it is executed on the tag value
   if type(pattern) == "function" then
-    local success, result = pcall(pattern, value, msg)
-    return success and result == true
+    return pattern(value, msg) == true
   end
-  
-  -- String pattern matching
-  if type(pattern) == "string" then
-    if value == nil then
-      return false
-    end
-    
-    local str_value = tostring(value)
-    
-    -- Check for regex special characters (excluding single '-')
+  -- if the patternMatchSpec is a string, check it for special symbols (less `-` alone)
+  -- and exact string match mode
+  if (type(pattern) == 'string') then
     if string.match(pattern, "[%^%$%(%)%%%.%[%]%*%+%?]") then
-      -- Regex pattern matching with error handling for LUERL
-      local success, result = pcall(string.match, str_value, pattern)
-      return success and result ~= nil
+      if string.match(value, pattern) then
+        return true
+      end
     else
-      -- Exact string match
-      return str_value == pattern
-    end
-  end
-  
-  -- Table pattern - check if any sub-pattern matches
-  if type(pattern) == "table" then
-    for _, subPattern in pairs(pattern) do
-      if _G.utils.matchesPattern(subPattern, value, msg) then
+      if value == pattern then
         return true
       end
     end
   end
-  
+
+  -- if the pattern is a table, recursively check if any of its sub-patterns match
+  if type(pattern) == 'table' then
+    for _, subPattern in pairs(pattern) do
+      if utils.matchesPattern(subPattern, value, msg) then
+        return true
+      end
+    end
+  end
+
   return false
 end
 
 --- Given a message and a spec, returns whether there is a spec match.
--- Supports function specs, table specs with pattern matching, and string action matching.
--- LUERL-optimized with proper error handling.
--- @param msg table The message to check against the spec
--- @param spec any The specification to match (function, table, or string)
--- @return boolean Whether there is a spec match
-function _G.utils.matchesSpec(msg, spec)
-  -- Explicit nil checks for LUERL
-  if msg == nil or spec == nil then
-    return false
+-- @usage utils.matchesSpec(msg, spec)
+-- @param msg The message to check for the spec
+-- @param spec The spec to check for in the message
+-- @treturn {boolean} Whether there is a spec match
+function utils.matchesSpec(msg, spec)
+  if type(spec) == 'function' then
+    return spec(msg)
   end
-  
-  -- Function spec execution
-  if type(spec) == "function" then
-    local success, result = pcall(spec, msg)
-    return success and result == true
-  end
-  
-  -- Table spec - all patterns must match corresponding message fields
-  if type(spec) == "table" then
+  -- If the spec is a table, step through every key/value pair in the pattern and check if the msg matches
+  -- Supported pattern types:
+  --   - Exact string match
+  --   - Lua gmatch string
+  --   - '_' (wildcard: Message has tag, but can be any value)
+  --   - Function execution on the tag, optionally using the msg as the second argument
+  --   - Table of patterns, where ANY of the sub-patterns matching the tag will result in a match
+  if type(spec) == 'table' then
     for key, pattern in pairs(spec) do
-      -- Message must have the key
-      if msg[key] == nil then
+      -- The key can either be in the top level of the 'msg' object
+      -- or in the body table of the msg
+      local msgValue = msg[key] or (msg.body and msg.body[key])
+      if not msgValue then
         return false
       end
-      -- Pattern must match the message field value
-      if not _G.utils.matchesPattern(pattern, msg[key], msg) then
+      local matchesMsgValue = utils.matchesPattern(pattern, msgValue, msg)
+      if not matchesMsgValue then
         return false
       end
+
     end
     return true
   end
-  
-  -- String spec - match against Action field
-  if type(spec) == "string" and msg.Action then
-    return tostring(msg.Action) == spec
+
+  if type(spec) == 'string' and msg.action and msg.action == spec then
+    return true
   end
-  
+  if type(spec) == 'string' and msg.body and msg.body.action and msg.body.action == spec then
+    return true
+  end
   return false
 end
 
---- Curries a function with specified arity.
--- LUERL-optimized curry implementation using table.unpack.
--- @param fn function The function to curry
--- @param arity number Optional arity (defaults to function parameter count if available)
--- @return function The curried function
-function _G.utils.curry(fn, arity)
-  -- Type validation
-  if type(fn) ~= "function" then
-    error("first argument must be a function", 2)
+--- Given a table, returns whether it is an array.
+-- An 'array' is defined as a table with integer keys starting from 1 and
+-- having no gaps between the keys.
+-- @lfunction isArray
+-- @param table The table to check
+-- @treturn {boolean} Whether the table is an array
+local function isArray(table)
+  if type(table) == "table" then
+      local maxIndex = 0
+      for k, v in pairs(table) do
+          if type(k) ~= "number" or k < 1 or math.floor(k) ~= k then
+              return false -- If there's a non-integer key, it's not an array
+          end
+          maxIndex = math.max(maxIndex, k)
+      end
+      -- If the highest numeric index is equal to the number of elements, it's an array
+      return maxIndex == #table
   end
-  
-  -- Default arity handling for LUERL (debug may not be available)
-  arity = arity or 2 -- Default to 2 if debug info not available
-  
-  -- LUERL performance: early return for simple functions
-  if arity < 2 then
-    return fn
+  return false
+end
+
+--- Curries a function.
+-- @tparam {function} fn The function to curry
+-- @tparam {number} arity The arity of the function
+-- @treturn {function} The curried function
+utils.curry = function (fn, arity)
+  assert(type(fn) == "function", "function is required as first argument")
+  -- LUERL compatibility: if debug.getinfo is not available, arity must be provided
+  if not arity then
+    if debug and debug.getinfo then
+      local info = debug.getinfo(fn, "u")
+      arity = info and info.nparams or 2  -- Default to 2 if we can't determine
+    else
+      arity = 2  -- Default to 2 for LUERL compatibility
+    end
   end
-  
-  return function(...)
+  if arity < 2 then return fn end
+
+  return function (...)
     local args = {...}
-    local arg_count = #args
-    
-    if arg_count >= arity then
-      -- Enough arguments, call the function
+
+    if #args >= arity then
       return fn(table.unpack(args))
     else
-      -- Not enough arguments, return another curried function
-      return _G.utils.curry(function(...)
-        local new_args = {...}
-        -- Create fresh combined args array to avoid reference issues
-        local combined_args = {}
-        for i = 1, #args do
-          combined_args[i] = args[i]
-        end
-        for i = 1, #new_args do
-          combined_args[#args + i] = new_args[i]
-        end
-        return fn(table.unpack(combined_args))
-      end, arity - arg_count)
+      return utils.curry(function (...)
+        return fn(table.unpack(args),  ...)
+      end, arity - #args)
     end
   end
 end
 
---- Concatenates two arrays into a new array.
--- LUERL-optimized using # operator for length and direct indexing.
--- @param a table The first array
--- @param b table The second array  
--- @return table The concatenated array
-_G.utils.concat = _G.utils.curry(function(a, b)
-  -- Type and array validation
-  if type(a) ~= "table" then
-    error("first argument must be an array table", 2)
-  end
-  if type(b) ~= "table" then
-    error("second argument must be an array table", 2)
-  end
-  if not isArray(a) then
-    error("first argument must be an array", 2)
-  end
-  if not isArray(b) then
-    error("second argument must be an array", 2)
-  end
-  
-  -- LUERL optimization: pre-allocate result table and use # operator
+--- Concat two Array Tables
+-- @function concat
+-- @usage utils.concat(a)(b)
+-- @usage utils.concat({1, 2})({3, 4}) --> {1, 2, 3, 4}
+-- @tparam {table<Array>} a The first array
+-- @tparam {table<Array>} b The second array
+-- @treturn {table<Array>} The concatenated array
+utils.concat = utils.curry(function (a, b)
+  assert(type(a) == "table", "first argument should be a table that is an array")
+  assert(type(b) == "table", "second argument should be a table that is an array")
+  assert(isArray(a), "first argument should be a table")
+  assert(isArray(b), "second argument should be a table")
+
   local result = {}
-  local a_len = #a
-  local b_len = #b
-  
-  -- Copy first array
-  for i = 1, a_len do
-    result[i] = a[i]
+  for i = 1, #a do
+      result[#result + 1] = a[i]
   end
-  
-  -- Copy second array
-  for i = 1, b_len do
-    result[a_len + i] = b[i]
+  for i = 1, #b do
+      result[#result + 1] = b[i]
   end
-  
   return result
 end, 2)
 
---- Reduces an array to a single value using a reducer function.
--- LUERL-optimized with ipairs for better performance and explicit nil handling.
--- @param fn function The reducer function (accumulator, value, index) -> accumulator
--- @param initial any The initial accumulator value
--- @param t table The array to reduce
--- @return any The final reduced value
-_G.utils.reduce = _G.utils.curry(function(fn, initial, t)
-  -- Type validation
-  if type(fn) ~= "function" then
-    error("first argument must be a function", 2)
-  end
-  if type(t) ~= "table" or not isArray(t) then
-    error("third argument must be an array table", 2)
-  end
-  
+--- Applies a function to each element of a table, reducing it to a single value.
+-- If the initial value is nil, the first element of the array becomes the initial value
+-- and the reduction function is not called on it.
+-- @function utils.reduce
+-- @usage utils.reduce(fn)(initial)(t)
+-- @usage utils.reduce(function(acc, x) return acc + x end)(0)({1, 2, 3}) --> 6
+-- @tparam {function} fn The function to apply
+-- @param initial The initial value (if nil, first array element is used)
+-- @tparam {table<Array>} t The table to reduce
+-- @return The reduced value
+utils.reduce = utils.curry(function (fn, initial, t)
+  assert(type(fn) == "function", "first argument should be a function that accepts (result, value, key)")
+  assert(type(t) == "table" and isArray(t), "third argument should be a table that is an array")
   local result = initial
-  
-  -- LUERL optimization: use ipairs for array iteration
-  for k, v in ipairs(t) do
+  for k, v in pairs(t) do
     if result == nil then
       result = v
     else
       result = fn(result, v, k)
     end
   end
-  
   return result
 end, 3)
 
---- Maps a function over an array, creating a new array.
--- LUERL-optimized implementation using reduce.
--- @param fn function The mapping function (value, index) -> new_value
--- @param data table The array to map over
--- @return table The new mapped array
-_G.utils.map = _G.utils.curry(function(fn, data)
-  -- Type validation
-  if type(fn) ~= "function" then
-    error("first argument must be a function", 2)
-  end
-  if type(data) ~= "table" or not isArray(data) then
-    error("second argument must be an array table", 2)
-  end
-  
-  -- Use reduce for mapping implementation
-  local function mapper(result, v, k)
+--- Applies a function to each element of an array table, mapping it to a new value.
+-- @function utils.map
+-- @usage utils.map(fn)(t)
+-- @usage utils.map(function(x) return x * 2 end)({1, 2, 3}) --> {2, 4, 6}
+-- @tparam {function} fn The function to apply to each element
+-- @tparam {table<Array>} data The table to map over
+-- @treturn {table<Array>} The mapped table
+utils.map = utils.curry(function (fn, data)
+  assert(type(fn) == "function", "first argument should be a unary function")
+  assert(type(data) == "table" and isArray(data), "second argument should be an Array")
+
+  local function map (result, v, k)
     result[k] = fn(v, k)
     return result
   end
-  
-  return _G.utils.reduce(mapper, {}, data)
+
+  return utils.reduce(map, {}, data)
 end, 2)
 
---- Filters an array based on a predicate function.
--- LUERL-optimized using reduce and table.insert.
--- @param fn function The predicate function (value) -> boolean
--- @param data table The array to filter
--- @return table The filtered array
-_G.utils.filter = _G.utils.curry(function(fn, data)
-  -- Type validation
-  if type(fn) ~= "function" then
-    error("first argument must be a function", 2)
-  end
-  if type(data) ~= "table" or not isArray(data) then
-    error("second argument must be an array table", 2)
-  end
-  
-  -- Use reduce for filtering implementation
-  local function filterer(result, v, _k)
+--- Filters an array table based on a predicate function.
+-- @function utils.filter
+-- @usage utils.filter(fn)(t)
+-- @usage utils.filter(function(x) return x > 1 end)({1, 2, 3}) --> {2,3}
+-- @tparam {function} fn The predicate function to determine if an element should be included.
+-- @tparam {table<Array>} data The array to filter
+-- @treturn {table<Array>} The filtered table
+utils.filter = utils.curry(function (fn, data)
+  assert(type(fn) == "function", "first argument should be a unary function")
+  assert(type(data) == "table" and isArray(data), "second argument should be an Array")
+
+  local function filter (result, v, _k)
     if fn(v) then
       table.insert(result, v)
     end
     return result
   end
-  
-  return _G.utils.reduce(filterer, {}, data)
+
+  return utils.reduce(filter,{}, data)
 end, 2)
 
---- Finds the first element in an array that satisfies a predicate.
--- LUERL-optimized with early return and ipairs iteration.
--- @param fn function The predicate function (value) -> boolean
--- @param t table The array to search
--- @return any|nil The first matching element or nil
-_G.utils.find = _G.utils.curry(function(fn, t)
-  -- Type validation
-  if type(fn) ~= "function" then
-    error("first argument must be a function", 2)
-  end
-  if type(t) ~= "table" then
-    error("second argument must be a table", 2)
-  end
-  
-  -- LUERL optimization: use ipairs for arrays, pairs for objects
-  if isArray(t) then
-    for _, v in ipairs(t) do
-      if fn(v) then
-        return v
-      end
-    end
-  else
-    for _, v in pairs(t) do
-      if fn(v) then
-        return v
-      end
+--- Finds the first element in an array table that satisfies a predicate function.
+-- @function utils.find
+-- @usage utils.find(fn)(t)
+-- @usage utils.find(function(x) return x > 1 end)({1, 2, 3}) --> 2
+-- @tparam {function} fn The predicate function to determine if an element should be included.
+-- @tparam {table<Array>} t The array table to search
+-- @treturn The first element that satisfies the predicate function
+utils.find = utils.curry(function (fn, t)
+  assert(type(fn) == "function", "first argument should be a unary function")
+  assert(type(t) == "table", "second argument should be a table that is an array")
+  assert(isArray(t), "second argument should be a table that is an array")
+  for _, v in pairs(t) do
+    if fn(v) then
+      return v
     end
   end
-  
-  return nil
 end, 2)
 
---- Checks if a property of an object equals a specific value.
--- LUERL-optimized with explicit type conversions.
--- @param propName string The property name to check
--- @param value any The value to compare against
--- @param object table The object to check
--- @return boolean Whether the property equals the value
-_G.utils.propEq = _G.utils.curry(function(propName, value, object)
-  -- Type validation
-  if type(propName) ~= "string" then
-    error("first argument must be a string", 2)
-  end
-  if type(object) ~= "table" then
-    error("third argument must be a table", 2)
-  end
-  
-  -- Direct comparison with nil handling
+--- Checks if a property of an object is equal to a value.
+-- @function utils.propEq
+-- @usage utils.propEq(propName)(value)(object)
+-- @usage utils.propEq("name")("Lua")({name = "Lua"}) --> true
+-- @usage utils.propEq("age")(25)({age = 25}) --> true
+-- @tparam {string} propName The property name to check
+-- @param value The value to check against (any type)
+-- @tparam {table} object The object to check
+-- @treturn {boolean} Whether the property is equal to the value
+utils.propEq = utils.curry(function (propName, value, object)
+  assert(type(propName) == "string", "first argument should be a string")
+  assert(type(object) == "table", "third argument should be a table<object>")
+
   return object[propName] == value
 end, 3)
 
---- Reverses an array, creating a new array.
--- LUERL-optimized using # operator and direct indexing.
--- @param data table The array to reverse
--- @return table The reversed array
-function _G.utils.reverse(data)
-  -- Type validation
-  if type(data) ~= "table" then
-    error("argument must be an array table", 2)
-  end
-  
-  -- LUERL optimization: direct indexing instead of reduce
-  local result = {}
-  local len = #data
-  
-  for i = 1, len do
-    result[len - i + 1] = data[i]
-  end
-  
-  return result
+--- Reverses an array table.
+-- @function utils.reverse
+-- @usage utils.reverse(data)
+-- @usage utils.reverse({1, 2, 3}) --> {3, 2, 1}
+-- @tparam {table<Array>} data The array table to reverse
+-- @treturn {table<Array>} The reversed array table
+utils.reverse = function (data)
+  assert(type(data) == "table", "argument needs to be a table that is an array")
+  return utils.reduce(
+    function (result, v, i)
+      result[#data - i + 1] = v
+      return result
+    end,
+    {},
+    data
+  )
 end
 
---- Composes multiple functions into a single function (right to left).
--- LUERL-optimized with proper argument handling.
--- @param ... function Functions to compose
--- @return function The composed function
-_G.utils.compose = _G.utils.curry(function(...)
-  local fns = {...}
-  
-  return function(v)
+--- Composes a series of functions into a single function.
+-- @function utils.compose
+-- @usage utils.compose(fn1)(fn2)(fn3)(v)
+-- @usage utils.compose(function(x) return x + 1 end)(function(x) return x * 2 end)(3) --> 7
+-- @tparam {function} ... The functions to compose
+-- @treturn {function} The composed function
+utils.compose = utils.curry(function (...)
+  local mutations = utils.reverse({...})
+
+  return function (v)
     local result = v
-    -- Apply functions in reverse order (right to left composition)
-    for i = #fns, 1, -1 do
-      local fn = fns[i]
-      if type(fn) ~= "function" then
-        error("all arguments must be functions", 2)
-      end
+    for _, fn in pairs(mutations) do
+      assert(type(fn) == "function", "each argument needs to be a function")
       result = fn(result)
     end
     return result
   end
 end, 2)
 
---- Gets a property value from an object.
--- LUERL-optimized direct property access.
--- @param propName string The property name to get
--- @param object table The object to get the property from
--- @return any The property value
-_G.utils.prop = _G.utils.curry(function(propName, object)
-  -- Type validation
-  if type(object) ~= "table" then
-    error("second argument must be a table", 2)
-  end
-  
+--- Returns the value of a property of an object.
+-- @function utils.prop
+-- @usage utils.prop(propName)(object)
+-- @usage utils.prop("name")({name = "Lua"}) --> "Lua"
+-- @tparam {string} propName The property name to get
+-- @tparam {table} object The object to get the property from
+-- @treturn The value of the property
+utils.prop = utils.curry(function (propName, object)
   return object[propName]
 end, 2)
 
---- Checks if an array includes a specific value.
--- LUERL-optimized using find function.
--- @param val any The value to search for
--- @param t table The array to search in
--- @return boolean Whether the value is found
-_G.utils.includes = _G.utils.curry(function(val, t)
-  -- Type validation
-  if type(t) ~= "table" or not isArray(t) then
-    error("second argument must be an array table", 2)
-  end
-  
-  -- Use find with equality check
-  return _G.utils.find(function(v) return v == val end, t) ~= nil
+--- Checks if an array table includes a value.
+-- @function utils.includes
+-- @usage utils.includes(val)(t)
+-- @usage utils.includes(2)({1, 2, 3}) --> true
+-- @param val The value to check for
+-- @tparam {table<Array>} t The array table to check
+-- @treturn {boolean} Whether the value is in the array table
+utils.includes = utils.curry(function (val, t)
+  assert(type(t) == "table", "argument needs to be a table")
+  assert(isArray(t), "argument should be a table that is an array")
+  return utils.find(function (v) return v == val end, t) ~= nil
 end, 2)
 
---- Gets all keys from a table as an array.
--- LUERL-optimized with table.insert for performance.
--- @param t table The table to get keys from
--- @return table Array of keys
-function _G.utils.keys(t)
-  -- Type validation
-  if type(t) ~= "table" then
-    error("argument must be a table", 2)
-  end
-  
+--- Returns the keys of a table.
+-- @usage utils.keys(t)
+-- @usage utils.keys({name = "Lua", age = 25}) --> {"name", "age"}
+-- @tparam {table} t The table to get the keys from
+-- @treturn {table<Array>} The keys of the table
+utils.keys = function (t)
+  assert(type(t) == "table", "argument needs to be a table")
   local keys = {}
-  for key, _ in pairs(t) do
+  for key in pairs(t) do
     table.insert(keys, key)
   end
-  
   return keys
 end
 
---- Gets all values from a table as an array.
--- LUERL-optimized with table.insert for performance.
--- @param t table The table to get values from
--- @return table Array of values
-function _G.utils.values(t)
-  -- Type validation
-  if type(t) ~= "table" then
-    error("argument must be a table", 2)
-  end
-  
+--- Returns the values of a table.
+-- @usage utils.values(t)
+-- @usage utils.values({name = "Lua", age = 25}) --> {"Lua", 25}
+-- @tparam {table} t The table to get the values from
+-- @treturn {table<Array>} The values of the table
+utils.values = function (t)
+  assert(type(t) == "table", "argument needs to be a table")
   local values = {}
   for _, value in pairs(t) do
     table.insert(values, value)
   end
-  
   return values
 end
 
---- Export utils for require() compatibility while maintaining global access
--- This allows both _G.utils.function() and local utils = require('utils') patterns
-return _G.utils
+--- Convert a message's tags to a table of key-value pairs
+-- @function Tab
+-- @tparam {table} msg The message containing tags
+-- @treturn {table} A table with tag names as keys and their values
+function utils.Tab(msg)
+  local inputs = {}
+  for _, o in ipairs(msg.Tags) do
+    if not inputs[o.name] then
+      inputs[o.name] = o.value
+    end
+  end
+  return inputs
+end
+
+
+return utils

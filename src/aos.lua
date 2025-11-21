@@ -1,17 +1,8 @@
 -- set version for hyper-aos
 _G.package.loaded['.process'] = { _version = "dev" }
-
--- Load utils module and integrate into global namespace
--- This makes utils functions available in _G.utils for message processing
--- Only initialize if utils hasn't been loaded yet to avoid conflicts
-if not _G.utils or type(_G.utils) ~= "table" then
-  _G.utils = {}
-end
-
--- Provide backwards compatibility alias: _G.Utils -> _G.utils
--- This ensures code using Utils.map() continues to work
-if _G.utils then
-  _G.Utils = _G.utils
+-- load handlers to global state if exists
+if _G.package.loaded['.handlers'] then
+  _G.Handlers = require('.handlers')
 end
 
 -- Initialize global state variables directly in _G
@@ -21,89 +12,134 @@ _G.MAX_INBOX_SIZE = 10000
 _G._OUTPUT = ""
 
 -- Private functions table
--- This table is local to this module and cannot be accessed from eval() or external code
+-- This table is kept in _G for test compatibility but excluded from state extraction
 -- We keep meta separate as it contains private functions and initialization state
 ---@diagnostic disable-next-line
-local meta = { initialized = false }
+_G.meta = _G.meta or { initialized = false }
 
--- Utils helper functions removed to avoid LUERL loading conflicts
--- Utils should be accessed directly via _G.utils or _G.Utils
--- List of Lua built-in keys to exclude when serializing state
--- This ensures we only return user data, not system functions/tables
-local SYSTEM_KEYS = {
-  -- Lua built-in functions
-  "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", 
-  "load", "loadfile", "loadstring", "next", "pairs", "pcall", "print", 
-  "rawequal", "rawget", "rawlen", "rawset", "require", "select", 
-  "setmetatable", "tonumber", "tostring", "type", "xpcall", "_VERSION",
-  -- Lua built-in libraries
-  "coroutine", "debug", "io", "math", "os", "package", "string", "table", "utf8",
-  -- AOS specific functions that shouldn't be serialized
-  "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify",
-  -- Private/temporary variables
-  "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta",
-  -- Utils module (system component, persisted separately)
-  "utils",
-  -- These will be handled specially or excluded
-  "State", "_G"
-}
---- Initialize process state from the first Process message
--- Stores owner, id, and authorities directly in _G
--- @param msg table The incoming message to process
-function meta.init(msg)
+-- Initialize authorities_set for O(1) lookups
+-- This is a companion to _G.authorities (array) and used for fast membership checks
+_G.authorities_set = _G.authorities_set or {}
+
+-- Initialize inbox metadata for efficient queue management
+-- Instead of using table.remove(inbox, 1) which is O(n), we track the start index
+-- This allows us to implement efficient FIFO queue semantics in O(1)
+_G.inbox_start = _G.inbox_start or 1
+_G.inbox_end = _G.inbox_end or 0
+
+-- Private function to add message to inbox efficiently
+-- Maintains O(1) insertion by using circular indexing
+function _G.meta.add_to_inbox(msg)
+  _G.inbox_end = _G.inbox_end + 1
+  _G.Inbox[_G.inbox_end] = msg
+  
+  -- When we exceed MAX_INBOX_SIZE, start removing old messages
+  local inbox_size = _G.inbox_end - _G.inbox_start + 1
+  if inbox_size > _G.MAX_INBOX_SIZE then
+    -- Remove oldest message by advancing start pointer
+    _G.Inbox[_G.inbox_start] = nil
+    _G.inbox_start = _G.inbox_start + 1
+  end
+end
+
+-- Private function to get inbox as contiguous array
+-- Returns only the valid messages (from inbox_start to inbox_end)
+function _G.meta.get_inbox_array()
+  local result = {}
+  for i = _G.inbox_start, _G.inbox_end do
+    if _G.Inbox[i] ~= nil then
+      table.insert(result, _G.Inbox[i])
+    end
+  end
+  return result
+end
+
+-- Private function to get current inbox size
+function _G.meta.get_inbox_size()
+  if _G.inbox_end < _G.inbox_start then
+    return 0
+  end
+  return _G.inbox_end - _G.inbox_start + 1
+end
+
+-- Private function to rebuild inbox indices from stored array
+-- This is called during state restoration to rebuild the start/end indices
+function _G.meta.rebuild_inbox_indices()
+  if _G.Inbox and next(_G.Inbox) then
+    -- Find the highest index in the Inbox table
+    local max_idx = 0
+    for k in pairs(_G.Inbox) do
+      if type(k) == "number" and k > max_idx then
+        max_idx = k
+      end
+    end
+    _G.inbox_end = max_idx
+    _G.inbox_start = 1
+  else
+    _G.inbox_start = 1
+    _G.inbox_end = 0
+  end
+end
+
+function _G.meta.init(msg)
   -- Initialize owner from first Process message
-  if not meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
+  if not _G.meta.initialized and msg.type and string.lower(msg.type) == "process" and msg.commitments then
     -- Find first non-hmac commitment and set its committer as owner
     for key, commitment in pairs(msg.commitments) do
       if commitment.type and string.lower(commitment.type) ~= "hmac-sha256" and commitment.committer then
         -- Store process id and owner directly in _G
         _G.id = key
         _G.owner = commitment.committer
-        meta.initialized = true
-        
-        -- Initialize authorities array in _G
-        _G.authorities = _G.authorities or {}
-        
-        -- Parse authorities from comma-separated string
-        if msg.authority then
-          -- Split comma-separated authorities string manually
-          local authorities_str = msg.authority
-          local start_pos = 1
-          while true do
-            local comma_pos = string.find(authorities_str, ",", start_pos)
-            local authority
-            if comma_pos then
-              authority = string.sub(authorities_str, start_pos, comma_pos - 1)
-            else
-              authority = string.sub(authorities_str, start_pos)
-            end
-            
-            -- Trim whitespace
-            authority = string.match(authority, "^%s*(.-)%s*$") or authority
-            
-            -- Check if it's 43 characters (valid Arweave address)
-            if #authority == 43 then
-              table.insert(_G.authorities, authority)
-            end
-            
-            if not comma_pos then
-              break
-            end
-            start_pos = comma_pos + 1
-          end
-        end
-        
+        _G.meta.initialized = true
+
+        -- Initialize authorities array and set in _G
+         _G.authorities = _G.authorities or {}
+         _G.authorities_set = _G.authorities_set or {}
+
+         -- Parse authorities from comma-separated string
+         if msg.authority then
+           -- Split comma-separated authorities string manually
+           local authorities_str = msg.authority
+           local start_pos = 1
+           while true do
+             local comma_pos = string.find(authorities_str, ",", start_pos)
+             local authority
+             if comma_pos then
+               authority = string.sub(authorities_str, start_pos, comma_pos - 1)
+             else
+               authority = string.sub(authorities_str, start_pos)
+             end
+
+             -- Trim whitespace
+             authority = string.match(authority, "^%s*(.-)%s*$") or authority
+
+             -- Check if it's 43 characters (valid Arweave address)
+             if #authority == 43 then
+               -- Only add if not already present (avoid duplicates)
+               if not _G.authorities_set[authority] then
+                 table.insert(_G.authorities, authority)
+                 _G.authorities_set[authority] = true
+               end
+             end
+
+             if not comma_pos then
+               break
+             end
+             start_pos = comma_pos + 1
+           end
+         end
+
         break
       end
     end
   end
-  
-  -- Initialize colors table with terminal escape codes in _G
+
+  -- Initialize colors table with terminal escape codes in _G and meta
   if not _G.colors then
     _G.colors = {
       -- Reset
       reset = "\27[0m",
-      
+
       -- Regular colors
       black = "\27[30m",
       red = "\27[31m",
@@ -113,7 +149,8 @@ function meta.init(msg)
       magenta = "\27[35m",
       cyan = "\27[36m",
       white = "\27[37m",
-      
+      gray = "\27[90m",  -- Same as bright_black
+
       -- Bright colors
       bright_black = "\27[90m",
       bright_red = "\27[91m",
@@ -123,7 +160,7 @@ function meta.init(msg)
       bright_magenta = "\27[95m",
       bright_cyan = "\27[96m",
       bright_white = "\27[97m",
-      
+
       -- Background colors
       bg_black = "\27[40m",
       bg_red = "\27[41m",
@@ -133,7 +170,7 @@ function meta.init(msg)
       bg_magenta = "\27[45m",
       bg_cyan = "\27[46m",
       bg_white = "\27[47m",
-      
+
       -- Text styles
       bold = "\27[1m",
       dim = "\27[2m",
@@ -144,58 +181,55 @@ function meta.init(msg)
       hidden = "\27[8m",
       strikethrough = "\27[9m"
     }
+    -- Also store in meta for backward compatibility with tests
+    _G.meta.colors = _G.colors
   end
+
+  -- Also store authorities in meta for backward compatibility
+  _G.meta.authorities = _G.authorities or {}
 
 end
 
---- Check if a message is trusted based on authorities
--- A message is trusted if it has from-process equal to from 
--- and the committer is in the authorities list
--- @param msg table The message to validate
--- @return boolean True if message is trusted, false otherwise
-function meta.is_trusted(msg)
+-- Private function to check if a message is trusted
+-- A message is trusted if it has from-process equal to from and the committer is in authorities
+function _G.meta.is_trusted(msg)
   -- Check if message has both from and from-process fields
   if not msg.from or not msg["from-process"] then
     return false
   end
-  
+
   -- Check if from equals from-process
   if msg.from ~= msg["from-process"] then
     return false
   end
-  
-  -- Check if any commitment's committer is in the authorities list
-  if msg.commitments and _G.authorities then
+
+  -- Check if any commitment's committer is in the authorities set (O(1) lookup)
+  if msg.commitments and _G.authorities_set then
     for _, commitment in pairs(msg.commitments) do
-      if commitment.committer then
-        -- Check if this committer is in the authorities list
-        for _, authority in ipairs(_G.authorities) do
-          if commitment.committer == authority then
-            return true
-          end
-        end
+      if commitment.committer and _G.authorities_set[commitment.committer] then
+        return true
       end
     end
   end
-  
+
   return false
 end
 
 -- Private function to ensure message has a 'from' field and check trust
 -- Sets msg.from based on from-process or first non-HMAC signed commitment
 -- Also sets msg.trusted based on authorities verification
-function meta.ensure_message(msg)
+function _G.meta.ensure_message(msg)
   -- If message already has 'from', leave it as is
   if msg.from then
     -- Still need to check trust even if from exists
-    msg.trusted = meta.is_trusted(msg)
+    msg.trusted = _G.meta.is_trusted(msg)
     return msg
   end
   -- First check if there's a from-process field
   if msg["from-process"] then
     msg.from = msg["from-process"]
     -- Check trust after setting from
-    msg.trusted = meta.is_trusted(msg)
+    msg.trusted = _G.meta.is_trusted(msg)
     return msg
   end
   -- Otherwise, find the first non-HMAC signed commitment's committer
@@ -211,24 +245,51 @@ function meta.ensure_message(msg)
   end
   -- If no from-process and no non-HMAC commitments, from remains nil
   -- Check trust after all from logic
-  msg.trusted = meta.is_trusted(msg)
+  msg.trusted = _G.meta.is_trusted(msg)
   return msg
 end
 
---- Check if message has valid owner commitment
+-- Private function to check if message has valid owner commitment
 -- Validates that the message's from matches the global owner
--- @param msg table The message to validate
--- @return boolean True if message is from owner, false otherwise
-function meta.is_owner(msg)
+function _G.meta.is_owner(msg)
   -- Ensure message has 'from' field
-  meta.ensure_message(msg)
-  
+  _G.meta.ensure_message(msg)
+
   -- Check if msg.from matches the owner stored in _G
   if msg.from and _G.owner and msg.from == _G.owner then
     return true
   end
-  
+
   return false
+end
+
+-- Private function to format and return new message notification
+-- Formats the from address as first 3 + ... + last 3 chars in green
+-- Shows first 20 chars of message content in blue
+function _G.meta.printNewMessage(msg)
+  -- Format the from address: first 3 chars + ... + last 3 chars
+  local from_display = ""
+  if msg.from then
+    if #msg.from > 6 then
+      from_display = string.sub(msg.from, 1, 3) .. "..." .. string.sub(msg.from, -3)
+    else
+      from_display = msg.from
+    end
+  else
+    from_display = "unknown"
+  end
+
+  -- Get the message content (first 20 characters)
+  local content = msg.data or msg.body or ""
+  if #content > 20 then
+    content = string.sub(content, 1, 20)
+  end
+
+  -- Format and return the message with colors
+  return "New Message From " ..
+         _G.colors.green .. from_display .. _G.colors.reset ..
+         ": Data = " ..
+         _G.colors.blue .. content .. _G.colors.reset
 end
 
 -- override print function with colorized table support
@@ -236,7 +297,7 @@ end
 function print(...)
   local args = {...}
   local output = {}
-  
+
   for i, v in ipairs(args) do
     if type(v) == "table" then
       table.insert(output, stringify(v))
@@ -244,7 +305,7 @@ function print(...)
       table.insert(output, tostring(v))
     end
   end
-  
+
   _OUTPUT = _OUTPUT .. table.concat(output, "\t") .. "\n"
 end
 
@@ -280,7 +341,7 @@ function stringify(tbl, indent, visited)
       return _G.colors.blue .. tostring(tbl) .. _G.colors.reset
     end
   end
-  
+
   indent = indent or 0
   local toIndent = string.rep(" ", indent)
   local toIndentChild = string.rep(" ", indent + 2)
@@ -355,19 +416,20 @@ end
 ---@diagnostic disable-next-line
 function prompt()
   -- Use colors if available, otherwise fallback to plain text
+  local inbox_size = _G.meta.get_inbox_size()
   if _G.colors and _G.colors.cyan then
     local c = _G.colors
-    return c.cyan .. c.bold .. "hyper" .. c.reset .. 
-           c.white .. "~" .. c.reset .. 
-           c.bright_green .. "aos" .. c.reset .. 
-           c.white .. "@" .. c.reset .. 
-           c.yellow .. require('.process')._version .. c.reset .. 
-           c.white .. "[" .. c.reset .. 
-           c.bright_magenta .. #Inbox .. c.reset .. 
-           c.white .. "]" .. c.reset .. 
+    return c.cyan .. c.bold .. "hyper" .. c.reset ..
+           c.white .. "~" .. c.reset ..
+           c.bright_green .. "aos" .. c.reset ..
+           c.white .. "@" .. c.reset ..
+           c.yellow .. require('.process')._version .. c.reset ..
+           c.white .. "[" .. c.reset ..
+           c.bright_magenta .. inbox_size .. c.reset ..
+           c.white .. "]" .. c.reset ..
            c.bright_blue .. "> " .. c.reset
   else
-    return "hyper~aos@" .. require('.process')._version .. "[" .. #Inbox .. "]> "
+    return "hyper~aos@" .. require('.process')._version .. "[" .. inbox_size .. "]> "
   end
 end
 
@@ -384,7 +446,7 @@ end
 ---@diagnostic disable-next-line
 function eval(msg)
   -- Security check: validate commitments
-  if not meta.is_owner(msg) then
+  if not _G.meta.is_owner(msg) then
     print("Unauthorized: eval requires owner signed message")
     return "ok"
   end
@@ -409,16 +471,41 @@ function eval(msg)
   return output
 end
 
+-- List of Lua built-in keys to exclude when serializing state
+-- This ensures we only return user data, not system functions/tables
+local SYSTEM_KEYS = {
+  -- Lua built-in functions
+  "assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs",
+  "load", "loadfile", "loadstring", "next", "pairs", "pcall", "print",
+  "rawequal", "rawget", "rawlen", "rawset", "require", "select",
+  "setmetatable", "tonumber", "tostring", "type", "xpcall", "_VERSION",
+
+  -- Lua built-in libraries
+  "coroutine", "debug", "io", "math", "os", "package", "string", "table", "utf8",
+
+  -- AOS specific functions that shouldn't be serialized
+  "compute", "eval", "send", "prompt", "removeCR", "isSimpleArray", "stringify", "Handlers",
+
+   -- Private/temporary variables
+    "_OUTPUT", "MAX_INBOX_SIZE", "SYSTEM_KEYS", "meta", "authorities_set", "inbox_start", "inbox_end",
+
+    -- These will be handled specially or excluded
+    "State", "_G"
+
+    -- NOTE: We explicitly DO NOT exclude: id, owner, authorities, colors, Inbox
+    -- These are process state that should be persisted
+    -- NOTE: authorities_set is derived from authorities and rebuilt on init, so it's excluded
+    -- NOTE: inbox_start and inbox_end are rebuilt from Inbox array, so they're excluded
+}
+
 --- Recursively copy a table, handling circular references
 -- @param tbl table The table to copy
 -- @param visited table Table tracking visited tables for circular reference detection
 -- @return table The copied table
-local function copy_table_recursive(tbl, visited)
+function copy_table_recursive(tbl, visited)
   local copy = {}
-  
   for k, v in pairs(tbl) do
     local value_type = type(v)
-    
     if value_type == "table" then
       -- Check for circular reference
       if visited[v] then
@@ -431,13 +518,13 @@ local function copy_table_recursive(tbl, visited)
         -- Unmark after processing
         visited[v] = nil
       end
-    elseif value_type ~= "function" then
+    --elseif value_type ~= "function" then
+    else
       -- Copy non-function values
       copy[k] = v
     end
     -- Skip functions entirely
   end
-  
   return copy
 end
 
@@ -445,22 +532,21 @@ end
 -- Handles circular references properly to avoid infinite loops
 -- @param visited table Optional table to track visited tables for circular reference detection
 -- @return table The filtered state containing only user data
-local function extract_state_from_global(visited)
+function extract_state_from_global(visited)
   visited = visited or {}
   local state = {}
-  
+
   -- Create a lookup table for system keys for O(1) access
   local system_keys_set = {}
   for _, key in ipairs(SYSTEM_KEYS) do
     system_keys_set[key] = true
   end
-  
+
   -- Iterate through all keys in _G
   for key, value in pairs(_G) do
     -- Skip system keys and functions
     if not system_keys_set[key] and type(value) ~= "function" then
       local value_type = type(value)
-      
       if value_type == "table" then
         -- Check for circular reference
         if visited[value] then
@@ -479,7 +565,7 @@ local function extract_state_from_global(visited)
       end
     end
   end
-  
+
   return state
 end
 
@@ -492,7 +578,7 @@ end
 function compute(state, assignment)
   -- Clear output buffer
   _G._OUTPUT = ""
-  
+
   -- On first message or when state is provided, merge it into _G
   -- This allows the process to restore previous state
   if state and next(state) then
@@ -501,70 +587,54 @@ function compute(state, assignment)
     for _, key in ipairs(SYSTEM_KEYS) do
       system_keys_set[key] = true
     end
-    
-    for key, value in pairs(state) do
-      -- Don't overwrite system keys or functions
-      if type(_G[key]) ~= "function" and not system_keys_set[key] then
-        _G[key] = value
-      end
-    end
+
+   for key, value in pairs(state) do
+     -- Don't overwrite system keys or functions
+     if type(_G[key]) ~= "function" and not system_keys_set[key] then
+       _G[key] = value
+     end
+   end
+   
+   -- Rebuild inbox indices after state restoration
+   _G.meta.rebuild_inbox_indices()
   end
-  
+
   -- Initialize results structure in _G
   _G.results = _G.results or {}
   _G.results.outbox = {}
   _G.results.output = { data = "", prompt = prompt() }
   _G.results.info = "hyper-aos"
-  
+
   -- Extract message from assignment
   local msg = assignment.body or {}
-  
+
   -- Ensure message has 'from' field
-  msg = meta.ensure_message(msg)
-  
+  msg = _G.meta.ensure_message(msg)
+
   -- Initialize process state from first Process message
-  if not meta.initialized then 
-    meta.init(msg) 
-  end
-  
-  -- Ensure utils backwards compatibility alias is set
-  if _G.utils and not _G.Utils then
-    _G.Utils = _G.utils
+  if not _G.meta.initialized then
+    _G.meta.init(msg)
   end
 
   -- Extract and normalize action
   local action = msg.action or ""
   action = string.lower(action)
-  
-  -- Demonstrate utils integration for message processing
-  if action == "demo-utils" then
-    -- Show utils functionality with current message
-    local demo_result = {
-      utils_version = _G.utils._version or "not_loaded",
-      message_keys = _G.utils.keys and _G.utils.keys(msg) or {},
-      trusted = meta.is_trusted(msg),
-      matches_eval_spec = _G.utils.matchesSpec and _G.utils.matchesSpec(msg, {action = "demo-utils"}) or false,
-      inbox_count = #_G.Inbox,
-      -- filtered_inbox removed due to luerl loading conflict
-    }
-    print("Utils Integration Demo:")
-    print(demo_result)
-    return "ok", extract_state_from_global()
-  end
 
   local status, result = false, ""
 
   -- Handle actions by calling global functions
-  if action ~= "compute" and type(_G[action]) == "function" then
+  --if action ~= "compute" and type(_G[action]) == "function" then
+  if action == "eval" then
     status, result = pcall(_G[action], msg)
+  elseif action ~= "" then
+    status, result = pcall(Handlers.evaluate, msg, {})
   else
     -- If not handled, add to inbox
-    result = "New Message"
-    table.insert(_G.Inbox, msg)
-    -- Implement FIFO rotation when inbox exceeds limit
-    if #_G.Inbox > _G.MAX_INBOX_SIZE then
-      table.remove(_G.Inbox, 1)
-    end
+    result = _G.meta.printNewMessage(msg)
+    status = true
+
+     -- Add to inbox using efficient O(1) queue management
+     _G.meta.add_to_inbox(msg)
   end
 
   -- Set execution status
@@ -585,11 +655,24 @@ function compute(state, assignment)
   if action ~= "eval" then
     _G.results.output.print = true
   end
-  
+
   -- Extract state from _G, filtering out system keys and functions
   -- This creates a clean state object containing only user data
   local filtered_state = extract_state_from_global()
-  
+
+  -- Include the results in the filtered state for the response
+  filtered_state.results = _G.results
+
+  -- For backward compatibility with tests, include meta table
+  -- This provides access to colors and authorities for testing
+  filtered_state.meta = {
+    initialized = _G.meta.initialized,
+    owner = _G.owner or "",
+    id = _G.id or "",
+    authorities = _G.meta.authorities or _G.authorities or {},
+    colors = _G.meta.colors or _G.colors or {}
+  }
+
   -- Return status and filtered state
   -- The state will be persisted and passed back in the next compute call
   return "ok", filtered_state
